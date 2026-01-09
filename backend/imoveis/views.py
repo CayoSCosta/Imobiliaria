@@ -2,8 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.db.models import Min, Max, Q
 from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .models import Imovel
+from .models import Imovel, Unidade
 from .serializers import ImovelSerializer
+from django.http import JsonResponse
 
 # =========================
 # FRONTEND (HTML)
@@ -66,7 +67,11 @@ class ImovelListAPIView(ListAPIView):
     queryset = Imovel.objects.filter(ativo=True)
     serializer_class = ImovelSerializer
 
-
 class ImovelDetailAPIView(RetrieveAPIView):
     queryset = Imovel.objects.filter(ativo=True)
     serializer_class = ImovelSerializer
+
+def buscar_unidades_ajax(request):
+    imovel_id = request.GET.get('imovel_id')
+    unidades = Unidade.objects.filter(imovel_id=imovel_id).values('id', 'titulo')
+    return JsonResponse(list(unidades), safe=False)

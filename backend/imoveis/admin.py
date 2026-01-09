@@ -1,9 +1,29 @@
 from django.contrib import admin
+from django import forms # <--- Certifique-se de que isso está no topo
 from django.utils.html import format_html
 from .models import Imovel, Unidade, ImagemImovel, ImagemUnidade
 
 # =========================
-# HELPER PARA PREVIEW (Opcional, mas ajuda muito)
+# 1. FORMULÁRIO DE FILTRO (Adicione isso no topo)
+# =========================
+class ImagemUnidadeForm(forms.ModelForm):
+    imovel = forms.ModelChoiceField(
+        queryset=Imovel.objects.all(),
+        required=False,
+        label="1. Escolha o Empreendimento"
+    )
+
+    class Meta:
+        model = ImagemUnidade
+        fields = ['imovel', 'unidade', 'imagem', 'principal', 'ordem']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk and self.instance.unidade:
+            self.fields['imovel'].initial = self.instance.unidade.imovel
+
+# =========================
+# HELPER PARA PREVIEW
 # =========================
 class ImagePreviewMixin:
     def preview(self, obj):
@@ -13,7 +33,7 @@ class ImagePreviewMixin:
     preview.short_description = 'Ver'
 
 # =========================
-# FILTRO DE PREÇO (Mantenha, ele é seguro)
+# FILTRO DE PREÇO
 # =========================
 class FaixaPrecoFilter(admin.SimpleListFilter):
     title = 'Faixa de Preço (Unidades)'
@@ -32,12 +52,11 @@ class FaixaPrecoFilter(admin.SimpleListFilter):
         if self.value() == '1000+': return queryset.filter(unidades__preco__gte=1000000).distinct()
 
 # =========================
-# INLINES PADRÃO (UM POR UM)
+# INLINES
 # =========================
-
 class ImagemImovelInline(admin.TabularInline, ImagePreviewMixin):
     model = ImagemImovel
-    extra = 3  # Mostra 3 linhas vazias para facilitar o upload de várias seguidas
+    extra = 3
     fields = ('preview', 'imagem', 'principal', 'ordem')
     readonly_fields = ('preview',)
     ordering = ('ordem',)
@@ -56,12 +75,12 @@ class UnidadeInline(admin.TabularInline):
     fields = ('titulo', 'preco', 'area_m2', 'quartos', 'banheiros', 'suites', 'vagas', 'ativo')
 
 # =========================
-# ADMINS
+# ADMINS (MANTENHA ESTES)
 # =========================
-
 @admin.register(Unidade)
-class UnidadeAdmin(admin.ModelAdmin, ImagePreviewMixin):
-    list_display = ('preview', 'titulo', 'imovel', 'preco', 'quartos', 'area_m2', 'ativo')
+class UnidadeAdmin(admin.ModelAdmin): 
+    # Remova o 'preview' da lista por enquanto para o erro sumir
+    list_display = ('titulo', 'imovel', 'preco', 'quartos', 'area_m2', 'ativo')
     list_filter = ('ativo', 'quartos', 'imovel')
     inlines = [ImagemUnidadeInline]
 
@@ -72,6 +91,20 @@ class ImovelAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("titulo", "bairro")}
     inlines = [UnidadeInline, ImagemImovelInline]
 
-# Registro das imagens separadas caso precise de edição rápida
+# =========================
+# REGISTROS DE IMAGENS (AQUI MUDOU)
+# =========================
+@admin.register(ImagemUnidade)
+class ImagemUnidadeAdmin(admin.ModelAdmin, ImagePreviewMixin):
+    form = ImagemUnidadeForm
+    list_display = ('preview', 'unidade', 'get_imovel', 'principal', 'ordem')
+    list_filter = ('unidade__imovel', 'principal')
+    
+    def get_imovel(self, obj):
+        return obj.unidade.imovel
+    get_imovel.short_description = 'Empreendimento'
+
+    class Media:
+        js = ('admin/js/vendor/jquery/jquery.js', 'js/remover_unidades.js')
+
 admin.site.register(ImagemImovel)
-admin.site.register(ImagemUnidade)

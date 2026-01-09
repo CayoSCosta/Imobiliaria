@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404
+from django.db.models import Min, Max, Q
 from django.conf import settings
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import Imovel
@@ -8,7 +9,13 @@ from .serializers import ImovelSerializer
 # FRONTEND (HTML)
 # =========================
 def index(request):
-    imoveis = Imovel.objects.filter(ativo=True)
+    imoveis = Imovel.objects.filter(ativo=True).annotate(
+        menor_preco=Min('unidades__preco'),
+        min_quartos=Min('unidades__quartos'),
+        max_quartos=Max('unidades__quartos'), 
+        min_area=Min('unidades__area_m2'),
+        max_area=Max('unidades__area_m2')     
+    ).prefetch_related('imagens', 'unidades')
 
     bairro = request.GET.get('bairro')
     tipo = request.GET.get('tipo')
@@ -32,9 +39,13 @@ def index(request):
 
     return render(request, 'imoveis/index.html', context)
 
-
 def imovel_detalhe(request, slug):
-    imovel = get_object_or_404(Imovel, slug=slug, ativo=True)
+# Adicionamos 'unidades__imagens' para trazer as fotos de cada planta
+    imovel = get_object_or_404(
+        Imovel.objects.prefetch_related('unidades__imagens', 'imagens'), 
+        slug=slug, 
+        ativo=True
+    )
 
     mensagem = (
         f"Olá! Tenho interesse no imóvel "

@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #d71920;
+        --primary-hover: #b3141a;
+        --text-dark: #2d3436;
+        --text-light: #636e72;
+        --bg-gray: #f8f9fa;
+        --white: #ffffff;
+        --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        --transition: all 0.3s ease;
+    }
+
+
+    /* --- FILTRO MODERNO --- */
+    .filtro-container {
+        max-width: 1100px;
+        margin: 20px auto 40px;
+        padding: 0 20px;
+    }
+
+    .filtro {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 15px;
+        background: var(--white);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+    }
+
+    .filtro input,
+    .filtro select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .filtro input:focus,
+    .filtro select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(215, 25, 32, 0.1);
+    }
+
+    .filtro button {
+        background: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .filtro button:hover {
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    /* --- GRID DE IMÓVEIS --- */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: var(--white);
+        border-radius: 16px;
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+        transition: var(--transition);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        position: relative;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* --- SWIPER CUSTOM --- */
+    .swiper {
+        width: 100%;
+        height: 240px;
+    }
+
+    .swiper-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .swiper-pagination-bullet-active {
+        background: var(--primary-color) !important;
+    }
+
+    /* --- INFO DO CARD --- */
+    .card-info {
+        padding: 20px;
+    }
+
+    .preco {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+    }
+
+    .titulo-imovel {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .detalhes-icons {
+        display: flex;
+        gap: 15px;
+        border-top: 1px solid #eee;
+        margin-top: 15px;
+        padding-top: 15px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+
+    .detalhes-icons span {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .bairro-tag {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .filtro {
+            grid-template-columns: 1fr;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="filtro-container">
+    <form method="get" class="filtro">
+        <input type="text" name="bairro" placeholder="🔍 Onde você quer morar?"
+            value="{{ bairro_selecionado|default:'' }}">
+
+        <select name="tipo">
+            <option value="">Todos os Padrões</option>
+            <option value="MCMV" {% if tipo_selecionado == "MCMV" %}selected{% endif %}>Econômico (MCMV)</option>
+            <option value="MEDIO" {% if tipo_selecionado == "MEDIO" %}selected{% endif %}>Médio Padrão</option>
+            <option value="ALTO" {% if tipo_selecionado == "ALTO" %}selected{% endif %}>Alto Padrão</option>
+        </select>
+
+        <select name="quartos">
+            <option value="">Quartos</option>
+            <option value="1" {% if quartos_selecionados == "1" %}selected{% endif %}>1+ Quarto</option>
+            <option value="2" {% if quartos_selecionados == "2" %}selected{% endif %}>2+ Quartos</option>
+            <option value="3" {% if quartos_selecionados == "3" %}selected{% endif %}>3+ Quartos</option>
+        </select>
+
+        <button type="submit">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+    </form>
+</div>
+
+<div class="grid">
+    {% for imovel in imoveis %}
+    <article class="card">
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                {% for img in imovel.imagens.all %}
+                <div class="swiper-slide">
+                    <img src="{{ img.imagem.url }}" alt="{{ imovel.titulo }}" loading="lazy">
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+
+        <a href="{% url 'imovel_detalhe' imovel.slug %}" style="text-decoration: none; color: inherit;">
+            <div class="card-info">
+                <div class="bairro-tag"><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro }}</div>
+                <div class="preco">
+                    {% if imovel.menor_preco %}
+                    A partir de R$ {{ imovel.menor_preco|floatformat:0 }}
+                    {% else %}
+                    Sob consulta
+                    {% endif %}
+                </div>
+                <div class="titulo-imovel">{{ imovel.titulo }}</div>
+
+                <div class="detalhes-icons">
+                    <span>
+                        <i class="fas fa-bed"></i>
+                        {% if imovel.min_quartos  ==  imovel.max_quartos %}
+                        {{ imovel.min_quartos }} dorms
+                        {% else %}
+                        {{ imovel.min_quartos }} a {{ imovel.max_quartos }} dorms
+                        {% endif %}
+                    </span>
+                    <span>
+                        <i class="fas fa-ruler-combined"></i>
+                        {{ imovel.min_area }} a {{ imovel.max_area }} m²
+                    </span>
+                </div>
+            </div>
+        </a>
+    </article>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+        <i class="fas fa-search-minus" style="font-size: 3rem; color: #ccc;"></i>
+        <p>Nenhum imóvel encontrado para essa busca.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.swiper').forEach(swiperEl => {
+        new Swiper(swiperEl, {
+            loop: true,
+            pagination: {
+                el: swiperEl.querySelector('.swiper-pagination'),
+                clickable: true,
+                dynamicBullets: true,
+            },
+            mousewheel: false,
+            keyboard: true,
+        });
+    });
+</script>
+
+{% endblock %}

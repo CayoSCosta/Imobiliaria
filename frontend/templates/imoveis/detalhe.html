@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #d71920;
+        --text-main: #1e272e;
+        --text-light: #7f8c8d;
+        --border-color: #efefef;
+        --bg-light: #f9f9f9;
+    }
+
+    .container-detalhe {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* --- GALERIA ESTILO GRID (MODELO LOPES/AIRBNB) --- */
+    .galeria-grid {
+        position: relative;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 400px;
+        gap: 10px;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+
+    .foto-principal {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .coluna-fotos-secundarias {
+        display: grid;
+        grid-template-rows: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .foto-secundaria {
+        width: 100%;
+        height: 195px;
+        object-fit: cover;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .foto-principal:hover, .foto-secundaria:hover {
+        opacity: 0.9;
+    }
+
+    .btn-ver-fotos {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background-color: #ffffff;
+        color: var(--text-main);
+        border: 1px solid var(--text-main);
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        z-index: 10;
+    }
+
+    .btn-ver-fotos:hover {
+        background-color: var(--bg-light);
+        transform: scale(1.02);
+    }
+
+    /* --- LAYOUT DUAS COLUNAS --- */
+    .conteudo-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 40px;
+    }
+
+    .header-imovel h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+        color: var(--text-main);
+    }
+
+    .header-imovel p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+
+    /* --- CARD DE UNIDADE REFATORADO (MODELO SOLICITADO) --- */
+    .unidade-card {
+        display: flex;
+        align-items: stretch;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .unidade-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .unidade-foto-box {
+        flex: 0 0 250px;
+        background: var(--bg-light);
+        border-right: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .unidade-foto-box img {
+        max-width: 100%;
+        max-height: 180px;
+        object-fit: contain;
+    }
+
+    .unidade-detalhes {
+        flex: 1;
+        padding: 25px 35px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .unidade-detalhes h4 {
+        font-size: 1.8rem;
+        color: var(--text-main);
+        margin: 0 0 20px 0;
+        font-weight: 400;
+    }
+
+    .unidade-specs {
+        display: flex;
+        gap: 40px;
+    }
+
+    .spec-item {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .spec-label {
+        font-size: 0.9rem;
+        color: var(--text-light);
+    }
+
+    .spec-value {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--text-main);
+    }
+
+    .spec-value i {
+        color: var(--primary-color);
+        font-size: 1.4rem;
+    }
+
+    /* SIDEBAR STICKY */
+    .sidebar-contact {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+        background: #fff;
+        border: 1px solid var(--border-color);
+        padding: 30px;
+        border-radius: 16px;
+    }
+
+    @media (max-width: 992px) {
+        .conteudo-wrapper, .galeria-grid { grid-template-columns: 1fr; }
+        .coluna-fotos-secundarias { display: none; }
+        .unidade-card { flex-direction: column; }
+        .unidade-foto-box { flex: 0 0 auto; width: 100%; }
+        .unidade-specs { gap: 20px; flex-wrap: wrap; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-detalhe">
+
+    <div class="galeria-grid">
+        <div class="main-photo">
+            {% with imovel.imagens.all|first as first_img %}
+                {% if first_img %}
+                <img src="{{ first_img.imagem.url }}" class="foto-principal" onclick="openLightbox(0)">
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="coluna-fotos-secundarias">
+            {% for img in imovel.imagens.all|slice:"1:3" %}
+            <img src="{{ img.imagem.url }}" class="foto-secundaria" onclick="openLightbox({{ forloop.counter }})">
+            {% endfor %}
+        </div>
+
+        <button class="btn-ver-fotos" onclick="openLightbox(0)">
+            <i class="fas fa-th"></i> Mostrar todas as fotos
+        </button>
+    </div>
+
+    <div class="conteudo-wrapper">
+        <main>
+            <div class="header-imovel">
+                <h1>{{ imovel.titulo }}</h1>
+                <p><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro }}, {{ imovel.cidade }}</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
+
+            <h3>Plantas e Disponibilidade</h3>
+            <div class="unidades-grid">
+                {% for unidade in imovel.unidades.all %}
+                <div class="unidade-card" onclick="changeGallery('{{ unidade.id }}')">
+                    
+                    <div class="unidade-foto-box">
+                        {% with unidade.imagens.all|first as planta %}
+                            <img src="{% if planta %}{{ planta.imagem.url }}{% else %}{% static 'img/placeholder.png' %}{% endif %}" alt="Planta">
+                        {% endwith %}
+                    </div>
+
+                    <div class="unidade-detalhes">
+                        <h4>{{ unidade.titulo }} {{ unidade.area_m2 }}m²</h4>
+                        <div class="unidade-specs">
+                            <div class="spec-item">
+                                <span class="spec-label">Dormitórios</span>
+                                <div class="spec-value"><i class="fas fa-bed"></i> {{ unidade.quartos }}</div>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Banheiros</span>
+                                <div class="spec-value"><i class="fas fa-shower"></i> {{ unidade.banheiros }}</div>
+                            </div>
+                            {% if unidade.vagas > 0 %}
+                            <div class="spec-item">
+                                <span class="spec-label">Vagas</span>
+                                <div class="spec-value"><i class="fas fa-car"></i> {{ unidade.vagas }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="fotos-unidade-{{ unidade.id }}" style="display:none;">
+                        {% for img in unidade.imagens.all %}
+                        <span class="url-foto">{{ img.imagem.url }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h4>Sobre o empreendimento</h4>
+                <p>{{ imovel.descricao|linebreaks }}</p>
+            </div>
+        </main>
+
+        <aside class="sidebar-contact">
+            <h4 style="margin-bottom: 20px;">Fale com um corretor</h4>
+            <div style="margin-bottom: 20px;">
+                <span style="display: block; font-size: 0.9rem; color: var(--text-light);">A partir de</span>
+                <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
+                    {% if preco_inicial %} R$ {{ preco_inicial|floatformat:0 }} {% else %} Sob consulta {% endif %}
+                </span>
+            </div>
+            
+            <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp"
+                style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold;">
+                <i class="fab fa-whatsapp"></i> Tenho interesse
+            </a>
+        </aside>
+    </div>
+</div>
+
+<div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999;">
+    <button onclick="closeLightbox()" style="position:absolute; top:20px; right:30px; color:white; font-size:45px; background:none; border:none; cursor:pointer; z-index:10000;">&times;</button>
+    
+    <div class="swiper" id="main-swiper" style="width: 100%; height: 100vh;">
+        <div class="swiper-wrapper" id="swiper-wrapper-main">
+            {% for img in imovel.imagens.all %}
+            <div class="swiper-slide" style="display:flex; align-items:center; justify-content:center;">
+                <img src="{{ img.imagem.url }}" style="max-width:90%; max-height:90%; object-fit:contain;">
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="swiper-button-next" style="color: white;"></div>
+        <div class="swiper-button-prev" style="color: white;"></div>
+        <div class="swiper-pagination" style="color: white; bottom: 20px;"></div>
+    </div>
+</div>
+
+<script>
+let swiperInstance;
+
+function initSwiper() {
+    if (swiperInstance) swiperInstance.destroy(true, true);
+    swiperInstance = new Swiper('#main-swiper', {
+        loop: true,
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+        pagination: { el: '.swiper-pagination', clickable: true, type: 'fraction' },
+        keyboard: true,
+    });
+}
+
+function openLightbox(index) {
+    document.getElementById('lightbox').style.display = 'block';
+    setTimeout(() => {
+        initSwiper();
+        swiperInstance.slideToLoop(index, 0);
+    }, 50);
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+}
+
+function changeGallery(unidadeId) {
+    const fotosDiv = document.getElementById(`fotos-unidade-${unidadeId}`);
+    const novasFotos = Array.from(fotosDiv.querySelectorAll('.url-foto')).map(span => span.innerText);
+
+    if (novasFotos.length > 0) {
+        const wrapper = document.getElementById('swiper-wrapper-main');
+        wrapper.innerHTML = ''; 
+        novasFotos.forEach(url => {
+            wrapper.innerHTML += `<div class="swiper-slide" style="display:flex; align-items:center; justify-content:center;"><img src="${url}" style="max-width:100%; max-height:100%; object-fit:contain;"></div>`;
+        });
+        openLightbox(0);
+    }
+}
+
+document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeLightbox(); });
+</script>
+{% endblock %}

@@ -87,14 +87,17 @@ def buscar_unidades_ajax(request):
 # =========================
 # CUSTOM ADMIN
 # =========================
+@staff_member_required
 def custom_admin_index(request):
     """Dashboard principal que permite escolher entre Imóveis e Leads"""
     return render(request, 'custom_admin/dashboard.html')
 
+@staff_member_required
 def custom_admin_imoveis_list(request):
     imoveis = Imovel.objects.all().order_by('-criado_em')
     return render(request, 'custom_admin/imoveis_list.html', {'imoveis': imoveis})
 
+@staff_member_required
 def custom_admin_imovel_imagens(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
     
@@ -145,17 +148,20 @@ def custom_admin_imovel_imagens(request, imovel_id):
         'imagens': imagens_existentes
     })
 
+@staff_member_required
 def custom_admin_delete_imagem(request, imagem_id):
     imagem = get_object_or_404(ImagemImovel, pk=imagem_id)
     imovel_id = imagem.imovel.id
     imagem.delete()
     return redirect('custom_admin_imovel_imagens', imovel_id=imovel_id)
 
+@staff_member_required
 def custom_admin_imovel_unidades(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
     unidades = imovel.unidades.all()
     return render(request, 'custom_admin/imovel_unidades.html', {'imovel': imovel, 'unidades': unidades})
 
+@staff_member_required
 def custom_admin_criar_unidade(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
     if request.method == 'POST':
@@ -177,6 +183,7 @@ def custom_admin_criar_unidade(request, imovel_id):
         form = UnidadeForm()
     return render(request, 'custom_admin/criar_unidade.html', {'imovel': imovel, 'form': form, 'titulo': 'Nova Unidade'})
 
+@staff_member_required
 def custom_admin_editar_unidade(request, unidade_id):
     unidade = get_object_or_404(Unidade, pk=unidade_id)
     imovel = unidade.imovel
@@ -205,12 +212,14 @@ def custom_admin_editar_unidade(request, unidade_id):
         'titulo': f'Editar {unidade.titulo}'
     })
 
+@staff_member_required
 def custom_admin_delete_unidade(request, unidade_id):
     unidade = get_object_or_404(Unidade, pk=unidade_id)
     imovel_id = unidade.imovel.id
     unidade.delete()
     return redirect('custom_admin_imovel_unidades', imovel_id=imovel_id)
 
+@staff_member_required
 def custom_admin_imovel_instalacoes(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
     if request.method == 'POST':
@@ -229,6 +238,7 @@ def custom_admin_imovel_instalacoes(request, imovel_id):
         'instalacao_form': instalacao_form
     })
 
+@staff_member_required
 def custom_admin_criar_instalacao(request):
     if request.method == 'POST':
         form = InstalacaoForm(request.POST)
@@ -239,6 +249,7 @@ def custom_admin_criar_instalacao(request):
             return redirect(next_url)
     return redirect('custom_admin_imoveis_list')
 
+@staff_member_required
 def custom_admin_criar_imovel(request):
     if request.method == 'POST':
         form = ImovelForm(request.POST)
@@ -250,6 +261,10 @@ def custom_admin_criar_imovel(request):
         form = ImovelForm()
     return render(request, 'custom_admin/criar_imovel.html', {'form': form})
 
+from .orulo_service import importar_imoveis_orulo
+from django.contrib import messages
+
+@staff_member_required
 def custom_admin_editar_imovel(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
     if request.method == 'POST':
@@ -260,3 +275,19 @@ def custom_admin_editar_imovel(request, imovel_id):
     else:
         form = ImovelForm(instance=imovel)
     return render(request, 'custom_admin/criar_imovel.html', {'form': form, 'imovel': imovel})
+
+@staff_member_required
+def custom_admin_importar_orulo(request):
+    """View para página de importação da Órulo"""
+    context = {}
+    
+    if request.method == 'POST':
+        sucesso, mensagem, total = importar_imoveis_orulo()
+        if sucesso:
+            messages.success(request, f"{mensagem} Total importado: {total}")
+        else:
+            messages.error(request, mensagem)
+        
+        return redirect('custom_admin_importar_orulo')
+
+    return render(request, 'custom_admin/importar_orulo.html', context)

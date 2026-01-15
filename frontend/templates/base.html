@@ -19,7 +19,9 @@
     </style>
 </head>
 <body>
-    {% include "shared/_navBar.html" %}
+    {% block navbar %}
+        {% include "shared/_navBar.html" %}
+    {% endblock %}
 
     {% block content %}{% endblock %}
 

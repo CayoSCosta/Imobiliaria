@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Minha Imobiliária{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="card shadow-lg border-0" style="width: 100%; max-width: 400px; border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-primary text-white text-center py-4">
+            <h4 class="mb-0 fw-bold"><i class="fas fa-user-lock me-2"></i>Acesso Restrito</h4>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-1"></i> Usuário ou senha incorretos.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+
+            {% if next %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-1"></i> Por favor, faça login para continuar.
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label fw-bold">Usuário</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                        <input type="text" name="username" class="form-control" id="id_username" placeholder="Seu usuário" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="id_password" class="form-label fw-bold">Senha</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="password" class="form-control" id="id_password" placeholder="Sua senha" required>
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg fw-bold">Entrar</button>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer bg-light text-center py-3 text-muted" style="font-size: 0.9rem;">
+            Área exclusiva para administradores.
+        </div>
+    </div>
+</div>
+{% endblock %}

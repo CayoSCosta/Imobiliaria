@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% include "shared/_navBarAdmin.html" %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos específicos do Admin */
+    body {
+        background-color: #f8f9fa;
+    }
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+</style>
+{% endblock %}

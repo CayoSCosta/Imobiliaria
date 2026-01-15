@@ -1,0 +1,45 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-primary"><i class="fas fa-cloud-download-alt"></i> Importação Órulo</h2>
+        <p class="text-muted">Sincronize sua base de dados com a API externa.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body text-center p-5">
+                <i class="fas fa-building fa-4x text-muted mb-4"></i>
+                
+                <h4 class="mb-3">Pronto para importar?</h4>
+                <p class="mb-4">
+                    Este processo irá buscar novos edifícios na plataforma Órulo e cadastrá-los 
+                    automaticamente no sistema. Imóveis já existentes (pelo nome) serão ignorados.
+                </p>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show text-start" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-play me-2"></i> Iniciar Importação
+                    </button>
+                    <p class="text-muted mt-3 small">
+                        <i class="fas fa-info-circle"></i> O processo pode levar alguns segundos dependendo da quantidade de dados.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

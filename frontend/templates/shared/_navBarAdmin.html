@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'custom_admin_index' %}">
+            <i class="fas fa-shield-alt text-primary me-2"></i>Painel Admin
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAdmin">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNavAdmin">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'custom_admin_index' %}">Visão Geral</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'imoveis' in request.path %}active{% endif %}" href="{% url 'custom_admin_imoveis_list' %}">Imóveis</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'leads' in request.path %}active{% endif %}" href="{% url 'custom_admin_leads_list' %}">Leads</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item me-3">
+                    <a href="/" target="_blank" class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-external-link-alt me-1"></i> Ver Site
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="adminUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
+                            {{ user.first_name|first|default:user.username|first|upper }}
+                        </div>
+                        <span>{{ user.get_full_name|default:user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminUserDropdown">
+                        <li><span class="dropdown-header">Logado como {{ user.username }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item text-danger border-0 bg-transparent">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Sair
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="nav-spacer"></div>

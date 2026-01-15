@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Página não encontrada{% endblock %}
+
+{% block content %}
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 70vh;">
+    <div class="text-center">
+        <h1 class="display-1 fw-bold text-primary">404</h1>
+        <h2 class="mb-4">Ops! Página não encontrada.</h2>
+        <p class="lead text-muted mb-5">
+            A página que você está procurando pode ter sido removida,<br>
+            ter seu nome alterado ou estar temporariamente indisponível.
+        </p>
+        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5">
+            <i class="fas fa-home me-2"></i>Voltar para o Início
+        </a>
+    </div>
+</div>
+{% endblock %}

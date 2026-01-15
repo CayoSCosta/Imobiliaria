@@ -494,6 +494,17 @@
     </div>
 </div>
 
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 10000;">
+    <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i> Solicitação enviada com sucesso!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Inicializa o Carrossel do Header (Carrossel principal da página)
     document.addEventListener('DOMContentLoaded', function() {
@@ -661,8 +672,7 @@ async function enviarContato(e) {
 
     try {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        // Tenta salvar o lead
-        await fetch('/api/leads/', {
+        const response = await fetch('/api/leads/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -671,33 +681,24 @@ async function enviarContato(e) {
             body: JSON.stringify(payload)
         });
         
-        // Sempre abre o WhatsApp (ou ação final), mesmo se falhar o save (fallback silencioso no console?)
-        // Se quisermos bloquear se falhar, colocamos no 'if response.ok'.
-        // Idealmente, garantimos o contato:
-        
-        const text = `Olá! Meu nome é *${nome}*. Tenho interesse no imóvel *${imovel}*. \nMeu telefone é: ${telefone}. \nPrefiro contato via: ${pref}. \nPor favor, me retornem.`;
-        
-        const firstBtn = document.querySelector('.sidebar-contact .btn-whatsapp');
-        let baseUrl = "https://wa.me/"; 
-        if (firstBtn) {
-            let href = firstBtn.getAttribute('href');
-            if (href && href.includes('?')) {
-                baseUrl = href.split('?')[0];
-            } else if (href) {
-                baseUrl = href;
-            }
+        if (!response.ok) {
+            throw new Error('Falha no envio');
         }
-        
-        const finalUrl = `${baseUrl}?text=${encodeURIComponent(text)}`;
-        window.open(finalUrl, '_blank');
+
         closeModalContato();
+        
+        // Show Toast
+        const toastEl = document.getElementById('liveToast');
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+        
+        // Limpar formulário
+        document.getElementById('contato-nome').value = '';
+        document.getElementById('contato-telefone').value = '';
 
     } catch (error) {
         console.error('Erro ao processar contato:', error);
-        // Fallback: abre o whatsapp mesmo assim
-        const text = `Olá! Meu nome é *${nome}*. Tenho interesse no imóvel *${imovel}*. \nMeu telefone é: ${telefone}. \nPrefiro contato via: ${pref}. \nPor favor, me retornem.`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); // Tenta URL genérica se falhar tudo
-        closeModalContato();
+        alert('Ocorreu um erro ao enviar sua solicitação. Por favor, tente novamente ou entre em contato diretamente pelo WhatsApp.');
     } finally {
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = originalText;

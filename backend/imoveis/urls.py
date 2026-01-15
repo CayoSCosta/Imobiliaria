@@ -18,6 +18,7 @@ from .views import (
     custom_admin_criar_imovel,
     custom_admin_editar_imovel,
     custom_admin_editar_unidade,
+    custom_admin_importar_orulo, # Importação
 )
 
 urlpatterns = [
@@ -30,6 +31,7 @@ urlpatterns = [
     # CUSTOM ADMIN
     # ======================
     path('custom-admin/', custom_admin_index, name='custom_admin_index'),
+    path('custom-admin/importar-orulo/', custom_admin_importar_orulo, name='custom_admin_importar_orulo'),  # Nova rota
     path('custom-admin/imoveis/', custom_admin_imoveis_list, name='custom_admin_imoveis_list'),
     path('custom-admin/novo/', custom_admin_criar_imovel, name='custom_admin_criar_imovel'),
     path('custom-admin/editar/<int:imovel_id>/', custom_admin_editar_imovel, name='custom_admin_editar_imovel'),

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'custom_admin/base_admin.html' %}
 
 {% block title %}Dashboard Admin{% endblock %}
 
@@ -21,9 +21,14 @@
                     </div>
                     <h3 class="card-title fw-bold mb-3">Imóveis</h3>
                     <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidaes e fotos.</p>
-                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">
-                        Acessar Imóveis
-                    </a>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary btn-lg rounded-pill fw-bold">
+                            Acessar Imóveis
+                        </a>
+                        <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
+                            <i class="fas fa-cloud-download-alt"></i> Importar da Órulo
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

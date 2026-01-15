@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Leads{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Leads Recebidos</h1>
+            <p class="text-muted">Acompanhe os contatos interessados em seus imóveis.</p>
+        </div>
+        <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar ao Painel
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Data</th>
+                            <th>Nome</th>
+                            <th>Telefone</th>
+                            <th>Pref. Contato</th>
+                            <th>Imóvel</th>
+                            <th>Mensagem</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr>
+                            <td class="ps-4 align-middle text-muted" style="font-size: 0.9rem;">
+                                {{ lead.data_criacao|date:"d/m/Y H:i" }}
+                            </td>
+                            <td class="align-middle fw-bold">{{ lead.nome }}</td>
+                            <td class="align-middle">
+                                <a href="https://wa.me/55{{ lead.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" target="_blank" class="text-decoration-none text-success fw-bold">
+                                    <i class="fab fa-whatsapp"></i> {{ lead.telefone }}
+                                </a>
+                            </td>
+                            <td class="align-middle">
+                                {% if lead.tipo_contato == 'whatsapp' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success">WhatsApp</span>
+                                {% else %}
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">Ligação</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if lead.imovel %}
+                                    <a href="{% url 'imovel_detalhe' lead.imovel.slug %}" target="_blank" class="text-decoration-none">
+                                        {{ lead.imovel.titulo }}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle text-muted">
+                                {{ lead.mensagem|truncatechars:30 }}
+                            </td>
+                            <td class="align-middle">
+                                {% if lead.atendido %}
+                                    <span class="badge bg-secondary">Atendido</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Novo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted">Nenhum lead recebido ainda.</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

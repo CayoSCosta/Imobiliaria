@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-5 fw-bold text-primary">Painel Administrativo</h1>
+            <p class="lead text-muted">Gerencie imóveis e acompanhe seus leads em um só lugar.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center g-4">
+        <!-- Card Imóveis -->
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-body p-5 text-center">
+                    <div style="background-color: rgba(3, 101, 248, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-home fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="card-title fw-bold mb-3">Imóveis</h3>
+                    <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidaes e fotos.</p>
+                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">
+                        Acessar Imóveis
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Leads -->
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-body p-5 text-center">
+                    <div style="background-color: rgba(37, 211, 102, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-users fa-2x text-success"></i>
+                    </div>
+                    <h3 class="card-title fw-bold mb-3">Leads</h3>
+                    <p class="card-text text-muted mb-4">Visualize e gerencie os contatos recebidos através do site.</p>
+                    <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-success btn-lg w-100 rounded-pill fw-bold">
+                        Acessar Leads
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

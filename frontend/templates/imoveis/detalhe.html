@@ -22,11 +22,10 @@
         position: relative;
         display: grid;
         grid-template-columns: 2fr 1fr;
-        grid-template-rows: 400px;
-        gap: 10px;
-        border-radius: 12px;
+        grid-template-rows: 55vh; /* Altura responsiva maior */
+        gap: 4px;
         overflow: hidden;
-        margin-bottom: 30px;
+        margin-bottom: 40px;
     }
 
     .foto-principal {
@@ -40,12 +39,12 @@
     .coluna-fotos-secundarias {
         display: grid;
         grid-template-rows: 1fr 1fr;
-        gap: 10px;
+        gap: 4px;
     }
 
     .foto-secundaria {
         width: 100%;
-        height: 195px;
+        height: 100%;
         object-fit: cover;
         cursor: pointer;
         transition: opacity 0.3s;
@@ -78,6 +77,11 @@
     .btn-ver-fotos:hover {
         background-color: var(--bg-light);
         transform: scale(1.02);
+    }
+
+    .btn-ver-rua:hover {
+        background-color: #f0f0f0;
+        border-color: #ccc;
     }
 
     /* --- LAYOUT DUAS COLUNAS --- */
@@ -179,15 +183,18 @@
         font-size: 1.4rem;
     }
 
-    /* SIDEBAR STICKY */
+    /* SIDEBAR (Sem sticky por enquanto pois adicionamos o mapa e ficaria muito alto) */
     .sidebar-contact {
-        position: sticky;
-        top: 100px;
+        position: relative;
+        /* position: sticky; */
+        /* top: 20px; */
         height: fit-content;
         background: #fff;
         border: 1px solid var(--border-color);
-        padding: 30px;
         border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        z-index: 100;
+        margin-top: -150px; /* Pull up over the carousel */
     }
 
     @media (max-width: 992px) {
@@ -196,101 +203,231 @@
         .unidade-card { flex-direction: column; }
         .unidade-foto-box { flex: 0 0 auto; width: 100%; }
         .unidade-specs { gap: 20px; flex-wrap: wrap; }
+        .sidebar-contact { margin-top: 0; z-index: 1; } /* Reset for mobile */
     }
+
+    /* Navegação na Imagem Principal da Galeria */
+    .nav-btn-galeria {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.9);
+        color: var(--text-main);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        transition: all 0.2s;
+        opacity: 0; /* Invisível até hover */
+    }
+
+    .main-photo {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .main-photo:hover .nav-btn-galeria {
+        opacity: 1;
+    }
+
+    .nav-btn-galeria:hover {
+        background-color: #fff;
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .nav-prev { left: 20px; }
+    .nav-next { right: 20px; }
+
+    
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-detalhe">
-
-    <div class="galeria-grid">
-        <div class="main-photo">
-            {% with imovel.imagens.all|first as first_img %}
-                {% if first_img %}
-                <img src="{{ first_img.imagem.url }}" class="foto-principal" onclick="openLightbox(0)">
-                {% endif %}
-            {% endwith %}
-        </div>
-        <div class="coluna-fotos-secundarias">
-            {% for img in imovel.imagens.all|slice:"1:3" %}
-            <img src="{{ img.imagem.url }}" class="foto-secundaria" onclick="openLightbox({{ forloop.counter }})">
+    <!-- Carrossel Principal da Página -->
+    <div class="swiper header-swiper" style="height: 450px; margin-bottom: 40px; position: relative;">
+        <div class="swiper-wrapper">
+            {% for img in imovel.imagens.all %}
+            <div class="swiper-slide">
+                <img src="{{ img.imagem.url }}" 
+                     style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" 
+                     onclick="openLightbox({{ forloop.counter0 }})">
+            </div>
+            {% empty %}
+            <div class="swiper-slide">
+                <img src="https://placehold.co/1200x800?text=Sem+Imagem+Disponível&font=roboto" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             {% endfor %}
         </div>
-
-        <button class="btn-ver-fotos" onclick="openLightbox(0)">
-            <i class="fas fa-th"></i> Mostrar todas as fotos
-        </button>
+        
+        <!-- Botões de navegação -->
+        <div class="swiper-button-next" style="color: white; text-shadow: 0 0 3px rgba(0,0,0,0.5);"></div>
+        <div class="swiper-button-prev" style="color: white; text-shadow: 0 0 3px rgba(0,0,0,0.5);"></div>
+        <div class="swiper-pagination"></div>
     </div>
 
+<div class="container-detalhe">
     <div class="conteudo-wrapper">
         <main>
             <div class="header-imovel">
                 <h1>{{ imovel.titulo }}</h1>
-                <p><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro }}, {{ imovel.cidade }}</p>
+                <i class="fas fa-map-marker-alt"></i> 
+                    <span>{{imovel.bairro}} - {{imovel.uf}}<br></span>
+                    <span>{{imovel.rua}} - {{imovel.bairro_oficial}} - {{imovel.cidade}}/{{imovel.uf}}</span>
+                    {% comment %} {% if imovel.rua %}{{ imovel.rua }}{% if imovel.numero and imovel.numero != 'None' %}, {{ imovel.numero }}{% endif %} - {% endif %}
+                    {{ imovel.bairro }}{% if imovel.bairro_oficial and imovel.bairro_oficial != imovel.bairro %} - {{ imovel.bairro_oficial }}{% endif %}, {{ imovel.cidade }} {% endcomment %}
+                
             </div>
 
-            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;">
-
-            <h3>Plantas e Disponibilidade</h3>
-            <div class="unidades-grid">
-                {% for unidade in imovel.unidades.all %}
-                <div class="unidade-card" onclick="changeGallery('{{ unidade.id }}')">
-                    
-                    <div class="unidade-foto-box">
-                        {% with unidade.imagens.all|first as planta %}
-                            <img src="{% if planta %}{{ planta.imagem.url }}{% else %}{% static 'img/placeholder.png' %}{% endif %}" alt="Planta">
-                        {% endwith %}
-                    </div>
-
-                    <div class="unidade-detalhes">
-                        <h4>{{ unidade.titulo }} {{ unidade.area_m2 }}m²</h4>
-                        <div class="unidade-specs">
-                            <div class="spec-item">
-                                <span class="spec-label">Dormitórios</span>
-                                <div class="spec-value"><i class="fas fa-bed"></i> {{ unidade.quartos }}</div>
-                            </div>
-                            <div class="spec-item">
-                                <span class="spec-label">Banheiros</span>
-                                <div class="spec-value"><i class="fas fa-shower"></i> {{ unidade.banheiros }}</div>
-                            </div>
-                            {% if unidade.vagas > 0 %}
-                            <div class="spec-item">
-                                <span class="spec-label">Vagas</span>
-                                <div class="spec-value"><i class="fas fa-car"></i> {{ unidade.vagas }}</div>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div id="fotos-unidade-{{ unidade.id }}" style="display:none;">
-                        {% for img in unidade.imagens.all %}
-                        <span class="url-foto">{{ img.imagem.url }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
+            {% comment %} <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;"> {% endcomment %}
+            <hr/>
 
             <div style="margin-top: 40px;">
                 <h4>Sobre o empreendimento</h4>
-                <p>{{ imovel.descricao|linebreaks }}</p>
+                <div id="descricao-wrapper" style="position: relative;">
+                    <div id="descricao-content" style="max-height: 150px; overflow: hidden; transition: max-height 0.5s ease;">
+                        <p class="text-secondary">{{ imovel.descricao|linebreaks }}</p>
+                    </div>
+                    <div id="descricao-blur" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,1)); pointer-events: none;"></div>
+                </div>
+                <button id="btn-ver-mais-desc" onclick="toggleDescricao()" style="border: none; background: none; color: var(--primary-color); font-weight: 600; padding: 0; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    Ver mais <i class="fas fa-chevron-down"></i>
+                </button>
             </div>
+
+            <hr/>
+
+            <div class="instalacoes-section" style="margin-top: 40px;">
+                <h4>Lazer e Facilidades</h4>
+                
+                <div id="instalacoes-wrapper" style="position: relative;">
+                    <div id="instalacoes-content" style="{% if imovel.instalacoes.count > 8 %}max-height: 110px; overflow: hidden;{% endif %} transition: max-height 0.5s ease;">
+                        <div class="instalacoes-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                            {% for item in imovel.instalacoes.all %}
+                            <div class="instalacao-item" style="display: flex; align-items: center; gap: 10px; color: var(--text-main); font-size: 0.95rem;">
+                                <i class="{{ item.icone|default:'fas fa-check-circle' }}" style="color: var(--primary-color); width: 20px;"></i>
+                                {{ item.nome }}
+                            </div>
+                            {% empty %}
+                            <p style="color: var(--text-light);">Consulte os itens de lazer disponíveis.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% if imovel.instalacoes.count > 8 %}
+                    <div id="instalacoes-blur" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,1)); pointer-events: none;"></div>
+                    {% endif %}
+                </div>
+
+                {% if imovel.instalacoes.count > 8 %}
+                <button id="btn-ver-mais-inst" onclick="toggleInstalacoes()" style="border: none; background: none; color: var(--primary-color); font-weight: 600; padding: 0; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    Ver mais <i class="fas fa-chevron-down"></i>
+                </button>
+                {% endif %}
+            </div>
+
+            <hr/>
+
+            <h4>Plantas e Disponibilidade</h4>
+                <div class="unidades-grid">
+                    {% for unidade in imovel.unidades.all %}
+                    <div class="unidade-card {% if forloop.counter > 2 %}unidade-oculta{% endif %}" onclick="changeGallery('{{ unidade.id }}')" {% if forloop.counter > 2 %}style="display:none;"{% endif %}>
+                        
+                        <div class="unidade-foto-box">
+                            {% with unidade.imagens.all|first as planta %}
+                                <img src="{% if planta %}{{ planta.imagem.url }}{% else %}https://placehold.co/600x400?text=Planta+Indisponível{% endif %}" alt="Planta">
+                            {% endwith %}
+                        </div>
+
+                        <div class="unidade-detalhes">
+                            <h4>{{ unidade.titulo }} {{ unidade.area_m2 }}m²</h4>
+                            <div class="unidade-specs">
+                                <div class="spec-item">
+                                    <span class="spec-label">Dormitórios</span>
+                                    <div class="spec-value"><i class="fas fa-bed"></i> {{ unidade.quartos }}</div>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-label">Banheiros</span>
+                                    <div class="spec-value"><i class="fas fa-shower"></i> {{ unidade.banheiros }}</div>
+                                </div>
+                                {% if unidade.vagas > 0 %}
+                                <div class="spec-item">
+                                    <span class="spec-label">Vagas</span>
+                                    <div class="spec-value"><i class="fas fa-car"></i> {{ unidade.vagas }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div id="fotos-unidade-{{ unidade.id }}" style="display:none;">
+                            {% for img in unidade.imagens.all %}
+                            <span class="url-foto">{{ img.imagem.url }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if imovel.unidades.count > 2 %}
+                 <button id="btn-ver-mais-unid" onclick="toggleUnidades()" style="border: none; background: none; color: var(--primary-color); font-weight: 600; padding: 0; margin-top: 10px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                    Ver mais unidades <i class="fas fa-chevron-down"></i>
+                </button>
+                {% endif %}
         </main>
 
-        <aside class="sidebar-contact">
-            <h4 style="margin-bottom: 20px;">Fale com um corretor</h4>
-            <div style="margin-bottom: 20px;">
-                <span style="display: block; font-size: 0.9rem; color: var(--text-light);">A partir de</span>
-                <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
-                    {% if preco_inicial %} R$ {{ preco_inicial|floatformat:0 }} {% else %} Sob consulta {% endif %}
-                </span>
+        <div class="sidebar-column">
+            <aside class="sidebar-contact">
+                <h4 style="margin-bottom: 20px; padding: 20px 20px 0;">Fale com um especialista</h4>
+                <div style="margin-bottom: 20px; padding: 0 20px;">
+                    <span style="display: block; font-size: 0.9rem; color: var(--text-light);">A partir de</span>
+                    <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
+                        {% if preco_inicial %} R$ {{ preco_inicial|floatformat:0 }} {% else %} Sob consulta {% endif %}
+                    </span>
+                </div>
+                
+                <div style="padding: 0 20px 20px;">
+                    <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp"
+                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%;">
+                        <i class="fab fa-whatsapp"></i> Falar agora com um especialista
+                    </a>
+                    <button onclick="openModalContato(event)" class="btn-whatsapp"
+                        onmouseover="this.style.background='#0254d1'" 
+                        onmouseout="this.style.background='#0365f8'"
+                        style="background: #0365f8; color: white; border: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; font-size: 1rem; transition: background 0.3s ease;">
+                        <i class="fa-solid fa-circle-info"></i> Quero mais informações
+                    </button>
+                </div>
+            </aside>
+
+            <div class="mapa-wrapper" style="margin-top: 30px; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h4 style="margin: 0; color: var(--text-main);">Localização</h4>
+                    <button onclick="openModalMapa()" class="btn-ver-rua" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #e0e0e0; color: var(--text-main); background: #fff; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
+                        <i class="fas fa-street-view"></i> Ver na Rua
+                    </button>
+                </div>
+                <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px;">
+                    {% if imovel.rua %}{{ imovel.rua }}{% if imovel.numero and imovel.numero != 'None' %}, {{ imovel.numero }}{% endif %} - {% endif %}
+                    {{ imovel.bairro }}{% if imovel.bairro_oficial and imovel.bairro_oficial != imovel.bairro %} - {{ imovel.bairro_oficial }}{% endif %}
+                </p>
+                <div style="height: 300px; border-radius: 8px; overflow: hidden; background: #eee;">
+                        <iframe
+                        width="100%"
+                        height="100%"
+                        frameborder="0"
+                        style="border:0"
+                        src="https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        allowfullscreen>
+                    </iframe>
+                </div>
             </div>
-            
-            <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp"
-                style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold;">
-                <i class="fab fa-whatsapp"></i> Tenho interesse
-            </a>
-        </aside>
+        </div>
     </div>
 </div>
 
@@ -312,7 +449,81 @@
     </div>
 </div>
 
+<div id="modal-mapa" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div style="position:relative; width:90%; height:80%; background:#fff; border-radius:8px; overflow:hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <button onclick="closeModalMapa()" style="position:absolute; top:15px; right:15px; z-index:10; background:white; border:none; border-radius:50%; width:40px; height:40px; cursor:pointer; font-weight:bold; font-size: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center;">&times;</button>
+        <iframe id="iframe-mapa-modal" width="100%" height="100%" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </div>
+</div>
+
+<div id="modal-contato" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div style="position:relative; width:90%; max-width: 500px; background:#fff; border-radius:12px; overflow:hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); padding: 30px;">
+        <button onclick="closeModalContato()" style="position:absolute; top:15px; right:15px; background:none; border:none; cursor:pointer; font-size: 24px; color: #333;">&times;</button>
+        
+        <h3 style="margin-top: 0; color: #1e272e; margin-bottom: 20px; font-size: 1.5rem;">Tenho interesse</h3>
+        <p style="color: #666; margin-bottom: 25px;">Preencha seus dados para receber mais informações sobre <strong>{{ imovel.titulo }}</strong>.</p>
+        
+        <form onsubmit="enviarContato(event)" style="display: flex; flex-direction: column; gap: 15px;">
+            {% csrf_token %}
+            <div>
+                <label for="contato-nome" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Nome</label>
+                <input type="text" id="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            
+            <div>
+                <label for="contato-telefone" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Telefone / WhatsApp</label>
+                <input type="tel" id="contato-telefone" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+            </div>
+            
+            <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Preferência de contato</label>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="contato-pref" value="WhatsApp" checked> WhatsApp
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="radio" name="contato-pref" value="Ligação"> Ligação
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; transition: background 0.2s;">
+                <i class="fab fa-whatsapp"></i> Enviar Solicitação
+            </button>
+        </form>
+    </div>
+</div>
+
 <script>
+    // Inicializa o Carrossel do Header (Carrossel principal da página)
+    document.addEventListener('DOMContentLoaded', function() {
+        new Swiper('.header-swiper', {
+            loop: true,
+            centeredSlides: true,
+            slidesPerView: 1.2, // Mobile: mostra um pedaço do próximo
+            spaceBetween: 10,
+            breakpoints: {
+                768: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                },
+                1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 30
+                }
+            },
+            navigation: {
+                nextEl: '.header-swiper .swiper-button-next',
+                prevEl: '.header-swiper .swiper-button-prev',
+            },
+            pagination: {
+                el: '.header-swiper .swiper-pagination',
+                clickable: true,
+            },
+            // autoplay: { delay: 4000 } // Opcional
+        });
+    });
+
 let swiperInstance;
 
 function initSwiper() {
@@ -351,6 +562,154 @@ function changeGallery(unidadeId) {
     }
 }
 
-document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeLightbox(); });
+function toggleDescricao() {
+    const content = document.getElementById('descricao-content');
+    const blur = document.getElementById('descricao-blur');
+    const btn = document.getElementById('btn-ver-mais-desc');
+    
+    if (content.style.maxHeight !== 'none') {
+        content.style.maxHeight = 'none';
+        blur.style.display = 'none';
+        btn.innerHTML = 'Ver menos <i class="fas fa-chevron-up"></i>';
+    } else {
+        content.style.maxHeight = '150px';
+        blur.style.display = 'block';
+        btn.innerHTML = 'Ver mais <i class="fas fa-chevron-down"></i>';
+    }
+}
+
+function toggleInstalacoes() {
+    const content = document.getElementById('instalacoes-content');
+    const blur = document.getElementById('instalacoes-blur');
+    const btn = document.getElementById('btn-ver-mais-inst');
+    
+    if (content.style.maxHeight !== 'none') {
+        content.style.maxHeight = 'none';
+        if(blur) blur.style.display = 'none';
+        btn.innerHTML = 'Ver menos <i class="fas fa-chevron-up"></i>';
+    } else {
+        content.style.maxHeight = '110px';
+        if(blur) blur.style.display = 'block';
+        btn.innerHTML = 'Ver mais <i class="fas fa-chevron-down"></i>';
+    }
+}
+
+function toggleUnidades() {
+    const hiddenUnits = document.querySelectorAll('.unidade-oculta');
+    const btn = document.getElementById('btn-ver-mais-unid');
+    const isShowing = btn.innerHTML.includes('Ver menos');
+
+    if (!isShowing) {
+        hiddenUnits.forEach(el => el.style.display = '');
+        btn.innerHTML = 'Ver menos unidades <i class="fas fa-chevron-up"></i>';
+    } else {
+        hiddenUnits.forEach(el => el.style.display = 'none');
+        btn.innerHTML = 'Ver mais unidades <i class="fas fa-chevron-down"></i>';
+    }
+}
+
+function openModalMapa() {
+    const modal = document.getElementById('modal-mapa');
+    const iframe = document.getElementById('iframe-mapa-modal');
+    
+    if (!iframe.src) {
+        iframe.src = "https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&t=&z=15&ie=UTF8&iwloc=&output=embed";
+    }
+    
+    modal.style.display = 'flex';
+}
+
+function closeModalMapa() {
+    document.getElementById('modal-mapa').style.display = 'none';
+    // Opcional: limpar src para parar execução quando fechar
+    // document.getElementById('iframe-mapa-modal').src = "";
+}
+
+function openModalContato(e) {
+    if(e) e.preventDefault();
+    document.getElementById('modal-contato').style.display = 'flex';
+}
+
+function closeModalContato() {
+    document.getElementById('modal-contato').style.display = 'none';
+}
+
+async function enviarContato(e) {
+    e.preventDefault();
+    
+    const btnSubmit = e.target.querySelector('button[type="submit"]');
+    const originalText = btnSubmit.innerHTML;
+    btnSubmit.disabled = true;
+    btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+    const nome = document.getElementById('contato-nome').value;
+    const telefone = document.getElementById('contato-telefone').value;
+    const pref = document.querySelector('input[name="contato-pref"]:checked').value;
+    const imovel = "{{ imovel.titulo }}";
+    const imovelId = "{{ imovel.id }}";
+    
+    let tipoContatoBackend = 'whatsapp';
+    if (pref === 'Ligação') tipoContatoBackend = 'telefone';
+
+    const payload = {
+        nome: nome,
+        telefone: telefone,
+        tipo_contato: tipoContatoBackend,
+        imovel: imovelId,
+        mensagem: 'Lead via formulário do site'
+    };
+
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // Tenta salvar o lead
+        await fetch('/api/leads/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        // Sempre abre o WhatsApp (ou ação final), mesmo se falhar o save (fallback silencioso no console?)
+        // Se quisermos bloquear se falhar, colocamos no 'if response.ok'.
+        // Idealmente, garantimos o contato:
+        
+        const text = `Olá! Meu nome é *${nome}*. Tenho interesse no imóvel *${imovel}*. \nMeu telefone é: ${telefone}. \nPrefiro contato via: ${pref}. \nPor favor, me retornem.`;
+        
+        const firstBtn = document.querySelector('.sidebar-contact .btn-whatsapp');
+        let baseUrl = "https://wa.me/"; 
+        if (firstBtn) {
+            let href = firstBtn.getAttribute('href');
+            if (href && href.includes('?')) {
+                baseUrl = href.split('?')[0];
+            } else if (href) {
+                baseUrl = href;
+            }
+        }
+        
+        const finalUrl = `${baseUrl}?text=${encodeURIComponent(text)}`;
+        window.open(finalUrl, '_blank');
+        closeModalContato();
+
+    } catch (error) {
+        console.error('Erro ao processar contato:', error);
+        // Fallback: abre o whatsapp mesmo assim
+        const text = `Olá! Meu nome é *${nome}*. Tenho interesse no imóvel *${imovel}*. \nMeu telefone é: ${telefone}. \nPrefiro contato via: ${pref}. \nPor favor, me retornem.`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); // Tenta URL genérica se falhar tudo
+        closeModalContato();
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = originalText;
+    }
+}
+
+document.addEventListener('keydown', (e) => { 
+    if (e.key === "Escape") {
+        closeLightbox(); 
+        closeModalMapa();
+        closeModalContato();
+    }
+});
 </script>
 {% endblock %}

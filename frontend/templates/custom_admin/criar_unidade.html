@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - {{ imovel.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+    <a href="{% url 'custom_admin_imovel_unidades' imovel.id %}" class="btn btn-outline-secondary mb-3">&larr; Voltar</a>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h2 class="h4 mb-0">{{ titulo }} para {{ imovel.titulo }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    {% for field in form %}
+                    <div class="col-12 col-md-6 mb-3">
+                        {% if field.name == 'ativo' %}
+                        <div class="form-check pt-4">
+                            {{ field }}
+                            <label class="form-check-label" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                        </div>
+                        {% else %}
+                            <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                            {{ field }}
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="text-danger small mt-1">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save me-1"></i> Salvar Unidade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

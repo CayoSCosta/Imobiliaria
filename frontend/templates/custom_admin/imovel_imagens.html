@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciar Imagens - {{ imovel.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary mb-4">&larr; Voltar para lista</a>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Gerenciar Imagens: {{ imovel.titulo }}</h1>
+    </div>
+    
+    <!-- Card Upload -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-primary text-white">
+            <h3 class="h5 mb-0"><i class="fas fa-cloud-upload-alt me-2"></i> Adicionar Imagens</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="upload">
+                <div class="mb-3">
+                    {{ form.imagens }}
+                    <div class="form-text">Você pode selecionar múltiplos arquivos na janela de seleção (segure Ctrl).</div>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-upload me-1"></i> Enviar Imagens
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Galeria -->
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_order">
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h4 mb-0">Imagens Existentes</h3>
+            {% if imagens %}
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-1"></i> Salvar Alterações
+            </button>
+            {% endif %}
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for imagem in imagens %}
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="position-relative">
+                        <img src="{{ imagem.imagem.url }}" class="card-img-top" alt="Imagem do Imóvel" style="height: 200px; object-fit: cover;">
+                        {% if imagem.principal %}
+                        <span class="position-absolute top-0 start-0 m-2 badge bg-warning text-dark shadow-sm">Principal</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold mb-1">Ordem:</label>
+                            <input type="number" name="ordem_{{ imagem.id }}" value="{{ imagem.ordem }}" class="form-control form-control-sm" min="0">
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="principal" id="principal_{{ imagem.id }}" value="{{ imagem.id }}" {% if imagem.principal %}checked{% endif %}>
+                            <label class="form-check-label small" for="principal_{{ imagem.id }}">
+                                Foto Principal
+                            </label>
+                        </div>
+
+                        <a href="{% url 'custom_admin_delete_imagem' imagem.id %}" 
+                           onclick="return confirm('Tem certeza que deseja apagar esta imagem?')" 
+                           class="btn btn-outline-danger btn-sm w-100">
+                            <i class="fas fa-trash me-1"></i> Excluir
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Nenhuma imagem cadastrada.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+{% endblock %}

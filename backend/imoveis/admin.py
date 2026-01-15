@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django import forms # <--- Certifique-se de que isso está no topo
+from django.db import models
 from django.utils.html import format_html
-from .models import Imovel, Unidade, ImagemImovel, ImagemUnidade
+from .models import Imovel, Instalacao, Unidade, ImagemImovel, ImagemUnidade
 
 # =========================
 # 1. FORMULÁRIO DE FILTRO (Adicione isso no topo)
@@ -84,12 +85,20 @@ class UnidadeAdmin(admin.ModelAdmin):
     list_filter = ('ativo', 'quartos', 'imovel')
     inlines = [ImagemUnidadeInline]
 
+@admin.register(Instalacao)
+class InstalacaoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'icone')
+    search_fields = ('nome',)
+
 @admin.register(Imovel)
 class ImovelAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'bairro', 'cidade', 'tipo', 'ativo', 'criado_em')
     list_filter = (FaixaPrecoFilter, 'tipo', 'bairro', 'ativo')
     prepopulated_fields = {"slug": ("titulo", "bairro")}
     inlines = [UnidadeInline, ImagemImovelInline]
+    formfield_overrides = {
+        models.ManyToManyField: {'widget': forms.CheckboxSelectMultiple},
+    }
 
 # =========================
 # REGISTROS DE IMAGENS (AQUI MUDOU)

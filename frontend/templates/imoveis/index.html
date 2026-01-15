@@ -107,7 +107,34 @@
     }
 
     .swiper-pagination-bullet-active {
-        background: var(--primary-color) !important;
+        background: var(--white) !important;
+        opacity: 1;
+    }
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: var(--white);
+        width: 30px;
+        height: 30px;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 50%;
+        display: none; /* Escondido por padrão, mostra no hover */
+    }
+
+    .swiper-button-next::after,
+    .swiper-button-prev::after {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .card:hover .swiper-button-next,
+    .card:hover .swiper-button-prev {
+        display: flex;
+    }
+
+    .swiper-button-next:hover,
+    .swiper-button-prev:hover {
+        background: var(--primary-color);
     }
 
     /* --- INFO DO CARD --- */
@@ -205,6 +232,8 @@
                 {% endfor %}
             </div>
             <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
 
         <a href="{% url 'imovel_detalhe' imovel.slug %}" style="text-decoration: none; color: inherit;">
@@ -249,6 +278,11 @@
     document.querySelectorAll('.swiper').forEach(swiperEl => {
         new Swiper(swiperEl, {
             loop: true,
+            spaceBetween: 10,
+            navigation: {
+                nextEl: swiperEl.querySelector('.swiper-button-next'),
+                prevEl: swiperEl.querySelector('.swiper-button-prev'),
+            },
             pagination: {
                 el: swiperEl.querySelector('.swiper-pagination'),
                 clickable: true,

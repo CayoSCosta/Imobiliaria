@@ -9,6 +9,7 @@ urlpatterns = [
 
     # FRONT + API
     path('', include('imoveis.urls')),
+    path('', include('leads.urls')),
 ]
 
 if settings.DEBUG:

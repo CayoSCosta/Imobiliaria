@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Instalações - {{ imovel.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 900px;">
+    <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary mb-3">&larr; Voltar para lista</a>
+    
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">Instalações: {{ imovel.titulo }}</h2>
+            <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#novaInstalacaoModal">
+                <i class="fas fa-plus"></i> Nova Instalação
+            </button>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">Selecione abaixo as opções de lazer e infraestrutura que este imóvel possui.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold d-block mb-3 fs-5">{{ form.instalacoes.label }}</label>
+                    
+                    <div class="form-check mb-3 ms-1">
+                        <input class="form-check-input" type="checkbox" id="checkAll">
+                        <label class="form-check-label" for="checkAll">
+                            Marcar/Desmarcar todos
+                        </label>
+                    </div>
+
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                        {% for checkbox in form.instalacoes %}
+                        <div class="col">
+                            <div class="form-check p-3 border rounded bg-light h-100 position-relative">
+                                {{ checkbox.tag }}
+                                <label class="form-check-label ms-2 stretched-link" for="{{ checkbox.id_for_label }}">
+                                    {{ checkbox.choice_label }}
+                                </label>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 border-top pt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-1"></i> Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Instalação -->
+<div class="modal fade" id="novaInstalacaoModal" tabindex="-1" aria-labelledby="novaInstalacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{% url 'custom_admin_criar_instalacao' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="novaInstalacaoModalLabel">Nova Instalação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% for field in instalacao_form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Salvar Nova Instalação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkAll = document.getElementById('checkAll');
+        // Seleciona as checkboxes dentro do container das instalações
+        const checkboxes = document.querySelectorAll('.row-cols-1 input[type="checkbox"]');
+
+        if (checkAll && checkboxes.length > 0) {
+            // Verifica estado inicial
+            const allInitiallyChecked = Array.from(checkboxes).every(c => c.checked);
+            const someInitiallyChecked = Array.from(checkboxes).some(c => c.checked);
+            
+            checkAll.checked = allInitiallyChecked;
+            if (someInitiallyChecked && !allInitiallyChecked) {
+                checkAll.indeterminate = true;
+            }
+
+            // Click no checkAll
+            checkAll.addEventListener('change', function() {
+                checkboxes.forEach(function(checkbox) {
+                    checkbox.checked = checkAll.checked;
+                });
+            });
+            
+            // Click nos checkboxes individuais
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    const someChecked = Array.from(checkboxes).some(c => c.checked);
+                    
+                    checkAll.checked = allChecked;
+                    checkAll.indeterminate = someChecked && !allChecked;
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

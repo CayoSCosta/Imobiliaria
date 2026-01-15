@@ -1,8 +1,20 @@
 from django.db import models
 from django.utils.text import slugify
 
-class Imovel(models.Model):
+class Instalacao(models.Model):
+    nome = models.CharField(max_length=100)
+    # Opcional: adicionar um campo para ícone (ex: FontAwesome)
+    icone = models.CharField(max_length=50, blank=True, null=True, help_text="Classe do FontAwesome (ex: fas fa-swimming-pool)")
 
+    class Meta:
+        verbose_name = "Instalação"
+        verbose_name_plural = "Instalações"
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
+class Imovel(models.Model):
     TIPO_CHOICES = [
         ('MCMV', 'Minha Casa Minha Vida'),
         ('MEDIO', 'Médio Padrão'),
@@ -12,14 +24,15 @@ class Imovel(models.Model):
     titulo = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     descricao = models.TextField()
+    instalacoes = models.ManyToManyField(Instalacao, blank=True, related_name="imoveis")
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
 
-    tipo = models.CharField(
-        max_length=10,
-        choices=TIPO_CHOICES
-    )
-
-    bairro = models.CharField(max_length=100)
+    bairro = models.CharField(max_length=100, verbose_name="Bairro (Comercial)")
+    bairro_oficial = models.CharField(max_length=100, blank=True, null=True, verbose_name="Bairro (Oficial)", help_text="Bairro de registro (ex: Cidade Monções)")
     cidade = models.CharField(max_length=100, default='São Paulo')
+    uf = models.CharField(max_length=2, default='SP', verbose_name="UF")
+    rua = models.CharField(max_length=255, blank=True, null=True)
+    numero = models.CharField(max_length=50, blank=True, null=True)
 
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -85,7 +98,7 @@ class ImagemImovel(models.Model):
     class Meta:
         verbose_name = 'Imagem do Imóvel'
         verbose_name_plural = 'Imagens dos Imóveis'
-        ordering = ['ordem']
+        ordering = ['-principal', 'ordem']
 
     def __str__(self):
         return f"Imagem do imóvel {self.imovel.titulo}"

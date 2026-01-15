@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Unidades - {{ imovel.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary mb-4">&larr; Voltar para lista</a>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2">Unidades de {{ imovel.titulo }}</h1>
+        <a href="{% url 'custom_admin_criar_unidade' imovel.id %}" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Nova Unidade
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Título</th>
+                            <th>Preço (R$)</th>
+                            <th>Área (m²)</th>
+                            <th>Quartos</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for unidade in unidades %}
+                        <tr>
+                            <td class="ps-4 align-middle fw-medium">{{ unidade.titulo }}</td>
+                            <td class="align-middle">R$ {{ unidade.preco }}</td>
+                            <td class="align-middle">{{ unidade.area_m2 }} m²</td>
+                            <td class="align-middle">{{ unidade.quartos }}</td>
+                            <td class="align-middle">
+                                {% if unidade.ativo %}
+                                <span class="badge bg-success">Ativa</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativa</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <a href="{% url 'custom_admin_editar_unidade' unidade.id %}" class="btn btn-outline-primary btn-sm me-1">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'custom_admin_delete_unidade' unidade.id %}" 
+                                   onclick="return confirm('Tem certeza que deseja apagar esta unidade?')" 
+                                   class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <span class="text-muted">Nenhuma unidade cadastrada.</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

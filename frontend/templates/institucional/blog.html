@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Blog - Minha Imobiliária{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-5 fw-bold">Nosso Blog</h1>
+    
+    <div class="row g-4">
+        <!-- Post 1 -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Post 1" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <span class="badge bg-primary mb-2">Mercado</span>
+                    <h5 class="card-title fw-bold">Tendências do Mercado Imobiliário para 2026</h5>
+                    <p class="card-text text-muted">Saiba o que esperar do setor imobiliário neste ano e onde estão as melhores oportunidades de investimento.</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a href="#" class="btn btn-outline-primary w-100">Ler mais</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <img src="https://images.unsplash.com/photo-1484154218962-a1c002085d2f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Post 2" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <span class="badge bg-success mb-2">Dicas</span>
+                    <h5 class="card-title fw-bold">Como Escolher o Apartamento Ideal na Planta</h5>
+                    <p class="card-text text-muted">Confira 5 dicas essenciais para não errar na hora de comprar seu imóvel na planta.</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a href="#" class="btn btn-outline-primary w-100">Ler mais</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Post 3 -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="card-img-top" alt="Post 3" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <span class="badge bg-warning text-dark mb-2">Financiamento</span>
+                    <h5 class="card-title fw-bold">Entenda as Novas Regras de Financiamento</h5>
+                    <p class="card-text text-muted">Mudanças nas taxas de juros e condições de pagamento que você precisa saber antes de financiar.</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a href="#" class="btn btn-outline-primary w-100">Ler mais</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.3s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

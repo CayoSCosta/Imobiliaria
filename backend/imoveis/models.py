@@ -1,5 +1,18 @@
 from django.db import models
 from django.utils.text import slugify
+import os
+
+def get_imovel_upload_path(instance, filename):
+    """
+    Gera o caminho: imoveis/<slug_do_imovel>/<nome_arquivo>
+    """
+    return os.path.join('imoveis', instance.imovel.slug, filename)
+
+def get_unidade_upload_path(instance, filename):
+    """
+    Gera o caminho: imoveis/<slug_do_imovel>/unidades/<nome_arquivo>
+    """
+    return os.path.join('imoveis', instance.unidade.imovel.slug, 'unidades', filename)
 
 class Instalacao(models.Model):
     nome = models.CharField(max_length=100)
@@ -21,11 +34,22 @@ class Imovel(models.Model):
         ('ALTO', 'Alto Padrão'),
     ]
 
+    STATUS_CHOICES = [
+        ('EM_OBRA', 'Em Obras'),
+        ('PRONTO', 'Pronto'),
+    ]
+
     titulo = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True)
     descricao = models.TextField()
     instalacoes = models.ManyToManyField(Instalacao, blank=True, related_name="imoveis")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    status = models.CharField(
+        max_length=20, 
+        choices=STATUS_CHOICES, 
+        default='PLANTA', 
+        verbose_name="Status da Obra"
+    )
 
     bairro = models.CharField(max_length=100, verbose_name="Bairro (Comercial)")
     bairro_oficial = models.CharField(max_length=100, blank=True, null=True, verbose_name="Bairro (Oficial)", help_text="Bairro de registro (ex: Cidade Monções)")
@@ -33,6 +57,11 @@ class Imovel(models.Model):
     uf = models.CharField(max_length=2, default='SP', verbose_name="UF")
     rua = models.CharField(max_length=255, blank=True, null=True)
     numero = models.CharField(max_length=50, blank=True, null=True)
+
+    # Integração Orulo
+    orulo_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="ID Órulo")
+    is_orulo = models.BooleanField(default=False, verbose_name="Importado da Órulo")
+    removido_na_origem = models.BooleanField(default=False, verbose_name="Removido na Órulo")
 
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
@@ -91,7 +120,7 @@ class ImagemImovel(models.Model):
         related_name='imagens',
         on_delete=models.CASCADE
     )
-    imagem = models.ImageField(upload_to='imoveis/')
+    imagem = models.ImageField(upload_to=get_imovel_upload_path)
     principal = models.BooleanField(default=False)
     ordem = models.PositiveIntegerField(default=0)
 
@@ -109,7 +138,7 @@ class ImagemUnidade(models.Model):
         related_name='imagens',
         on_delete=models.CASCADE
     )
-    imagem = models.ImageField(upload_to='unidades/')
+    imagem = models.ImageField(upload_to=get_unidade_upload_path)
     principal = models.BooleanField(default=False)
     ordem = models.PositiveIntegerField(default=0)
 
@@ -120,3 +149,26 @@ class ImagemUnidade(models.Model):
 
     def __str__(self):
         return f"Imagem da unidade {self.unidade.titulo}"
+
+def get_arquivo_upload_path(instance, filename):
+    return os.path.join('imoveis', instance.imovel.slug, 'arquivos', filename)
+
+class ArquivoImovel(models.Model):
+    imovel = models.ForeignKey(
+        Imovel,
+        related_name='arquivos',
+        on_delete=models.CASCADE
+    )
+    arquivo = models.FileField(upload_to=get_arquivo_upload_path)
+    nome = models.CharField(max_length=255)
+    tipo = models.CharField(max_length=50, blank=True, null=True) # Ex: Tabela, Memorial
+    orulo_id = models.CharField(max_length=50, blank=True, null=True)
+
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Arquivo do Imóvel'
+        verbose_name_plural = 'Arquivos dos Imóveis'
+
+    def __str__(self):
+        return self.nome

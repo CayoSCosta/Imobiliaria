@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Simulador Minha Casa Minha Vida - Minha Imobiliária{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Minha_Casa_Minha_Vida_logo.svg/1200px-Minha_Casa_Minha_Vida_logo.svg.png" alt="Logo MCMV" style="height: 60px; margin-bottom: 20px;">
+                <h1 class="fw-bold">Simulador de Enquadramento</h1>
+                <p class="text-muted">Verifique se você se enquadra nas faixas do programa Minha Casa Minha Vida.</p>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <form id="mcmvForm">
+                        <div class="mb-4">
+                            <label for="rendaBruta" class="form-label fw-bold">Renda Bruta Familiar Mensal (R$)</label>
+                            <input type="number" class="form-control form-control-lg" id="rendaBruta" placeholder="Soma dos salários de todos que vão comprar" required>
+                            <div class="form-text">Considerar o valor bruto, sem descontos.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Você já possui imóvel em seu nome?</label>
+                            <div class="d-flex gap-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="possuiImovel" id="imovelNao" value="nao" checked>
+                                    <label class="form-check-label" for="imovelNao">Não</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="possuiImovel" id="imovelSim" value="sim">
+                                    <label class="form-check-label" for="imovelSim">Sim</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 text-center mt-5">
+                            <button type="button" class="btn btn-warning btn-lg px-5 rounded-pill text-white fw-bold" onclick="verificarMCMV()">
+                                Verificar Elegibilidade
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Resultados -->
+                    <div id="resultadoMCMV" class="mt-5 d-none p-4 rounded-3 text-center border">
+                        <i id="iconeResultado" class="fas fa-3x mb-3"></i>
+                        <h3 class="mb-2 fw-bold" id="tituloResultado"></h3>
+                        <p class="mb-0" id="textoResultado"></p>
+                        <a href="{% url 'home' %}?tipo=MCMV" id="btnVerImoveis" class="btn btn-outline-primary mt-3 d-none">Ver Imóveis Disponíveis</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 text-muted small">
+                <h5>Sobre as Faixas de Renda (Valores aproximados para 2026):</h5>
+                <ul>
+                    <li><strong>Faixa 1:</strong> Renda até R$ 2.640,00</li>
+                    <li><strong>Faixa 2:</strong> Renda de R$ 2.640,01 até R$ 4.400,00</li>
+                    <li><strong>Faixa 3:</strong> Renda de R$ 4.400,01 até R$ 8.000,00</li>
+                </ul>
+                <p>O subsídio varia conforme a renda, região e valor do imóvel.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function verificarMCMV() {
+        const renda = parseFloat(document.getElementById('rendaBruta').value);
+        const possuiImovel = document.querySelector('input[name="possuiImovel"]:checked').value;
+        
+        const resultadoDiv = document.getElementById('resultadoMCMV');
+        const icone = document.getElementById('iconeResultado');
+        const titulo = document.getElementById('tituloResultado');
+        const texto = document.getElementById('textoResultado');
+        const btnVerImoveis = document.getElementById('btnVerImoveis');
+
+        if (!renda) {
+            alert("Por favor, informe a renda.");
+            return;
+        }
+
+        resultadoDiv.classList.remove('d-none', 'bg-success-subtle', 'bg-danger-subtle', 'bg-warning-subtle');
+        icone.className = 'fas fa-3x mb-3';
+        btnVerImoveis.classList.add('d-none');
+
+        if (possuiImovel === 'sim') {
+            resultadoDiv.classList.add('bg-danger-subtle');
+            icone.classList.add('fa-times-circle', 'text-danger');
+            titulo.textContent = "Não Elegível";
+            texto.textContent = "Para participar do programa na modalidade de subsídio, geralmente não é permitido possuir outro imóvel residencial na mesma cidade ou região metropolitana. Consulte um corretor para exceções.";
+        } else if (renda <= 2640) {
+            resultadoDiv.classList.add('bg-success-subtle');
+            icone.classList.add('fa-check-circle', 'text-success');
+            titulo.textContent = "Elegível - Faixa 1";
+            texto.textContent = "Você se enquadra na Faixa 1! Esta categoria possui os maiores subsídios e as menores taxas de juros.";
+            btnVerImoveis.classList.remove('d-none');
+        } else if (renda <= 4400) {
+            resultadoDiv.classList.add('bg-success-subtle');
+            icone.classList.add('fa-check-circle', 'text-success');
+            titulo.textContent = "Elegível - Faixa 2";
+            texto.textContent = "Você se enquadra na Faixa 2. Você pode ter direito a subsídios significativos e taxas de juros reduzidas.";
+            btnVerImoveis.classList.remove('d-none');
+        } else if (renda <= 8000) {
+            resultadoDiv.classList.add('bg-success-subtle');
+            icone.classList.add('fa-check-circle', 'text-success');
+            titulo.textContent = "Elegível - Faixa 3";
+            texto.textContent = "Você se enquadra na Faixa 3. Embora o subsídio seja menor, você ainda conta com taxas de juros muito atrativas em relação ao mercado tradicional.";
+            btnVerImoveis.classList.remove('d-none');
+        } else {
+            resultadoDiv.classList.add('bg-warning-subtle');
+            icone.classList.add('fa-exclamation-circle', 'text-warning');
+            titulo.textContent = "Renda acima do limite MCMV";
+            texto.textContent = "Sua renda familiar parece estar acima do teto atual do programa (R$ 8.000,00). No entanto, oferecemos excelentes opções de médio e alto padrão com financiamento SBPE.";
+             btnVerImoveis.href = "{% url 'home' %}?tipo=MEDIO"; // Link para médio padrão
+             btnVerImoveis.classList.remove('d-none');
+             btnVerImoveis.textContent = "Ver Imóveis Médio/Alto Padrão";
+        }
+    }
+</script>
+{% endblock %}

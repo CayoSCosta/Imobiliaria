@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Dúvidas Frequentes - Minha Imobiliária{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+    <h1 class="text-center mb-5 fw-bold">Dúvidas Frequentes</h1>
+
+    <div class="accordion" id="faqAccordion">
+        <!-- Item 1 -->
+        <div class="accordion-item mb-3 border rounded shadow-sm">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    Como funciona o processo de compra de um imóvel na planta?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Comprar na planta envolve assinar um contrato de promessa de compra e venda com a construtora. Você paga uma entrada e parcelas durante a obra. O financiamento bancário geralmente ocorre após a entrega das chaves (Habite-se). É uma excelente forma de valorização do investimento.
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="accordion-item mb-3 border rounded shadow-sm">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Quais documentos são necessários para aprovar um financiamento?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Geralmente são necessários RG, CPF, comprovante de estado civil, comprovante de renda (holerites ou imposto de renda) e comprovante de residência. Para autônomos, pode ser necessário apresentar extratos bancários e DECORE.
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="accordion-item mb-3 border rounded shadow-sm">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Posso usar meu FGTS na compra do imóvel?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    Sim! O FGTS pode ser utilizado para pagar a entrada, amortizar o saldo devedor ou diminuir o valor das parcelas, desde que o imóvel e o comprador se enquadrem nas regras do SFH (Sistema Financeiro de Habitação).
+                </div>
+            </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="accordion-item mb-3 border rounded shadow-sm">
+            <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    Qual a diferença entre área útil e área total?
+                </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                <div class="accordion-body text-muted">
+                    A área útil (ou privativa) é o espaço interno do apartamento onde você mora. A área total inclui a área útil mais a divisão proporcional das áreas comuns do condomínio (corredores, hall, lazer, garagem).
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

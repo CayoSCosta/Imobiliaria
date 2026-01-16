@@ -27,6 +27,7 @@
                             <th>Imóvel</th>
                             <th>Mensagem</th>
                             <th>Status</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,7 +36,11 @@
                             <td class="ps-4 align-middle text-muted" style="font-size: 0.9rem;">
                                 {{ lead.data_criacao|date:"d/m/Y H:i" }}
                             </td>
-                            <td class="align-middle fw-bold">{{ lead.nome }}</td>
+                            <td class="align-middle fw-bold">
+                                <a href="{% url 'custom_admin_lead_detail' lead.pk %}" class="text-decoration-none text-dark">
+                                    {{ lead.nome }}
+                                </a>
+                            </td>
                             <td class="align-middle">
                                 <a href="https://wa.me/55{{ lead.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" target="_blank" class="text-decoration-none text-success fw-bold">
                                     <i class="fab fa-whatsapp"></i> {{ lead.telefone }}
@@ -67,10 +72,15 @@
                                     <span class="badge bg-warning text-dark">Novo</span>
                                 {% endif %}
                             </td>
+                            <td class="align-middle">
+                                <a href="{% url 'custom_admin_lead_detail' lead.pk %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                            </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">Nenhum lead recebido ainda.</div>
                             </td>
                         </tr>

@@ -1,0 +1,181 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block title %}Detalhes do Lead{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2">Detalhes do Lead</h1>
+            <p class="text-muted">Informações e histórico de acompanhamento.</p>
+        </div>
+        <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Coluna de Informações do Lead -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Dados do Contato</h5>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">{{ lead.nome }}</h4>
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Telefone/WhatsApp</label>
+                        <span class="fs-5">{{ lead.telefone }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Preferência de Contato</label>
+                        <span class="badge bg-secondary">{{ lead.get_tipo_contato_display }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Data de Entrada</label>
+                        <span>{{ lead.data_criacao|date:"d/m/Y H:i" }}</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Status</label>
+                        {% if lead.atendido %}
+                            <span class="badge bg-success">Atendido</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Pendente</span>
+                        {% endif %}
+                    </div>
+
+                    {% if lead.imovel %}
+                    <hr>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Imóvel de Interesse</label>
+                        <a href="#" class="text-decoration-none fw-bold">{{ lead.imovel.titulo }}</a>
+                        <p class="small text-muted mt-1">{{ lead.imovel.bairro }} - {{ lead.imovel.cidade }}</p>
+                    </div>
+                    {% endif %}
+
+                    {% if lead.mensagem %}
+                    <hr>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Mensagem Inicial</label>
+                        <p class="fst-italic bg-light p-2 rounded">{{ lead.mensagem }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna de Acompanhamento -->
+        <div class="col-md-8">
+            <!-- Formulário de Novo Acompanhamento -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Novo Acompanhamento</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.texto.id_for_label }}" class="form-label">Descrição do contato</label>
+                            {{ form.texto }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.proximo_passo.id_for_label }}" class="form-label">Próximo Passo</label>
+                                {{ form.proximo_passo }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_proximo_contato.id_for_label }}" class="form-label">Data Limite</label>
+                                {{ form.data_proximo_contato }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Salvar Acompanhamento
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Histórico -->
+            <h5 class="mb-3">Histórico de Interações</h5>
+            {% if acompanhamentos %}
+                <div class="timeline">
+                    {% for item in acompanhamentos %}
+                    <div class="card shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="fw-bold text-primary mb-0">Acompanhamento</h6>
+                                <small class="text-muted">{{ item.data_hora|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <p class="card-text">{{ item.texto|linebreaksbr }}</p>
+                            
+                            {% if item.proximo_passo or item.data_proximo_contato %}
+                            <div class="mt-3 pt-2 border-top bg-light p-2 rounded d-flex gap-3">
+                                {% if item.proximo_passo %}
+                                <div>
+                                    <small class="text-muted d-block">Próximo Passo:</small>
+                                    <strong>{{ item.proximo_passo }}</strong>
+                                </div>
+                                {% endif %}
+                                {% if item.data_proximo_contato %}
+                                <div>
+                                    <small class="text-muted d-block">Data Agendada:</small>
+                                    <strong>{{ item.data_proximo_contato|date:"d/m/Y" }}</strong>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginação -->
+                {% if acompanhamentos.has_other_pages %}
+                <nav aria-label="Navegação de acompanhamentos" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if acompanhamentos.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ acompanhamentos.previous_page_number }}">Anterior</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Anterior</span>
+                        </li>
+                        {% endif %}
+
+                        {% for i in acompanhamentos.paginator.page_range %}
+                            {% if acompanhamentos.number == i %}
+                            <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+                            {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if acompanhamentos.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ acompanhamentos.next_page_number }}">Próximo</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Próximo</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-info">
+                    Nenhum acompanhamento registrado ainda.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

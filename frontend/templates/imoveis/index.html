@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block extra_css %}
 <style>
@@ -13,17 +14,46 @@
         --transition: all 0.3s ease;
     }
 
+    /* --- HERO BACKGROUND --- */
+    .hero {
+        position: relative;
+        background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1545324418-cc1a3d2740ea?q=80&w=1920&fit=crop'); 
+        background-size: cover;
+        background-position: center;
+        padding: 80px 0;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        color: var(--white);
+        text-align: center;
+    }
 
-    /* --- FILTRO MODERNO --- */
+    .hero h1 {
+        font-weight: 700;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+
+    /* --- FILTRO AGORA DENTRO DO HERO --- */
     .filtro-container {
         max-width: 1100px;
-        margin: 20px auto 40px;
+        width: 100%;
         padding: 0 20px;
     }
 
     .filtro {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr auto;
+        grid-template-columns: 2.5fr 1fr 1fr 0.8fr auto;
         gap: 15px;
         background: var(--white);
         padding: 20px;
@@ -181,6 +211,28 @@
         letter-spacing: 0.5px;
     }
 
+    .btn-filtros-extra {
+        background: transparent;
+        color: var(--text-dark);
+        border: 1px solid #e0e0e0;
+        padding: 12px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+    .btn-filtros-extra:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(215, 25, 32, 0.05);
+    }
+
     /* Responsividade */
     @media (max-width: 768px) {
         .filtro {
@@ -195,34 +247,136 @@
 {% endblock %}
 
 {% block content %}
-<div class="filtro-container">
-    <form method="get" class="filtro">
-        <input type="text" name="bairro" placeholder="🔍 Onde você quer morar?"
-            value="{{ bairro_selecionado|default:'' }}">
+<section class="hero">
+    <h1>Encontre o seu próximo lar</h1>
+    <p>Os melhores apartamentos de São Paulo estão aqui</p>
+    
+    <div class="filtro-container">
+        <form method="get">
+            <div class="filtro">
+                <input type="text" name="termo" placeholder="🔍 Bairro ou Condomínio"
+                    value="{{ termo_selecionado|default:'' }}">
 
-        <select name="tipo">
-            <option value="">Todos os Padrões</option>
-            <option value="MCMV" {% if tipo_selecionado == "MCMV" %}selected{% endif %}>Econômico (MCMV)</option>
-            <option value="MEDIO" {% if tipo_selecionado == "MEDIO" %}selected{% endif %}>Médio Padrão</option>
-            <option value="ALTO" {% if tipo_selecionado == "ALTO" %}selected{% endif %}>Alto Padrão</option>
-        </select>
+                <select name="status">
+                    <option value="">Status da Obra</option>
+                    <option value="EM_OBRA" {% if status_selecionado == "EM_OBRA" %}selected{% endif %}>Em Obras</option>
+                    <option value="PRONTO" {% if status_selecionado == "PRONTO" %}selected{% endif %}>Pronto</option>
+                </select>
 
-        <select name="quartos">
-            <option value="">Quartos</option>
-            <option value="1" {% if quartos_selecionados == "1" %}selected{% endif %}>1+ Quarto</option>
-            <option value="2" {% if quartos_selecionados == "2" %}selected{% endif %}>2+ Quartos</option>
-            <option value="3" {% if quartos_selecionados == "3" %}selected{% endif %}>3+ Quartos</option>
-        </select>
+                <select name="tipo">
+                    <option value="">Tipo do Imóvel</option>
+                    <option value="MCMV" {% if tipo_selecionado == "MCMV" %}selected{% endif %}>Econômico (MCMV)</option>
+                    <option value="MEDIO" {% if tipo_selecionado == "MEDIO" %}selected{% endif %}>Médio Padrão</option>
+                    <option value="ALTO" {% if tipo_selecionado == "ALTO" %}selected{% endif %}>Alto Padrão</option>
+                </select>
 
-        <button type="submit">
-            <i class="fas fa-search"></i> Buscar
-        </button>
-    </form>
-</div>
+                <button type="button" class="btn-filtros-extra" data-bs-toggle="modal" data-bs-target="#filtrosModal">
+                    <i class="fas fa-sliders-h"></i> Filtros
+                </button>
+
+                <button type="submit">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+
+            <!-- Modal de Filtros Avançados -->
+            <div class="modal fade" id="filtrosModal" tabindex="-1" aria-labelledby="filtrosModalLabel" aria-hidden="true" style="color: var(--text-dark); text-align: left;">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="filtrosModalLabel">Filtros Avançados</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-3">
+                                <!-- Quartos -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Quartos</label>
+                                    <select name="quartos" class="form-select">
+                                        <option value="">Qualquer</option>
+                                        <option value="1" {% if quartos_selecionados == "1" %}selected{% endif %}>1+</option>
+                                        <option value="2" {% if quartos_selecionados == "2" %}selected{% endif %}>2+</option>
+                                        <option value="3" {% if quartos_selecionados == "3" %}selected{% endif %}>3+</option>
+                                        <option value="4" {% if quartos_selecionados == "4" %}selected{% endif %}>4+</option>
+                                    </select>
+                                </div>
+
+                                <!-- Vagas -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Vagas</label>
+                                    <select name="vagas" class="form-select">
+                                        <option value="">Qualquer</option>
+                                        <option value="1" {% if vagas_selecionadas == "1" %}selected{% endif %}>1+</option>
+                                        <option value="2" {% if vagas_selecionadas == "2" %}selected{% endif %}>2+</option>
+                                        <option value="3" {% if vagas_selecionadas == "3" %}selected{% endif %}>3+</option>
+                                    </select>
+                                </div>
+
+                                <!-- Banheiros -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Banheiros</label>
+                                    <select name="banheiros" class="form-select">
+                                        <option value="">Qualquer</option>
+                                        <option value="1" {% if banheiros_selecionados == "1" %}selected{% endif %}>1+</option>
+                                        <option value="2" {% if banheiros_selecionados == "2" %}selected{% endif %}>2+</option>
+                                        <option value="3" {% if banheiros_selecionados == "3" %}selected{% endif %}>3+</option>
+                                    </select>
+                                </div>
+
+                                <!-- Suítes -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Suítes</label>
+                                    <select name="suites" class="form-select">
+                                        <option value="">Qualquer</option>
+                                        <option value="1" {% if suites_selecionadas == "1" %}selected{% endif %}>1+</option>
+                                        <option value="2" {% if suites_selecionadas == "2" %}selected{% endif %}>2+</option>
+                                        <option value="3" {% if suites_selecionadas == "3" %}selected{% endif %}>3+</option>
+                                    </select>
+                                </div>
+
+                                <!-- Área -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold mt-2">Área (m²)</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="number" name="area_min" class="form-control" placeholder="Mínimo" value="{{ area_min_selecionada|default:'' }}">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" name="area_max" class="form-control" placeholder="Máximo" value="{{ area_max_selecionada|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Valor -->
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold mt-2">Valor (R$)</label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <input type="number" name="preco_min" class="form-control" placeholder="Mínimo" value="{{ preco_min_selecionado|default:'' }}">
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="number" name="preco_max" class="form-control" placeholder="Máximo" value="{{ preco_max_selecionado|default:'' }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
 
 <div class="grid">
     {% for imovel in imoveis %}
     <article class="card">
+        <span class="badge-status {{ imovel.status|lower|slugify }} abs-badge">{{ imovel.get_status_display }}</span>
         <div class="swiper">
             <div class="swiper-wrapper">
                 {% for img in imovel.imagens.all %}
@@ -241,7 +395,7 @@
                 <div class="bairro-tag"><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro }}</div>
                 <div class="preco">
                     {% if imovel.menor_preco %}
-                    A partir de R$ {{ imovel.menor_preco|floatformat:0 }}
+                    A partir de R$ {{ imovel.menor_preco|intcomma }}
                     {% else %}
                     Sob consulta
                     {% endif %}
@@ -273,25 +427,87 @@
     {% endfor %}
 </div>
 
+<!-- Botão Ver Mais -->
+{% if imoveis.has_next %}
+<div class="container my-5 text-center">
+    <button id="btn-ver-mais" class="btn btn-primary btn-lg rounded-pill px-5" 
+            data-next-url="?page={{ imoveis.next_page_number }}{% if bairro_selecionado %}&bairro={{ bairro_selecionado }}{% endif %}{% if cidade_selecionada %}&cidade={{ cidade_selecionada }}{% endif %}{% if tipo_selecionado %}&tipo={{ tipo_selecionado }}{% endif %}{% if quartos_selecionados %}&quartos={{ quartos_selecionados }}{% endif %}">
+        Ver Mais Imóveis
+    </button>
+</div>
+{% endif %}
+
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-    document.querySelectorAll('.swiper').forEach(swiperEl => {
-        new Swiper(swiperEl, {
-            loop: true,
-            spaceBetween: 10,
-            navigation: {
-                nextEl: swiperEl.querySelector('.swiper-button-next'),
-                prevEl: swiperEl.querySelector('.swiper-button-prev'),
-            },
-            pagination: {
-                el: swiperEl.querySelector('.swiper-pagination'),
-                clickable: true,
-                dynamicBullets: true,
-            },
-            mousewheel: false,
-            keyboard: true,
+    const initSwipers = (scope = document) => {
+        scope.querySelectorAll('.swiper').forEach(swiperEl => {
+            if (swiperEl.swiper) return;
+            new Swiper(swiperEl, {
+                loop: true,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: swiperEl.querySelector('.swiper-button-next'),
+                    prevEl: swiperEl.querySelector('.swiper-button-prev'),
+                },
+                pagination: {
+                    el: swiperEl.querySelector('.swiper-pagination'),
+                    clickable: true,
+                    dynamicBullets: true,
+                },
+                mousewheel: false,
+                keyboard: true,
+            });
         });
-    });
+    };
+
+    // Inicializa no carregamento
+    document.addEventListener('DOMContentLoaded', () => initSwipers());
+
+    // Lógica do Ver Mais
+    const btnVerMais = document.getElementById('btn-ver-mais');
+    if (btnVerMais) {
+        btnVerMais.addEventListener('click', function() {
+            const url = this.getAttribute('data-next-url');
+            if (!url) return;
+            
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+            this.disabled = true;
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newItems = doc.querySelectorAll('.grid article');
+                    const grid = document.querySelector('.grid');
+
+                    if(newItems.length > 0) {
+                        newItems.forEach(item => grid.appendChild(item));
+                        
+                        // Inicializa Swiper nos novos elementos
+                        initSwipers(grid);
+
+                        // Verifica se existe próxima página no HTML retornado
+                        const newBtn = doc.querySelector('#btn-ver-mais');
+                        if (newBtn) {
+                            this.setAttribute('data-next-url', newBtn.getAttribute('data-next-url'));
+                            this.innerHTML = originalContent;
+                            this.disabled = false;
+                        } else {
+                            this.remove();
+                        }
+                    } else {
+                        this.remove();
+                    }
+                })
+                .catch(err => {
+                    console.error('Erro:', err);
+                    this.innerHTML = originalContent;
+                    this.disabled = false;
+                });
+        });
+    }
 </script>
 
 {% endblock %}

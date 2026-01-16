@@ -29,17 +29,96 @@
                     {% endfor %}
                 {% endif %}
 
-                <form method="post">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-lg px-5">
-                        <i class="fas fa-play me-2"></i> Iniciar Importação
-                    </button>
-                    <p class="text-muted mt-3 small">
-                        <i class="fas fa-info-circle"></i> O processo pode levar alguns segundos dependendo da quantidade de dados.
-                    </p>
-                </form>
+
+                <div id="import-area">
+                    <form id="importForm" method="post">
+                        {% csrf_token %}
+                        <button type="submit" id="btnImportar" class="btn btn-primary btn-lg px-5">
+                            <i class="fas fa-play me-2"></i> Iniciar Importação
+                        </button>
+                    </form>
+                </div>
+
+                <div id="progress-area" class="d-none mt-4">
+                    <h5 id="progress-status" class="mb-2">Iniciando...</h5>
+                    <div class="progress" style="height: 25px;">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                    <p class="text-muted mt-2 small">Por favor, não feche esta página.</p>
+                </div>
+
+                <div id="result-area" class="d-none mt-4">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i> <span id="result-message">Concluído!</span>
+                    </div>
+                    <a href="{% url 'custom_admin_orulo_list' %}" class="btn btn-outline-primary">Ver Lista de Imóveis</a>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('importForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const btn = document.getElementById('btnImportar');
+    const progressArea = document.getElementById('progress-area');
+    const importArea = document.getElementById('import-area');
+    const progressBar = document.getElementById('progress-bar');
+    const progressStatus = document.getElementById('progress-status');
+    const resultArea = document.getElementById('result-area');
+    
+    // UI Update
+    btn.disabled = true;
+    importArea.classList.add('d-none');
+    progressArea.classList.remove('d-none');
+    
+    // Start Import
+    fetch('', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 'started') {
+            startPolling();
+        } else {
+            alert('Erro ao iniciar: ' + data.message);
+            location.reload();
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro de conexão.');
+        location.reload();
+    });
+
+    function startPolling() {
+        const interval = setInterval(() => {
+            fetch('{% url "check_import_progress" %}')
+            .then(res => res.json())
+            .then(status => {
+                // Update Bar
+                const percent = status.progress;
+                progressBar.style.width = percent + '%';
+                progressBar.innerText = percent + '%';
+                progressStatus.innerText = status.message;
+                
+                if(!status.running && percent >= 100) {
+                    clearInterval(interval);
+                    progressArea.classList.add('d-none');
+                    resultArea.classList.remove('d-none');
+                    document.getElementById('result-message').innerText = status.message + (status.total ? ` (${status.total} importados)` : '');
+                }
+            });
+        }, 1000);
+    }
+});
+</script>
 {% endblock %}

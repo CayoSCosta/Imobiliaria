@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Simulador de Financiamento - Minha Imobiliária{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-4 fw-bold">Simulador de Financiamento</h1>
+            <p class="text-center text-muted mb-5">Faça uma simulação simplificada e descubra o valor aproximado das parcelas do seu novo imóvel.</p>
+
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <form id="simuladorForm">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label for="valorImovel" class="form-label fw-bold">Valor do Imóvel (R$)</label>
+                                <input type="number" class="form-control form-control-lg" id="valorImovel" placeholder="Ex: 300000" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="valorEntrada" class="form-label fw-bold">Valor da Entrada (R$)</label>
+                                <input type="number" class="form-control form-control-lg" id="valorEntrada" placeholder="Ex: 60000" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="prazoAnos" class="form-label fw-bold">Prazo (Anos)</label>
+                                <input type="number" class="form-control form-control-lg" id="prazoAnos" value="30" max="35" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="taxaJuros" class="form-label fw-bold">Taxa de Juros Anual (%)</label>
+                                <input type="number" class="form-control form-control-lg" id="taxaJuros" value="9.5" step="0.1" required>
+                            </div>
+                            
+                            <div class="col-12 text-center mt-4">
+                                <button type="button" class="btn btn-primary btn-lg px-5 rounded-pill" onclick="calcularFinanciamento()">
+                                    Calcular Parcelas
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Resultados -->
+                    <div id="resultado" class="mt-5 d-none bg-light p-4 rounded-3 text-center">
+                        <h3 class="mb-3">Resultado da Simulação</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <small class="text-muted d-block">Valor Financiado</small>
+                                <span class="h4 text-primary fw-bold" id="resValorFinanciado">R$ 0,00</span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <small class="text-muted d-block">Primeira Parcela</small>
+                                <span class="h4 text-success fw-bold" id="resPrimeiraParcela">R$ 0,00</span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <small class="text-muted d-block">Última Parcela</small>
+                                <span class="h4 text-info fw-bold" id="resUltimaParcela">R$ 0,00</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-3 mb-0">*Simulação baseada no sistema SAC. Os valores são estimativas e podem variar conforme análise de crédito bancário. Não inclui taxas administrativas e seguros.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcularFinanciamento() {
+        const valorImovel = parseFloat(document.getElementById('valorImovel').value);
+        const valorEntrada = parseFloat(document.getElementById('valorEntrada').value);
+        const anos = parseInt(document.getElementById('prazoAnos').value);
+        const taxaAnual = parseFloat(document.getElementById('taxaJuros').value) / 100;
+
+        if (!valorImovel || !valorEntrada || !anos || !taxaAnual) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+        }
+
+        if (valorEntrada >= valorImovel) {
+            alert("O valor da entrada deve ser menor que o valor do imóvel.");
+            return;
+        }
+
+        const valorFinanciado = valorImovel - valorEntrada;
+        const meses = anos * 12;
+        const taxaMensal = taxaAnual / 12;
+
+        // Cálculo SAC simplificado
+        // Amortização constante
+        const amortizacao = valorFinanciado / meses;
+        
+        // Juros da primeira parcela (sobre o saldo devedor total)
+        const jurosPrimeira = valorFinanciado * taxaMensal;
+        const primeiraParcela = amortizacao + jurosPrimeira;
+
+        // Juros da última parcela (sobre o saldo devedor de 1 amortização)
+        const jurosUltima = amortizacao * taxaMensal; // Aproximação, pois na ultima o saldo é = amortização
+        const ultimaParcela = amortizacao + jurosUltima;
+
+        // Formatação
+        const fmt = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        document.getElementById('resValorFinanciado').textContent = fmt.format(valorFinanciado);
+        document.getElementById('resPrimeiraParcela').textContent = fmt.format(primeiraParcela);
+        document.getElementById('resUltimaParcela').textContent = fmt.format(ultimaParcela);
+
+        document.getElementById('resultado').classList.remove('d-none');
+    }
+</script>
+{% endblock %}

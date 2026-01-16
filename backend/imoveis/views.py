@@ -2,8 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Min, Max, Q
 from django.conf import settings
+from django.utils.text import slugify
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade
+from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade, ArquivoImovel
 from .serializers import ImovelSerializer
 from django.http import JsonResponse
 from .forms import (
@@ -11,12 +12,15 @@ from .forms import (
     UnidadeForm, 
     ImovelInstalacoesForm, 
     ImovelForm,
-    InstalacaoForm
+    InstalacaoForm,
+    ImovelArquivosForm
 )
 
 # =========================
 # FRONTEND (HTML)
 # =========================
+from django.core.paginator import Paginator
+
 def index(request):
     imoveis = Imovel.objects.filter(ativo=True).annotate(
         menor_preco=Min('unidades__preco'),
@@ -26,27 +30,95 @@ def index(request):
         max_area=Max('unidades__area_m2')     
     ).prefetch_related('imagens', 'unidades')
 
-    bairro = request.GET.get('bairro')
+    # Filtros
+    termo = request.GET.get('termo')
     tipo = request.GET.get('tipo')
+    status = request.GET.get('status')
     quartos = request.GET.get('quartos')
+    vagas = request.GET.get('vagas')
+    banheiros = request.GET.get('banheiros')
+    suites = request.GET.get('suites')
+    area_min = request.GET.get('area_min')
+    area_max = request.GET.get('area_max')
+    preco_min = request.GET.get('preco_min')
+    preco_max = request.GET.get('preco_max')
 
-    if bairro:
-        imoveis = imoveis.filter(bairro__icontains=bairro)
+    if termo:
+        imoveis = imoveis.filter(Q(bairro__icontains=termo) | Q(titulo__icontains=termo))
 
     if tipo:
         imoveis = imoveis.filter(tipo=tipo)
 
+    if status:
+        imoveis = imoveis.filter(status=status)
+
     if quartos:
-        imoveis = imoveis.filter(quartos__gte=quartos)
+        imoveis = imoveis.filter(unidades__quartos__gte=quartos).distinct()
+
+    if vagas:
+        imoveis = imoveis.filter(unidades__vagas__gte=vagas).distinct()
+    
+    if banheiros:
+        imoveis = imoveis.filter(unidades__banheiros__gte=banheiros).distinct()
+
+    if suites:
+        imoveis = imoveis.filter(unidades__suites__gte=suites).distinct()
+
+    if area_min:
+        imoveis = imoveis.filter(unidades__area_m2__gte=area_min).distinct()
+
+    if area_max:
+        imoveis = imoveis.filter(unidades__area_m2__lte=area_max).distinct()
+
+    if preco_min:
+        imoveis = imoveis.filter(unidades__preco__gte=preco_min).distinct()
+
+    if preco_max:
+        imoveis = imoveis.filter(unidades__preco__lte=preco_max).distinct()
+
+    # Paginação
+    paginator = Paginator(imoveis, 9) # 9 imóveis por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     context = {
-        'imoveis': imoveis,
-        'bairro_selecionado': bairro,
+        'imoveis': page_obj, 
+        'termo_selecionado': termo,
         'tipo_selecionado': tipo,
+        'status_selecionado': status,
         'quartos_selecionados': quartos,
+        'vagas_selecionadas': vagas,
+        'banheiros_selecionados': banheiros,
+        'suites_selecionadas': suites,
+        'area_min_selecionada': area_min,
+        'area_max_selecionada': area_max,
+        'preco_min_selecionado': preco_min,
+        'preco_max_selecionado': preco_max,
     }
 
     return render(request, 'imoveis/index.html', context)
+
+def sobre_nos(request):
+    return render(request, 'institucional/sobre_nos.html')
+
+def blog(request):
+    return render(request, 'institucional/blog.html')
+
+def duvidas_frequentes(request):
+    return render(request, 'institucional/duvidas_frequentes.html')
+
+def simulacao_financiamento(request):
+    return render(request, 'simuladores/financiamento.html')
+
+def simulacao_mcmv(request):
+    return render(request, 'simuladores/mcmv.html')
+
+def fale_conosco(request):
+    if request.method == 'POST':
+        # Aqui você implementaria o envio de e-mail
+        # Por enquanto, apenas renderizamos a mesma página com uma mensagem de sucesso (dummy)
+        return render(request, 'institucional/fale_conosco.html', {'sucesso': True})
+    return render(request, 'institucional/fale_conosco.html')
 
 def imovel_detalhe(request, slug):
 # Adicionamos 'unidades__imagens' para trazer as fotos de cada planta
@@ -94,9 +166,69 @@ def custom_admin_index(request):
 
 @staff_member_required
 def custom_admin_imoveis_list(request):
-    imoveis = Imovel.objects.all().order_by('-criado_em')
-    return render(request, 'custom_admin/imoveis_list.html', {'imoveis': imoveis})
+    imoveis_list = Imovel.objects.all().order_by('-criado_em')
 
+    # Filtros
+    titulo = request.GET.get('titulo')
+    bairro = request.GET.get('bairro')
+    status = request.GET.get('status')
+
+    if titulo:
+        imoveis_list = imoveis_list.filter(Q(titulo__icontains=titulo) | Q(slug__icontains=slugify(titulo)))
+    
+    if bairro:
+        imoveis_list = imoveis_list.filter(Q(bairro__icontains=bairro) | Q(slug__icontains=slugify(bairro)))
+
+    if status:
+        imoveis_list = imoveis_list.filter(status=status)
+    
+    paginator = Paginator(imoveis_list, 10)  # Mostra 10 imóveis por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'imoveis': page_obj, 
+        'page_obj': page_obj,
+        'titulo_filtro': titulo,
+        'bairro_filtro': bairro,
+        'status_filtro': status,
+        'status_choices': Imovel.STATUS_CHOICES,
+    }
+
+    return render(request, 'custom_admin/imoveis_list.html', context)
+@staff_member_required
+def custom_admin_delete_imovel(request, imovel_id):
+    """Exclui um imóvel específico"""
+    imovel = get_object_or_404(Imovel, id=imovel_id)
+    if request.method == 'POST':
+        imovel.delete()
+        # messages.success(request, f'Imóvel "{imovel.titulo}" excluído com sucesso!') # Se tiver messages
+        return redirect('custom_admin_imoveis_list')
+    
+    # Se for GET, não faz nada ou renderiza confirmação (mas vamos usar modal e POST)
+    return redirect('custom_admin_imoveis_list')
+
+@staff_member_required
+def custom_admin_sync_orulo_imovel(request, imovel_id):
+    """View para sincronizar um imóvel específico"""
+    sucesso, resultado = sincronizar_imovel_orulo(imovel_id)
+    
+    # Se for requisição AJAX, retorna JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax'):
+        return JsonResponse({
+            'success': sucesso,
+            'message': resultado['message'],
+            'changes': resultado['changes'],
+            'removed': resultado['removed']
+        })
+
+    # Fallback para redirect normal
+    if sucesso:
+        messages.success(request, resultado['message'])
+    else:
+        messages.error(request, resultado['message'])
+        
+    return redirect('custom_admin_orulo_list')
 @staff_member_required
 def custom_admin_imovel_imagens(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)
@@ -154,6 +286,42 @@ def custom_admin_delete_imagem(request, imagem_id):
     imovel_id = imagem.imovel.id
     imagem.delete()
     return redirect('custom_admin_imovel_imagens', imovel_id=imovel_id)
+
+@staff_member_required
+def custom_admin_imovel_arquivos(request, imovel_id):
+    imovel = get_object_or_404(Imovel, pk=imovel_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'upload':
+            form = ImovelArquivosForm(request.POST, request.FILES)
+            if form.is_valid():
+                arquivos = request.FILES.getlist('arquivos')
+                for f in arquivos:
+                    # Tenta limpar o nome do arquivo
+                    safe_name = slugify(f.name.split('.')[0])
+                    ext = f.name.split('.')[-1]
+                    f.name = f"{safe_name}.{ext}"
+                    ArquivoImovel.objects.create(imovel=imovel, arquivo=f, nome=f.name)
+                return redirect('custom_admin_imovel_arquivos', imovel_id=imovel.id)
+        
+    else:
+        form = ImovelArquivosForm()
+    
+    arquivos_existentes = imovel.arquivos.all()
+    return render(request, 'custom_admin/imovel_arquivos.html', {
+        'imovel': imovel,
+        'form': form,
+        'arquivos': arquivos_existentes
+    })
+
+@staff_member_required
+def custom_admin_delete_arquivo(request, arquivo_id):
+    arquivo = get_object_or_404(ArquivoImovel, pk=arquivo_id)
+    imovel_id = arquivo.imovel.id
+    arquivo.delete()
+    return redirect('custom_admin_imovel_arquivos', imovel_id=imovel_id)
 
 @staff_member_required
 def custom_admin_imovel_unidades(request, imovel_id):
@@ -261,7 +429,7 @@ def custom_admin_criar_imovel(request):
         form = ImovelForm()
     return render(request, 'custom_admin/criar_imovel.html', {'form': form})
 
-from .orulo_service import importar_imoveis_orulo
+from .orulo_service import importar_imoveis_orulo, sincronizar_imovel_orulo
 from django.contrib import messages
 
 @staff_member_required
@@ -276,18 +444,89 @@ def custom_admin_editar_imovel(request, imovel_id):
         form = ImovelForm(instance=imovel)
     return render(request, 'custom_admin/criar_imovel.html', {'form': form, 'imovel': imovel})
 
+import threading
+
+# Estado global para progresso (Em produção, use Redis/Cache)
+IMPORT_STATUS = {
+    'running': False,
+    'progress': 0,
+    'message': 'Aguardando...',
+    'total': 0,
+    'success': False
+}
+
+def update_progress(percent, message):
+    IMPORT_STATUS['progress'] = percent
+    IMPORT_STATUS['message'] = message
+
+def run_import_thread(paginas=1):
+    from .orulo_service import importar_imoveis_orulo
+    global IMPORT_STATUS
+    
+    IMPORT_STATUS['running'] = True
+    IMPORT_STATUS['progress'] = 0
+    IMPORT_STATUS['message'] = 'Iniciando...'
+    
+    try:
+        sucesso, mensagem, total = importar_imoveis_orulo(paginas=paginas, progress_callback=update_progress)
+        IMPORT_STATUS['success'] = sucesso
+        IMPORT_STATUS['message'] = mensagem
+        IMPORT_STATUS['total'] = total
+    except Exception as e:
+        IMPORT_STATUS['success'] = False
+        IMPORT_STATUS['message'] = f"Erro: {str(e)}"
+    finally:
+        IMPORT_STATUS['running'] = False
+        IMPORT_STATUS['progress'] = 100
+
+@staff_member_required
+def check_import_progress(request):
+    return JsonResponse(IMPORT_STATUS)
+
 @staff_member_required
 def custom_admin_importar_orulo(request):
     """View para página de importação da Órulo"""
-    context = {}
     
     if request.method == 'POST':
-        sucesso, mensagem, total = importar_imoveis_orulo()
-        if sucesso:
-            messages.success(request, f"{mensagem} Total importado: {total}")
-        else:
-            messages.error(request, mensagem)
-        
-        return redirect('custom_admin_importar_orulo')
+        # Se já estiver rodando, não inicia outro
+        if IMPORT_STATUS['running']:
+            return JsonResponse({'status': 'error', 'message': 'Já existe uma importação em andamento.'})
 
-    return render(request, 'custom_admin/importar_orulo.html', context)
+        # Inicia thread
+        t = threading.Thread(target=run_import_thread, kwargs={'paginas': 1})
+        t.daemon = True
+        t.start()
+        
+        return JsonResponse({'status': 'started'})
+
+    return render(request, 'custom_admin/importar_orulo.html', {})
+
+@staff_member_required
+def custom_admin_orulo_list(request):
+    """
+    Lista específica para imóveis importados da Órulo.
+    """
+    imoveis_list = Imovel.objects.filter(is_orulo=True).order_by('-criado_em')
+
+    # Filtros
+    titulo = request.GET.get('titulo')
+    bairro = request.GET.get('bairro')
+    
+    if titulo:
+        imoveis_list = imoveis_list.filter(Q(titulo__icontains=titulo) | Q(slug__icontains=slugify(titulo)))
+    
+    if bairro:
+        imoveis_list = imoveis_list.filter(Q(bairro__icontains=bairro) | Q(slug__icontains=slugify(bairro)))
+
+    paginator = Paginator(imoveis_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'imoveis': page_obj, 
+        'page_obj': page_obj,
+        'titulo_filtro': titulo,
+        'bairro_filtro': bairro,
+    }
+
+    return render(request, 'custom_admin/orulo_list.html', context)

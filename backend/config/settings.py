@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'rest_framework',
     'imoveis',
     'leads',
@@ -145,3 +146,10 @@ MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 LOGIN_REDIRECT_URL = 'custom_admin_index'
 
 WHATSAPP_NUMERO = "5511999999999"
+
+# Orulo API Settings
+ORULO_CLIENT_ID = "CtqRrQx5RmBwsoZgrzPaPMZdNSZC24LXnaAkB3Einrg"
+ORULO_CLIENT_SECRET = "A-Aq4DQYNU8GRc08heY__NChiE92r1L1fzmkUnQozbs"
+ORULO_BASE_URL = "https://www.orulo.com.br/api/v2"
+ORULO_CLIENT_SECRET = "A-Aq4DQYNU8GRc08heY__NChiE92r1L1fzmkUnQozbs"
+ORULO_BASE_URL = "https://www.orulo.com.br/api/v2"

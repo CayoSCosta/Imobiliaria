@@ -26,6 +26,15 @@ class ImovelImagensForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.fields['imagens'].widget.attrs['class'] = 'form-control'
 
+class ImovelArquivosForm(forms.Form):
+    arquivos = MultipleFileField(
+        label='Selecione os arquivos',
+        required=False
+    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['arquivos'].widget.attrs['class'] = 'form-control'
+
 class UnidadeForm(forms.ModelForm):
     imagem_planta = forms.ImageField(label="Imagem da Planta", required=False)
 
@@ -90,11 +99,12 @@ class ImovelForm(forms.ModelForm):
 
     class Meta:
         model = Imovel
-        fields = ['titulo', 'descricao', 'tipo', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
+        fields = ['titulo', 'descricao', 'tipo', 'status', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
         labels = {
             'titulo': 'Título do Empreendimento',
             'descricao': 'Descrição',
             'tipo': 'Tipo',
+            'status': 'Status da Obra',
             'rua': 'Endereço (Rua/Av)',
             'numero': 'Número',
             'bairro': 'Bairro Comercial',

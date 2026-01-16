@@ -1,0 +1,295 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="text-primary"><i class="fas fa-network-wired"></i> Imóveis Órulo</h2>
+                <p class="text-muted">Gerencie os imóveis importados da plataforma externa.</p>
+            </div>
+            <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-primary">
+                <i class="fas fa-sync-alt me-2"></i> Nova Importação
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="titulo" value="{{ titulo_filtro|default:'' }}" placeholder="Buscar por título">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="bairro" value="{{ bairro_filtro|default:'' }}" placeholder="Buscar por bairro">
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-filter me-1"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">ID Órulo</th>
+                            <th>Empreendimento</th>
+                            <th>Bairro</th>
+                            <th>Status</th>
+                            <th>Atualizado em</th>
+                            <th class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for imovel in imoveis %}
+                        <tr>
+                            <td class="ps-4"><span class="badge bg-secondary">{{ imovel.orulo_id }}</span></td>
+                            <td class="fw-bold">
+                                {{ imovel.titulo }}
+                                {% if imovel.removido_na_origem %}
+                                    <span class="badge bg-danger ms-2" title="Imóvel não existe mais na API">Removido na Origem</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ imovel.bairro }}</td>
+                            <td>
+                                {% if imovel.status == 'PRONTO' %}
+                                    <span class="badge bg-success">Pronto</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Em Obras</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ imovel.criado_em|date:"d/m/Y H:i" }}</td>
+                            <td class="text-end pe-4">
+                                <button type="button" 
+                                        class="btn btn-sm btn-outline-primary" 
+                                        title="Sincronizar"
+                                        onclick="abrirModalSync(this)"
+                                        data-id="{{ imovel.id }}"
+                                        data-nome="{{ imovel.titulo }}"
+                                        data-url="{% url 'custom_admin_sync_orulo_imovel' imovel.id %}?ajax=1">
+                                    <i class="fas fa-sync"></i>
+                                </button>
+                                <a href="{% url 'imovel_detalhe' imovel.slug %}" target="_blank" class="btn btn-sm btn-outline-info" title="Visualizar no Site">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                                <a href="{% url 'custom_admin_editar_imovel' imovel.id %}" class="btn btn-sm btn-outline-secondary" title="Editar">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                                Nenhum imóvel importado encontrado.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Paginação -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white py-3">
+            <nav aria-label="Navegação">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if titulo_filtro %}&titulo={{ titulo_filtro }}{% endif %}" aria-label="Anterior">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if titulo_filtro %}&titulo={{ titulo_filtro }}{% endif %}" aria-label="Próximo">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Sincronização -->
+<div class="modal fade" id="syncModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="syncModalTitle">Sincronizando Imóvel</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Estado Carregando -->
+        <div id="syncLoading" class="text-center py-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mb-0 text-muted">Consultando API da Órulo...</p>
+        </div>
+
+        <!-- Estado Resultado -->
+        <div id="syncResult" class="d-none">
+            <div id="syncResultIcon" class="text-center mb-3"></div>
+            <h6 id="syncResultTitle" class="text-center mb-3"></h6>
+            <ul id="syncResultList" class="list-group list-group-flush small mb-3">
+            </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1060;">
+  <div id="syncToast" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body d-flex align-items-center">
+        <i id="toastIcon" class="me-2"></i>
+        <div>
+          <strong class="d-block" id="toastTitle"></strong>
+          <span id="toastMessage"></span>
+        </div>
+      </div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+    function abrirModalSync(btn) {
+        const url = btn.getAttribute('data-url');
+        const nome = btn.getAttribute('data-nome');
+        
+        // Setup Modal
+        const modalEl = document.getElementById('syncModal');
+        const modal = new bootstrap.Modal(modalEl);
+        
+        document.getElementById('syncModalTitle').innerText = `Sincronizando: ${nome}`;
+        document.getElementById('syncLoading').classList.remove('d-none');
+        document.getElementById('syncResult').classList.add('d-none');
+        
+        // Limpa lista anterior
+        document.getElementById('syncResultList').innerHTML = '';
+        
+        modal.show();
+
+        // Faz a requisição
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            mostrarResultadoSync(data);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarResultadoSync({
+                success: false, 
+                message: 'Erro de conexão com o servidor.',
+                changes: []
+            });
+        });
+    }
+
+    function mostrarResultadoSync(data) {
+        document.getElementById('syncLoading').classList.add('d-none');
+        const resultDiv = document.getElementById('syncResult');
+        resultDiv.classList.remove('d-none');
+        
+        const list = document.getElementById('syncResultList');
+        list.innerHTML = '';
+
+        const iconDiv = document.getElementById('syncResultIcon');
+        const titleEl = document.getElementById('syncResultTitle');
+
+        if (data.success) {
+            if (data.removed) {
+                 iconDiv.innerHTML = '<i class="fas fa-trash-alt fa-3x text-danger"></i>';
+                 titleEl.innerText = "Imóvel Removido na Origem";
+                 titleEl.className = "text-center mb-3 text-danger";
+            } else {
+                 iconDiv.innerHTML = '<i class="fas fa-check-circle fa-3x text-success"></i>';
+                 titleEl.innerText = "Sincronização com Sucesso";
+                 titleEl.className = "text-center mb-3 text-success";
+            }
+            
+            // Lista de mudanças
+            if (data.changes && data.changes.length > 0) {
+                data.changes.forEach(change => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.innerHTML = `<i class="fas fa-angle-right me-2 text-muted"></i> ${change}`;
+                    list.appendChild(li);
+                });
+            } else {
+                 const li = document.createElement('li');
+                 li.className = 'list-group-item text-muted text-center';
+                 li.innerText = "Nenhuma alteração encontrada.";
+                 list.appendChild(li);
+            }
+
+            mostrarToast('Sucesso', data.message, 'success');
+            
+            // Recarregar a página ao fechar se houve mudança crítica
+            if (data.removed) {
+                const modalEl = document.getElementById('syncModal');
+                 modalEl.addEventListener('hidden.bs.modal', function () {
+                   window.location.reload();
+                }, { once: true });
+            }
+
+        } else {
+            iconDiv.innerHTML = '<i class="fas fa-times-circle fa-3x text-danger"></i>';
+            titleEl.innerText = "Falha na Sincronização";
+            titleEl.className = "text-center mb-3 text-danger";
+            
+            const li = document.createElement('li');
+            li.className = 'list-group-item text-danger';
+            li.innerText = data.message;
+            list.appendChild(li);
+
+            mostrarToast('Erro', data.message, 'danger');
+        }
+    }
+
+    function mostrarToast(titulo, msg, tipo) {
+        const toastEl = document.getElementById('syncToast');
+        const toast = new bootstrap.Toast(toastEl);
+        
+        document.getElementById('toastTitle').innerText = titulo;
+        document.getElementById('toastMessage').innerText = msg;
+        
+        const icon = document.getElementById('toastIcon');
+        // Define cor do ícone
+        if (tipo === 'success') {
+            icon.className = 'fas fa-check-circle text-success me-2 fa-lg';
+        } else {
+            icon.className = 'fas fa-exclamation-circle text-danger me-2 fa-lg';
+        }
+
+        toast.show();
+    }
+</script>
+
+{% endblock %}

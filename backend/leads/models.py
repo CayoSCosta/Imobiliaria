@@ -25,3 +25,21 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.nome} - {self.data_criacao.strftime('%d/%m/%Y %H:%M')}"
+
+
+class Acompanhamento(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, related_name='acompanhamentos')
+    data_hora = models.DateTimeField(auto_now_add=True, verbose_name='Data/Hora')
+    texto = models.TextField(verbose_name='Acompanhamento')
+    
+    # Ideias para enriquecer
+    proximo_passo = models.CharField(max_length=200, blank=True, null=True, verbose_name='Próximo Passo')
+    data_proximo_contato = models.DateField(blank=True, null=True, verbose_name='Data do Próximo Contato')
+    
+    class Meta:
+        ordering = ['-data_hora']
+        verbose_name = 'Acompanhamento'
+        verbose_name_plural = 'Acompanhamentos'
+
+    def __str__(self):
+        return f"Acompanhamento de {self.lead.nome} em {self.data_hora.strftime('%d/%m/%Y')}"

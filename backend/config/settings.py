@@ -151,7 +151,7 @@ MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 # Authentication Redirects
 LOGIN_REDIRECT_URL = 'custom_admin_index'
 
-WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO', "5511934673787")
+WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO')
 
 # Orulo API Settings
 ORULO_CLIENT_ID = os.getenv('ORULO_CLIENT_ID', "seu_client_id_aqui")

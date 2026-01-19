@@ -17,6 +17,7 @@ urlpatterns = [
     # FRONT + API
     path('', include('imoveis.urls')),
     path('', include('leads.urls')),
+    path('', include('blog.urls')),
 ]
 
 if settings.DEBUG:

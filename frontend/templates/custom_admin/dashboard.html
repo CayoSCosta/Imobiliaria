@@ -13,16 +13,16 @@
 
     <div class="row justify-content-center g-4">
         <!-- Card Imóveis -->
-        <div class="col-md-5">
+        <div class="col-md-4">
             <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-5 text-center">
+                <div class="card-body p-4 text-center">
                     <div style="background-color: rgba(3, 101, 248, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-home fa-2x text-primary"></i>
                     </div>
                     <h3 class="card-title fw-bold mb-3">Imóveis</h3>
-                    <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidaes e fotos.</p>
+                    <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidades e fotos.</p>
                     <div class="d-grid gap-2">
-                        <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary btn-lg rounded-pill fw-bold">
+                        <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary rounded-pill fw-bold">
                             Acessar Imóveis
                         </a>
                         <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
@@ -34,16 +34,32 @@
         </div>
 
         <!-- Card Leads -->
-        <div class="col-md-5">
+        <div class="col-md-4">
             <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-5 text-center">
+                <div class="card-body p-4 text-center">
                     <div style="background-color: rgba(37, 211, 102, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
                         <i class="fas fa-users fa-2x text-success"></i>
                     </div>
                     <h3 class="card-title fw-bold mb-3">Leads</h3>
                     <p class="card-text text-muted mb-4">Visualize e gerencie os contatos recebidos através do site.</p>
-                    <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-success btn-lg w-100 rounded-pill fw-bold">
+                    <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-success w-100 rounded-pill fw-bold">
                         Acessar Leads
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Blog -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-body p-4 text-center">
+                    <div style="background-color: rgba(255, 193, 7, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-newspaper fa-2x text-warning"></i>
+                    </div>
+                    <h3 class="card-title fw-bold mb-3">Blog</h3>
+                    <p class="card-text text-muted mb-4">Gerencie postagens, notícias e espaços de publicidade do blog.</p>
+                    <a href="{% url 'custom_admin_blog_list' %}" class="btn btn-warning w-100 rounded-pill fw-bold text-white">
+                        Gerenciar Blog
                     </a>
                 </div>
             </div>

@@ -1,0 +1,71 @@
+<div id="cookie-banner" class="cookie-banner d-none">
+    <div class="container">
+        <div class="d-md-flex align-items-center justify-content-between">
+            <div class="mb-3 mb-md-0 me-md-4">
+                <h5 class="fw-bold mb-2">Sua privacidade importa</h5>
+                <p class="mb-0 small text-muted">
+                    Utilizamos cookies para personalizar sua experiência, lembrar suas preferências e analisar nosso tráfego. 
+                    Ao clicar em "Aceitar todos", você concorda com o uso de todos os cookies. 
+                    Você pode alterar suas configurações a qualquer momento ou consultar nossa 
+                    <a href="{% url 'politica_de_privacidade' %}" target="_blank" class="text-primary text-decoration-underline">Política de Privacidade</a>.
+                </p>
+            </div>
+            <div class="cookie-actions d-flex gap-2 flex-shrink-0">
+                <button id="btn-accept-cookies" class="btn btn-primary btn-sm fw-bold px-4">
+                    Aceitar todos
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .cookie-banner {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #ffffff;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+        padding: 20px 0;
+        z-index: 10000;
+        border-top: 1px solid #eee;
+        animation: slideUpBanner 0.5s ease-out;
+    }
+
+    @keyframes slideUpBanner {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cookieBanner = document.getElementById('cookie-banner');
+        const acceptBtn = document.getElementById('btn-accept-cookies');
+        
+        // Verifica se já aceitou nos últimos 30 dias
+        const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+        
+        if (!cookiesAccepted) {
+            // Mostra o banner após um pequeno delay
+            setTimeout(() => {
+                cookieBanner.classList.remove('d-none');
+            }, 1000);
+        }
+
+        acceptBtn.addEventListener('click', function() {
+            // Salva a preferência no LocalStorage com timestamp (opcional, aqui simplificado)
+            localStorage.setItem('cookiesAccepted', 'true');
+            
+            // Animação de saída
+            cookieBanner.style.transform = 'translateY(100%)';
+            cookieBanner.style.transition = 'transform 0.5s ease';
+            
+            // Remove do DOM após animação
+            setTimeout(() => {
+                cookieBanner.classList.add('d-none');
+            }, 500);
+        });
+    });
+</script>

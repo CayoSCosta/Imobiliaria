@@ -57,6 +57,11 @@ class Imovel(models.Model):
     uf = models.CharField(max_length=2, default='SP', verbose_name="UF")
     rua = models.CharField(max_length=255, blank=True, null=True)
     numero = models.CharField(max_length=50, blank=True, null=True)
+    cep = models.CharField(max_length=10, blank=True, null=True, verbose_name="CEP")
+    
+    # Geolocalização
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 
     # Integração Orulo
     orulo_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="ID Órulo")

@@ -245,14 +245,52 @@
     .nav-prev { left: 20px; }
     .nav-next { right: 20px; }
 
-    
+    /* Altura responsiva do carrossel */
+    .header-swiper {
+        height: 300px; /* Mobile */
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .header-swiper {
+            height: 450px; /* Desktop/Tablet */
+        }
+    }
+
+    /* Botão Flutuante Mobile */
+    .mobile-floating-cta {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        z-index: 9990; /* Abaixo de modais (9999) mas acima de tudo */
+        display: none;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+        from { transform: translate(-50%, 100%); opacity: 0; }
+        to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    @media (max-width: 991px) {
+        .mobile-floating-cta {
+            display: flex;
+        }
+        /* Ajuste para o rodapé não cobrir conteúdo */
+        body { padding-bottom: 80px; } 
+    }
 
 </style>
 {% endblock %}
 
 {% block content %}
     <!-- Carrossel Principal da Página -->
-    <div class="swiper header-swiper" style="height: 450px; margin-bottom: 40px; position: relative;">
+    <div class="swiper header-swiper">
         <div class="swiper-wrapper">
             {% for img in imovel.imagens.all %}
             <div class="swiper-slide">
@@ -496,12 +534,20 @@
                 </div>
             </div>
 
+            <p style="font-size: 0.8rem; color: #666; margin-top: 15px; margin-bottom: 5px; line-height: 1.4; text-align: center;">
+                Ao enviar concordo com os <a href="{% url 'termos_de_uso' %}" target="_blank" style="color: #0365f8; text-decoration: underline;">termos de uso</a> e <a href="{% url 'politica_de_privacidade' %}" target="_blank" style="color: #0365f8; text-decoration: underline;">política de privacidade</a>, para contatar os próximos anunciantes e afirmo ter mais de 18 anos
+            </p>
+
             <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; transition: background 0.2s;">
                 <i class="fab fa-whatsapp"></i> Enviar Solicitação
             </button>
         </form>
     </div>
 </div>
+
+<a href="{{ whatsapp_url }}" target="_blank" class="mobile-floating-cta btn btn-success py-3 rounded-pill fw-bold text-white text-decoration-none justify-content-center align-items-center gap-2">
+    <i class="fab fa-whatsapp fa-lg"></i> Falar com Especialista
+</a>
 
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 10000;">
     <div id="liveToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">

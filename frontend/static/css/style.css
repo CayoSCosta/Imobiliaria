@@ -20,94 +20,149 @@ body {
 
 /* --- NAVBAR --- */
 .custom-navbar {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 80px;
+    /* position fixed já vem do Bootstrap ou mantemos se quisermos garantir */
+    /* top: 0; left: 0; width: 100%; (Bootstrap fixed-top faz isso) */
+    min-height: 80px; /* Altura mínima em vez de fixa */
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     z-index: 1000;
-    display: flex; align-items: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
-.nav-container {
-    max-width: 1200px; width: 100%; margin: 0 auto; padding: 0 20px;
-    display: flex; justify-content: space-between; align-items: center;
-}
-
+/* Ajuste do Logo */
 .logo { font-size: 1.5rem; font-weight: 800; color: var(--text-dark); text-decoration: none; }
+.logo:hover { color: var(--text-dark); }
 .logo span { color: var(--primary-color); }
 
-.nav-links { display: flex; list-style: none; gap: 15px; align-items: center; margin: 0; padding: 0; }
-.nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 600; transition: var(--transition); }
-.nav-links a:hover { color: var(--primary-color); }
+/* Ajuste dos Links da Navbar do Bootstrap */
+.navbar-nav .nav-link {
+    color: var(--text-dark);
+    font-weight: 600;
+    transition: var(--transition);
+    margin-right: 15px; /* Espaçamento entre itens */
+}
+
+.navbar-nav .nav-link:hover, .navbar-nav .nav-link:focus {
+    color: var(--primary-color);
+}
+
+.navbar-toggler {
+    border: none;
+    outline: none;
+}
+.navbar-toggler:focus {
+    box-shadow: none;
+}
 
 /* Botão de Destaque */
 .nav-btn-contato {
     background: var(--text-dark); color: white !important;
     padding: 10px 20px; border-radius: 8px;
+    font-weight: 600;
+    transition: var(--transition);
+}
+.nav-btn-contato:hover {
+    background: var(--primary-color);
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+/* Classes legadas removidas ou adaptadas */
+/* .nav-container { ... } (Substituído por .container do Bootstrap) */
+/* .nav-links { ... } (Substituído por .navbar-nav) */
+
+/* Espaçador para compensar a navbar fixa */
+.nav-spacer {
+    height: 80px;
+    display: block;
 }
 
 /* Dropdown Customizado (Namespace para não quebrar Bootstrap) */
-.custom-navbar .dropdown {
-    position: relative;
+/* Comportamento Desktop (Hover) */
+@media (min-width: 992px) {
+    .custom-navbar .dropdown {
+        position: relative;
+    }
+
+    /* Seta giratória no menu principal */
+    .custom-navbar .dropdown > a i {
+        margin-left: 5px;
+        font-size: 0.75rem;
+        transition: transform 0.3s ease;
+    }
+
+    .custom-navbar .dropdown:hover > a i {
+        transform: rotate(180deg);
+    }
+
+    /* Container do menu dropdown desktop */
+    .custom-navbar .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--white);
+        min-width: 240px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        border-radius: 12px;
+        padding: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(15px);
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        border: 1px solid rgba(0,0,0,0.04);
+        display: block; /* Bootstrap usa JS para toggle display, mas aqui forçamos block e controlamos via opacity */
+        z-index: 1100;
+        margin-top: 10px; 
+    }
+
+    /* Mostra o dropdown ao passar o mouse na li */
+    .custom-navbar .dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
 }
 
-/* Seta giratória no menu principal */
-.custom-navbar .dropdown > a i {
-    margin-left: 5px;
-    font-size: 0.75rem;
-    transition: transform 0.3s ease;
-}
-
-.custom-navbar .dropdown:hover > a i {
-    transform: rotate(180deg);
-}
-
-/* Container do menu dropdown */
-.custom-navbar .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: var(--white);
-    min-width: 240px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-    border-radius: 12px;
-    list-style: none;
-    padding: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(15px);
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: 1px solid rgba(0,0,0,0.04);
-    display: block;
-    z-index: 1100;
-    margin-top: 10px; /* Pequeno espaçamento do topo */
-}
-
-/* Mostra o dropdown ao passar o mouse na li */
-.custom-navbar .dropdown:hover .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-/* Itens individuais do dropdown */
+/* Estilos de itens do menu (comum a mobile/desktop com ajustes) */
 .custom-navbar .dropdown-menu li a {
-    display: block;
+    /*display: block;*/ /* Já vem do dropdown-item do Bootstrap */
     padding: 10px 16px;
-    color: var(--text-dark);
     font-weight: 500;
     border-radius: 8px;
     font-size: 0.95rem;
     transition: all 0.2s ease;
-    text-decoration: none;
 }
 
-/* Hover nos itens do dropdown */
 .custom-navbar .dropdown-menu li a:hover {
     background-color: var(--bg-gray);
     color: var(--primary-color);
     padding-left: 22px; /* Efeito de slide */
+}
+
+/* Mobile Tweaks */
+@media (max-width: 991px) {
+    .custom-navbar .navbar-collapse {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-top: 10px;
+    }
+    
+    .nav-btn-contato {
+        margin-top: 15px;
+        display: block;
+        text-align: center;
+    }
+    
+    .custom-navbar .dropdown-menu {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        padding-left: 20px;
+    }
 }
 
 
@@ -134,11 +189,19 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     display: inline-block;
+    background-color: #95a5a6; /* Fallback (Cinza) para status desconhecidos */
+    color: white;
 }
-.badge-status.em-obra {
-    background-color: #f39c12;
-    color: #fff;
+.badge-status.em-obra,
+.badge-status.em_obra, 
+.badge-status.em-obras,
+.badge-status.em_obras,
+.badge-status.planta,
+.badge-status.lancamento {
+    background-color: #ffc107; /* Amarelo */
+    color: #1e272e;
 }
+
 .badge-status.pronto {
     background-color: #27ae60;
     color: #fff;
@@ -151,4 +214,68 @@ body {
     left: 15px;
     z-index: 10; /* Acima do Swiper */
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* WhatsApp Float Button */
+.whatsapp-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--whatsapp-color, #25d366);
+    color: #FFF;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 40px;
+    box-shadow: 2px 2px 3px rgba(0,0,0,0.3);
+    z-index: 1000;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+    background-color: #128C7E;
+    transform: scale(1.1);
+    color: #FFF;
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 115px; /* 30px (bottom) + 70px (whatsapp height) + 15px (gap) */
+    right: 40px; /* Alinhado ao centro do WhatsApp (70px vs 50px) */
+    background-color: var(--primary-color, #d71920);
+    color: #FFF;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 999;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    cursor: pointer;
+    border: none;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background-color: var(--primary-hover, #b3141a);
+    transform: translateY(-5px);
+    color: #FFF;
 }

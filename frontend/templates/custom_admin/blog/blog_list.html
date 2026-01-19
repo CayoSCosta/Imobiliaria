@@ -1,0 +1,127 @@
+{% extends 'custom_admin/base_admin.html' %}
+
+{% block title %}Gerenciar Blog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Gerenciar Blog</h1>
+        <div>
+            <a href="{% url 'custom_admin_criar_post' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Novo Post
+            </a>
+            <a href="{% url 'custom_admin_criar_propaganda' %}" class="btn btn-success ms-2">
+                <i class="fas fa-ad"></i> Nova Propaganda
+            </a>
+        </div>
+    </div>
+
+    <!-- Seção de Posts -->
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Posts</h5>
+        </div>
+        <div class="card-body">
+            {% if posts %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Data Criação</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in posts %}
+                        <tr>
+                            <td>{{ post.titulo }}</td>
+                            <td>{{ post.data_criacao|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                {% if post.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'custom_admin_editar_post' post.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{% url 'custom_admin_delete_post' post.id %}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir este post?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center my-4">Nenhum post encontrado.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Seção de Propagandas -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white py-3">
+            <h5 class="mb-0 fw-bold">Propagandas</h5>
+        </div>
+        <div class="card-body">
+            {% if propagandas %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Título</th>
+                            <th>Link Destino</th>
+                            <th>Status</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prop in propagandas %}
+                        <tr>
+                            <td>{{ prop.titulo }}</td>
+                            <td>
+                                {% if prop.link_destino %}
+                                <a href="{{ prop.link_destino }}" target="_blank">{{ prop.link_destino|truncatechars:30 }}</a>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if prop.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{% url 'custom_admin_editar_propaganda' prop.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{% url 'custom_admin_delete_propaganda' prop.id %}" method="POST" class="d-inline" onsubmit="return confirm('Tem certeza que deseja excluir esta propaganda?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted text-center my-4">Nenhuma propaganda encontrada.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

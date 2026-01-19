@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.titulo }} - Blog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="fw-bold mb-3">{{ post.titulo }}</h1>
+            <p class="text-muted mb-4">
+                <i class="far fa-calendar-alt me-2"></i>{{ post.data_criacao|date:"d/m/Y \à\s H:i" }}
+            </p>
+
+            {% if post.imagem_capa %}
+            <div class="mb-5 shadow-sm rounded overflow-hidden">
+                <img src="{{ post.imagem_capa.url }}" class="img-fluid w-100" alt="{{ post.titulo }}">
+            </div>
+            {% endif %}
+
+            <div class="article-content" style="font-size: 1.1rem; line-height: 1.8;">
+                {{ post.conteudo|linebreaks }}
+            </div>
+
+            <hr class="my-5">
+
+            <div class="text-center">
+                <a href="{% url 'blog_list' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Voltar para o Blog
+                </a>
+            </div>
+        </div>
+
+        <!-- Sidebar / Propagandas -->
+        <div class="col-lg-4">
+            {% if propagandas %}
+            <div class="sticky-top" style="top: 20px;">
+                <h5 class="fw-bold mb-4">Parceiros</h5>
+                {% for prop in propagandas %}
+                <div class="mb-4 text-center">
+                    {% if prop.link_destino %}
+                    <a href="{{ prop.link_destino }}" target="_blank">
+                    {% endif %}
+                        <img src="{{ prop.imagem.url }}" class="img-fluid rounded shadow-sm" alt="{{ prop.titulo }}">
+                    {% if prop.link_destino %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

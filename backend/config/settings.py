@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'imoveis',
     'leads',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -70,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'imoveis.context_processors.whatsapp_settings',
             ],
         },
     },
@@ -145,7 +147,7 @@ MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 # Authentication Redirects
 LOGIN_REDIRECT_URL = 'custom_admin_index'
 
-WHATSAPP_NUMERO = "5511999999999"
+WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO', "5511934673787")
 
 # Orulo API Settings
 ORULO_CLIENT_ID = "CtqRrQx5RmBwsoZgrzPaPMZdNSZC24LXnaAkB3Einrg"

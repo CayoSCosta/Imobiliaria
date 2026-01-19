@@ -7,9 +7,21 @@ class Lead(models.Model):
         ('telefone', 'Ligação'),
     ]
 
+    STATUS_CHOICES = [
+        ('novo', 'Novo'),
+        ('em_atendimento', 'Em Atendimento'),
+        ('visita_agendada', 'Visita Agendada'),
+        ('proposta', 'Proposta'),
+        ('fechado', 'Fechado (Venda)'),
+        ('perdido', 'Perdido'),
+    ]
+
     nome = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100, blank=True, null=True)
     telefone = models.CharField(max_length=20)
+    origem = models.CharField(max_length=100, default='Site', verbose_name='Canal de Chegada')
     tipo_contato = models.CharField(max_length=10, choices=TIPO_CONTATO_CHOICES, default='whatsapp', verbose_name='Preferência de Contato')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='novo', verbose_name='Status do Lead')
     
     # O imóvel é opcional, caso o lead venha de uma página institucional, mas no fluxo atual virá do detalhe
     imovel = models.ForeignKey(Imovel, on_delete=models.SET_NULL, null=True, blank=True, related_name='leads')

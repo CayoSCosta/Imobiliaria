@@ -133,6 +133,9 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                 state = address.get('state', 'SP')
                 street = address.get('street', '')
                 number = address.get('number', '')
+                zip_code = address.get('zip_code', '')
+                latitude = address.get('latitude')
+                longitude = address.get('longitude')
                 
                 # Definição do Tipo e Preço
                 min_price = building.get('min_price') or 0
@@ -157,6 +160,9 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                     imovel.uf = state
                     imovel.rua = street
                     imovel.numero = str(number)
+                    imovel.cep = zip_code
+                    if latitude: imovel.latitude = Decimal(str(latitude))
+                    if longitude: imovel.longitude = Decimal(str(longitude))
                     imovel.is_orulo = True
                     # imovel.ativo = True # Manter o estado atual de ativo se já existe
                     imovel.save()
@@ -172,6 +178,9 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                         uf=state,
                         rua=street,
                         numero=str(number),
+                        cep=zip_code,
+                        latitude=Decimal(str(latitude)) if latitude else None,
+                        longitude=Decimal(str(longitude)) if longitude else None,
                         orulo_id=orulo_id,
                         is_orulo=True,
                         ativo=True

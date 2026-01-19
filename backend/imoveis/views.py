@@ -1,12 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Min, Max, Q
+from django.db.models import Min, Max, Q, F, Value, FloatField
+from django.db.models.functions import ACos, Cos, Radians, Sin, Cast
 from django.conf import settings
 from django.utils.text import slugify
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade, ArquivoImovel
 from .serializers import ImovelSerializer
 from django.http import JsonResponse
+from leads.models import Lead
 from .forms import (
     ImovelImagensForm, 
     UnidadeForm, 
@@ -42,6 +44,37 @@ def index(request):
     area_max = request.GET.get('area_max')
     preco_min = request.GET.get('preco_min')
     preco_max = request.GET.get('preco_max')
+    
+    # Geolocalização
+    lat = request.GET.get('lat')
+    lng = request.GET.get('lng')
+
+    if lat and lng:
+        try:
+            user_lat = float(lat)
+            user_lon = float(lng)
+            
+            # Filtra apenas imóveis com coordenadas
+            imoveis = imoveis.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+            
+            # Constantes para fórmula (convertendo input para radianos diretamente no python ou db)
+            # Para evitar erros de banco, usamos functions do Django
+            # Fórmula Haversine: 6371 * acos(cos(rad(user_lat)) * cos(rad(lat)) * cos(rad(long) - rad(user_lon)) + sin(rad(user_lat)) * sin(rad(lat)))
+            
+            # Nota: Isso requer suporte do banco de dados para funções trigonométricas. Postgres tem.
+            
+            imoveis = imoveis.annotate(
+                distance=6371 * ACos(
+                    Cos(Radians(user_lat)) * 
+                    Cos(Radians(Cast(F('latitude'), FloatField()))) * 
+                    Cos(Radians(Cast(F('longitude'), FloatField())) - Radians(user_lon)) + 
+                    Sin(Radians(user_lat)) * 
+                    Sin(Radians(Cast(F('latitude'), FloatField())))
+                )
+            ).order_by('distance')
+            
+        except ValueError:
+            pass # Ignora se lat/lng inválidos
 
     if termo:
         imoveis = imoveis.filter(Q(bairro__icontains=termo) | Q(titulo__icontains=termo))
@@ -101,22 +134,79 @@ def index(request):
 def sobre_nos(request):
     return render(request, 'institucional/sobre_nos.html')
 
-def blog(request):
-    return render(request, 'institucional/blog.html')
+def termos_de_uso(request):
+    return render(request, 'termos_de_uso.html')
+
+def politica_de_privacidade(request):
+    return render(request, 'politica_de_privacidade.html')
+
+# def blog(request):
+#    return render(request, 'institucional/blog.html')
 
 def duvidas_frequentes(request):
     return render(request, 'institucional/duvidas_frequentes.html')
 
 def simulacao_financiamento(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        
+        nome = data.get('nome')
+        telefone = data.get('telefone')
+        email = data.get('email')
+        
+        conteudo = f"Origem: Simulador de Financiamento\nE-mail: {email}"
+        
+        Lead.objects.create(
+            nome=nome,
+            telefone=telefone,
+            mensagem=conteudo,
+            status='novo'
+        )
+        return JsonResponse({'success': True})
+
     return render(request, 'simuladores/financiamento.html')
 
 def simulacao_mcmv(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        
+        nome = data.get('nome')
+        telefone = data.get('telefone')
+        email = data.get('email')
+        
+        conteudo = f"Origem: Simulador Minha Casa Minha Vida\nE-mail: {email}"
+        
+        Lead.objects.create(
+            nome=nome,
+            telefone=telefone,
+            mensagem=conteudo,
+            status='novo'
+        )
+        return JsonResponse({'success': True})
+
     return render(request, 'simuladores/mcmv.html')
 
 def fale_conosco(request):
     if request.method == 'POST':
-        # Aqui você implementaria o envio de e-mail
-        # Por enquanto, apenas renderizamos a mesma página com uma mensagem de sucesso (dummy)
+        nome = request.POST.get('nome')
+        telefone = request.POST.get('telefone')
+        email = request.POST.get('email')
+        assunto = request.POST.get('assunto')
+        mensagem = request.POST.get('mensagem')
+
+        # Constrói uma mensagem composta já que o modelo de Lead (ainda) não tem campo e-mail separado
+        conteudo_completo = f"Origem: Fale Conosco\nAssunto: {assunto}\nE-mail: {email}\n\nMensagem:\n{mensagem}"
+
+        Lead.objects.create(
+            nome=nome,
+            telefone=telefone,
+            mensagem=conteudo_completo,
+            tipo_contato='whatsapp', # Padrão
+            status='novo'
+        )
+
         return render(request, 'institucional/fale_conosco.html', {'sucesso': True})
     return render(request, 'institucional/fale_conosco.html')
 
@@ -269,15 +359,46 @@ def custom_admin_imovel_imagens(request, imovel_id):
                         continue
             
             return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
+            
+        elif action == 'move_to_unit':
+            imagem_id = request.POST.get('imagem_id')
+            unidade_id = request.POST.get('unidade_id')
+            
+            try:
+                from django.core.files.base import ContentFile
+                
+                img_imovel = ImagemImovel.objects.get(pk=imagem_id, imovel=imovel)
+                unidade = Unidade.objects.get(pk=unidade_id, imovel=imovel)
+                
+                # Cria nova imagem na unidade copiando o conteúdo
+                new_img = ImagemUnidade(unidade=unidade)
+                # Lê o arquivo original e salva no novo modelo (isso gera um novo arquivo no disco)
+                if img_imovel.imagem:
+                    new_img.imagem.save(img_imovel.imagem.name.split('/')[-1], ContentFile(img_imovel.imagem.read()))
+                    new_img.save()
+                    
+                    # Deleta a antiga
+                    img_imovel.delete()
+                    
+                    # messages.success(request, "Imagem movida para a unidade.")
+            except Exception as e:
+                print(f"Erro ao mover imagem: {e}")
+                # messages.error(request, "Erro ao mover imagem.")
+            
+            return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
 
     else:
         form = ImovelImagensForm()
     
     imagens_existentes = imovel.imagens.all()
+    # Busca unidades para o modal de transferência
+    unidades = imovel.unidades.all()
+    
     return render(request, 'custom_admin/imovel_imagens.html', {
         'imovel': imovel,
         'form': form,
-        'imagens': imagens_existentes
+        'imagens': imagens_existentes,
+        'unidades': unidades
     })
 
 @staff_member_required

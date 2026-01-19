@@ -1,94 +1,359 @@
 {% extends 'custom_admin/base_admin.html' %}
 
-{% block title %}Gerenciar Leads{% endblock %}
+{% block title %}Kanban de Leads{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilo "Trello-like" */
+    
+    /* Container Principal */
+    .container-fluid {
+        height: calc(100vh - 80px); /* Altura total menos navbar */
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Remove rolagem da página */
+    }
+
+    .kanban-board {
+        display: flex;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 15px;
+        padding-bottom: 20px;
+        align-items: flex-start;
+        height: 100%;
+        padding-left: 5px;
+        
+        /* Custom Scrollbar Horizontal */
+        scrollbar-width: thin;
+        scrollbar-color: #bdc3c7 #f1f2f6;
+    }
+
+    .kanban-board::-webkit-scrollbar {
+        height: 12px;
+    }
+    .kanban-board::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.05); 
+        border-radius: 10px;
+    }
+    .kanban-board::-webkit-scrollbar-thumb {
+        background-color: #bdc3c7; 
+        border-radius: 10px;
+    }
+
+    .kanban-column {
+        flex: 0 0 300px; /* Largura fixa da coluna */
+        background-color: #ebecf0; /* Cinza claro estilo Trello */
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        max-height: 100%; /* Ocupa altura disponível mas não estica */
+        border: none;
+        margin-right: 5px;
+    }
+
+    .kanban-header {
+        padding: 12px 15px;
+        font-weight: 700;
+        color: #172b4d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: transparent;
+        border-bottom: none;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        font-size: 0.95rem;
+    }
+
+    .kanban-items {
+        padding: 0 10px 10px 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 50px;
+        
+        /* Custom Scrollbar Vertical */
+        scrollbar-width: thin;
+        scrollbar-color: #bdc3c7 transparent;
+    }
+    
+    .kanban-items::-webkit-scrollbar {
+        width: 8px;
+    }
+    .kanban-items::-webkit-scrollbar-thumb {
+        background-color: #bdc3c7;
+        border-radius: 4px;
+    }
+
+    .kanban-card {
+        background: white;
+        border-radius: 6px;
+        padding: 10px;
+        box-shadow: 0 1px 2px rgba(9, 30, 66, 0.25); /* Sombra sutil estilo Trello */
+        cursor: pointer; /* Indica que é clicável */
+        border: none; /* Remove bordas coloridas anteriores */
+        border-bottom: 1px solid rgba(9, 30, 66, 0.1);
+        transition: background-color 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.9rem;
+        position: relative;
+        touch-action: none; /* Melhora suporte a touch */
+        user-select: none; /* Evita selecionar texto ao arrastar */
+    }
+
+    .kanban-card:hover {
+        background-color: #f4f5f7;
+        box-shadow: 0 2px 5px rgba(9, 30, 66, 0.3);
+    }
+
+    .kanban-card.is-dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+    }
+    
+    /* Previne conflito de clique no select */
+    .status-select-container {
+        position: relative;
+        z-index: 5;
+    }
+    
+    /* Indicador visual de status (barra lateral colorida) */
+    .col-novo .kanban-card { border-left: 4px solid #3498db; }
+    .col-em_atendimento .kanban-card { border-left: 4px solid #f39c12; }
+    .col-visita_agendada .kanban-card { border-left: 4px solid #9b59b6; }
+    .col-proposta .kanban-card { border-left: 4px solid #e67e22; }
+    .col-fechado .kanban-card { border-left: 4px solid #27ae60; }
+    .col-perdido .kanban-card { border-left: 4px solid #e74c3c; opacity: 0.9; }
+
+    /* Estilização dos títulos das colunas (Opcional: manter cores no header) */
+    .col-novo .kanban-header span:first-child { color: #2980b9; } 
+    .col-fechado .kanban-header span:first-child { color: #27ae60; }
+    .col-perdido .kanban-header span:first-child { color: #c0392b; }
+
+    .card-meta {
+        font-size: 0.75rem;
+        color: #5e6c84;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+    }
+    
+    .card-title {
+        font-weight: 600;
+        color: #172b4d;
+        margin-bottom: 0;
+    }
+    
+    .status-select-container select {
+        font-size: 0.8rem;
+        padding: 2px 4px;
+        background-color: #f4f5f7;
+        border: 1px solid #dfe1e6;
+        color: #172b4d;
+        border-radius: 3px;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-3">
         <div>
-            <h1 class="h2">Leads Recebidos</h1>
-            <p class="text-muted">Acompanhe os contatos interessados em seus imóveis.</p>
+            <h1 class="h3 mb-0">Gestão de Leads</h1>
+            <p class="text-muted small mb-0">Arraste os cards para mudar o status</p>
         </div>
-        <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Voltar ao Painel
-        </a>
+        <div>
+            <a href="{% url 'exportar_leads_csv' %}" class="btn btn-success btn-sm me-2">
+                <i class="fas fa-file-csv me-1"></i> Exportar CSV
+            </a>
+            <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-4">Data</th>
-                            <th>Nome</th>
-                            <th>Telefone</th>
-                            <th>Pref. Contato</th>
-                            <th>Imóvel</th>
-                            <th>Mensagem</th>
-                            <th>Status</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for lead in leads %}
-                        <tr>
-                            <td class="ps-4 align-middle text-muted" style="font-size: 0.9rem;">
-                                {{ lead.data_criacao|date:"d/m/Y H:i" }}
-                            </td>
-                            <td class="align-middle fw-bold">
-                                <a href="{% url 'custom_admin_lead_detail' lead.pk %}" class="text-decoration-none text-dark">
-                                    {{ lead.nome }}
-                                </a>
-                            </td>
-                            <td class="align-middle">
-                                <a href="https://wa.me/55{{ lead.telefone|cut:' '|cut:'-'|cut:'('|cut:')' }}" target="_blank" class="text-decoration-none text-success fw-bold">
-                                    <i class="fab fa-whatsapp"></i> {{ lead.telefone }}
-                                </a>
-                            </td>
-                            <td class="align-middle">
-                                {% if lead.tipo_contato == 'whatsapp' %}
-                                    <span class="badge bg-success bg-opacity-10 text-success">WhatsApp</span>
-                                {% else %}
-                                    <span class="badge bg-primary bg-opacity-10 text-primary">Ligação</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle">
-                                {% if lead.imovel %}
-                                    <a href="{% url 'imovel_detalhe' lead.imovel.slug %}" target="_blank" class="text-decoration-none">
-                                        {{ lead.imovel.titulo }}
-                                    </a>
-                                {% else %}
-                                    <span class="text-muted">-</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle text-muted">
-                                {{ lead.mensagem|truncatechars:30 }}
-                            </td>
-                            <td class="align-middle">
-                                {% if lead.atendido %}
-                                    <span class="badge bg-secondary">Atendido</span>
-                                {% else %}
-                                    <span class="badge bg-warning text-dark">Novo</span>
-                                {% endif %}
-                            </td>
-                            <td class="align-middle">
-                                <a href="{% url 'custom_admin_lead_detail' lead.pk %}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye"></i> Ver
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center py-5">
-                                <div class="text-muted">Nenhum lead recebido ainda.</div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="kanban-board">
+        {% for status_key, leads in kanban_data.items %}
+        <div class="kanban-column col-{{ status_key }}">
+            <div class="kanban-header">
+                <span>{{ status_key|title|cut:'_' }}</span>
+                <span class="badge bg-light text-dark rounded-pill">{{ leads|length }}</span>
+            </div>
+            <div class="kanban-items" data-status="{{ status_key }}">
+                {% for lead in leads %}
+                <div class="kanban-card" data-id="{{ lead.id }}" data-url="{% url 'custom_admin_lead_detail' lead.pk %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="card-title">
+                            <span class="text-dark fw-bold">
+                                {{ lead.nome }}
+                            </span>
+                        </div>
+                        {% if lead.tipo_contato == 'whatsapp' %}
+                        <i class="fab fa-whatsapp text-success"></i>
+                        {% else %}
+                        <i class="fas fa-phone text-primary"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-muted small mb-2">
+                        {% if lead.imovel %}
+                            <i class="fas fa-building me-1"></i> {{ lead.imovel.titulo|truncatechars:25 }}
+                        {% elif lead.mensagem and "Simulador de Financiamento" in lead.mensagem %}
+                            <i class="fas fa-calculator me-1"></i> Simulador Financiamento
+                        {% elif lead.mensagem and "Simulador Minha Casa Minha Vida" in lead.mensagem %}
+                            <i class="fas fa-home me-1"></i> Simulador MCMV
+                        {% else %}
+                            <i class="fas fa-comments me-1"></i> Fale Conosco
+                        {% endif %}
+                    </div>
+                    
+                    <div class="status-select-container">
+                        <select class="form-select form-select-sm status-select" data-lead-id="{{ lead.id }}">
+                            {% for s_key, s_label in status_choices %}
+                            <option value="{{ s_key }}" {% if lead.status == s_key %}selected{% endif %}>{{ s_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="card-meta">
+                        <span>{{ lead.data_criacao|date:"d/m H:i" }}</span>
+                        <!-- <i class="fas fa-eye text-primary"></i> -->
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializa Sortable para Drag & Drop
+        const containers = document.querySelectorAll('.kanban-items');
+        let isDragging = false; // Flag para diferenciar clique de arraste
+
+        containers.forEach(container => {
+            new Sortable(container, {
+                group: 'leads',
+                animation: 150,
+                ghostClass: 'bg-light',
+                chosenClass: 'is-dragging',
+                delay: 100, // Pequeno delay para evitar arraste acidental ao clicar rápido
+                delayOnTouchOnly: true,
+                onStart: function() {
+                    isDragging = true;
+                },
+                onEnd: function (evt) {
+                    isDragging = false; // Reset flag
+                    const itemEl = evt.item;
+                    const newStatus = evt.to.getAttribute('data-status');
+                    const leadId = itemEl.getAttribute('data-id');
+                    
+                    if (evt.from === evt.to) return;
+                    
+                    // Atualiza o select dentro do card para refletir a nova coluna
+                    const select = itemEl.querySelector('.status-select');
+                    if(select) select.value = newStatus;
+
+                    updateStatus(leadId, newStatus, evt.from, evt.to);
+                }
+            });
+        });
+
+        // Click handler para o card inteiro
+        document.querySelectorAll('.kanban-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Se estiver arrastando, ignora o clique
+                if (isDragging) return;
+
+                // Se clicou no select ou suas opções, ignora
+                if (e.target.tagName === 'SELECT' || e.target.closest('select')) return;
+                
+                // Navega para a url do card
+                const url = this.getAttribute('data-url');
+                if(url) window.location.href = url;
+            });
+        });
+
+        // Event listener para mudança via Dropdown
+        document.querySelectorAll('.status-select').forEach(select => {
+            select.addEventListener('click', function(e) {
+                e.stopPropagation(); // Impede que o clique no select abra o card
+            });
+            select.addEventListener('change', function(e) {
+                e.stopPropagation(); // Impede propagação
+                const leadId = this.getAttribute('data-lead-id');
+                const newStatus = this.value;
+                const card = this.closest('.kanban-card');
+                const currentColumn = card.closest('.kanban-items');
+                
+                // Encontra a coluna de destino
+                const targetColumn = document.querySelector(`.kanban-items[data-status="${newStatus}"]`);
+                
+                if (targetColumn && currentColumn !== targetColumn) {
+                    // Move o card visualmente
+                    targetColumn.appendChild(card);
+                    updateStatus(leadId, newStatus, currentColumn, targetColumn);
+                }
+            });
+        });
+
+        function updateStatus(leadId, newStatus, fromContainer, toContainer) {
+            fetch(`/custom-admin/leads/${leadId}/update-status/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateCount(fromContainer);
+                    updateCount(toContainer);
+                } else {
+                    alert('Erro ao atualizar status: ' + (data.error || 'Erro desconhecido'));
+                    window.location.reload(); 
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro de conexão');
+                window.location.reload();
+            });
+        }
+
+        function updateCount(container) {
+            const count = container.querySelectorAll('.kanban-card').length;
+            const badge = container.parentElement.querySelector('.kanban-header .badge');
+            if(badge) badge.textContent = count;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
 {% endblock %}

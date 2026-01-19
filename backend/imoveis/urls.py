@@ -5,7 +5,9 @@ from .views import (
     imovel_detalhe,
     index,
     sobre_nos,
-    blog,
+    termos_de_uso,
+    politica_de_privacidade,
+    # blog,
     duvidas_frequentes,
     simulacao_financiamento,
     simulacao_mcmv,
@@ -43,7 +45,9 @@ urlpatterns = [
     # ======================
     path('', index, name='home'),
     path('sobre-nos/', sobre_nos, name='sobre_nos'),
-    path('blog/', blog, name='blog'),
+    path('termos-de-uso/', termos_de_uso, name='termos_de_uso'),
+    path('politica-de-privacidade/', politica_de_privacidade, name='politica_de_privacidade'),
+    # path('blog/', blog, name='blog'), # Removido, agora no app blog
     path('duvidas-frequentes/', duvidas_frequentes, name='duvidas_frequentes'),
     path('simulacao/financiamento/', simulacao_financiamento, name='simulacao_financiamento'),
     path('simulacao/minha-casa-minha-vida/', simulacao_mcmv, name='simulacao_mcmv'),

@@ -98,10 +98,45 @@
         transform: translateY(-1px);
     }
 
+    /* --- INPUT COM ÍCONE INTERNO --- */
+    .input-wrapper {
+        position: relative;
+        width: 100%;
+        display: flex;
+        align-items: center;
+    }
+    
+    .input-wrapper input {
+        width: 100%;
+        padding-right: 40px !important;
+    }
+
+    .btn-location-icon {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        padding: 0;
+        transition: var(--transition);
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+    }
+
+    .btn-location-icon:hover {
+        transform: scale(1.1);
+        color: var(--primary-hover);
+    }
+
     /* --- GRID DE IMÓVEIS --- */
     .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 30px;
         max-width: 1200px;
         margin: 0 auto;
@@ -235,12 +270,29 @@
 
     /* Responsividade */
     @media (max-width: 768px) {
+        .hero {
+            padding: 40px 0;
+        }
+
         .filtro {
             grid-template-columns: 1fr;
+            gap: 10px;
+            padding: 15px;
+        }
+        
+        .grid {
+            gap: 20px;
+            padding: 15px;
         }
 
         h1 {
             font-size: 1.8rem;
+            padding: 0 15px;
+        }
+
+        .hero p {
+            padding: 0 15px;
+            font-size: 1rem;
         }
     }
 </style>
@@ -254,8 +306,13 @@
     <div class="filtro-container">
         <form method="get">
             <div class="filtro">
-                <input type="text" name="termo" placeholder="🔍 Bairro ou Condomínio"
-                    value="{{ termo_selecionado|default:'' }}">
+                <div class="input-wrapper">
+                    <input type="text" name="termo" placeholder="🔍 Bairro, Condomínio ou Cidade"
+                        value="{{ termo_selecionado|default:'' }}">
+                    <button type="button" class="btn-location-icon" onclick="getLocation()" title="Buscar imóveis próximos a mim">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </button>
+                </div>
 
                 <select name="status">
                     <option value="">Status da Obra</option>
@@ -437,6 +494,16 @@
 </div>
 {% endif %}
 
+<!-- Botão Voltar ao Topo -->
+<button id="backToTop" class="back-to-top" title="Voltar ao início">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- Botão Flutuante WhatsApp -->
+<a href="https://wa.me/{{ WHATSAPP_NUMERO }}" class="whatsapp-float" target="_blank" title="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
     const initSwipers = (scope = document) => {
@@ -461,7 +528,25 @@
     };
 
     // Inicializa no carregamento
-    document.addEventListener('DOMContentLoaded', () => initSwipers());
+    document.addEventListener('DOMContentLoaded', () => {
+        initSwipers();
+
+        // Botão Voltar ao Topo
+        const backToTopBtn = document.getElementById('backToTop');
+        if (backToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    });
 
     // Lógica do Ver Mais
     const btnVerMais = document.getElementById('btn-ver-mais');
@@ -507,6 +592,53 @@
                     this.disabled = false;
                 });
         });
+    }
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            const btn = document.querySelector('.btn-location-icon');
+            let originalHtml = '';
+            if(btn) {
+                originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                btn.disabled = true;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('lat', lat);
+                    url.searchParams.set('lng', lng);
+                    
+                    window.location.href = url.toString();
+                },
+                function(error) {
+                    if(btn) {
+                        btn.innerHTML = originalHtml;
+                        btn.disabled = false;
+                    }
+                    
+                    let msg = "Erro desconhecido.";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            msg = "Permissão de localização negada.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg = "Localização indisponível.";
+                            break;
+                        case error.TIMEOUT:
+                            msg = "Tempo esgotado.";
+                            break;
+                    }
+                    alert(msg);
+                }
+            );
+        } else {
+            alert("Navegador sem suporte a GPS.");
+        }
     }
 </script>
 

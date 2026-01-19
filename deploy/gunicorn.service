@@ -1,0 +1,12 @@
+[Unit]
+Description=gunicorn daemon for Imobiliaria Project
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/var/www/imobiliaria/backend
+ExecStart=/var/www/imobiliaria/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/var/www/imobiliaria/imobiliaria.sock config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

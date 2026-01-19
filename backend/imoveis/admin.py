@@ -92,8 +92,9 @@ class InstalacaoAdmin(admin.ModelAdmin):
 
 @admin.register(Imovel)
 class ImovelAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'bairro', 'cidade', 'tipo', 'ativo', 'criado_em')
-    list_filter = (FaixaPrecoFilter, 'tipo', 'bairro', 'ativo')
+    list_display = ('titulo', 'destaque', 'bairro', 'cidade', 'tipo', 'ativo', 'criado_em')
+    list_editable = ('destaque', 'ativo')
+    list_filter = (FaixaPrecoFilter, 'destaque', 'tipo', 'bairro', 'ativo')
     prepopulated_fields = {"slug": ("titulo", "bairro")}
     inlines = [UnidadeInline, ImagemImovelInline]
     formfield_overrides = {

@@ -50,7 +50,7 @@ class Imovel(models.Model):
         default='PLANTA', 
         verbose_name="Status da Obra"
     )
-
+    destaque = models.BooleanField(default=False, verbose_name="Destaque", help_text="Exibe este imóvel com destaque na Home e nas buscas")
     bairro = models.CharField(max_length=100, verbose_name="Bairro (Comercial)")
     bairro_oficial = models.CharField(max_length=100, blank=True, null=True, verbose_name="Bairro (Oficial)", help_text="Bairro de registro (ex: Cidade Monções)")
     cidade = models.CharField(max_length=100, default='São Paulo')

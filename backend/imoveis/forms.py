@@ -99,12 +99,13 @@ class ImovelForm(forms.ModelForm):
 
     class Meta:
         model = Imovel
-        fields = ['titulo', 'descricao', 'tipo', 'status', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
+        fields = ['titulo', 'descricao', 'tipo', 'status', 'destaque', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
         labels = {
             'titulo': 'Título do Empreendimento',
             'descricao': 'Descrição',
             'tipo': 'Tipo',
             'status': 'Status da Obra',
+            'destaque': 'Destaque?',
             'rua': 'Endereço (Rua/Av)',
             'numero': 'Número',
             'bairro': 'Bairro Comercial',
@@ -115,5 +116,6 @@ class ImovelForm(forms.ModelForm):
         }
         widgets = {
              'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left: 0;'}),
+             'destaque': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left: 0;'}),
              'descricao': forms.Textarea(attrs={'rows': 3}),
         }

@@ -22,12 +22,12 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o0()6mgdg2kj4m770+p@ootqgr1je(lod^j+zad-=qhe2pvibc'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-o0()6mgdg2kj4m770+p@ootqgr1je(lod^j+zad-=qhe2pvibc')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'rest_framework',
+    'audit.apps.AuditConfig',
     'imoveis',
     'leads',
     'blog',
@@ -53,6 +54,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'config.middleware.RestrictAdminMiddleware',
+    'audit.middleware.AuditMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -130,6 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STATICFILES_DIRS = [
     BASE_DIR / 'frontend' / 'static',
@@ -150,8 +154,6 @@ LOGIN_REDIRECT_URL = 'custom_admin_index'
 WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO', "5511934673787")
 
 # Orulo API Settings
-ORULO_CLIENT_ID = "CtqRrQx5RmBwsoZgrzPaPMZdNSZC24LXnaAkB3Einrg"
-ORULO_CLIENT_SECRET = "A-Aq4DQYNU8GRc08heY__NChiE92r1L1fzmkUnQozbs"
-ORULO_BASE_URL = "https://www.orulo.com.br/api/v2"
-ORULO_CLIENT_SECRET = "A-Aq4DQYNU8GRc08heY__NChiE92r1L1fzmkUnQozbs"
-ORULO_BASE_URL = "https://www.orulo.com.br/api/v2"
+ORULO_CLIENT_ID = os.getenv('ORULO_CLIENT_ID', "seu_client_id_aqui")
+ORULO_CLIENT_SECRET = os.getenv('ORULO_CLIENT_SECRET', "seu_client_secret_aqui")
+ORULO_BASE_URL = os.getenv('ORULO_BASE_URL', "https://www.orulo.com.br/api/v2")

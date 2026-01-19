@@ -64,6 +64,7 @@
                             <th>Bairro</th>
                             <th>Origem</th>
                             <th>Status</th>
+                            <th>Destaque</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
@@ -89,6 +90,13 @@
                                     <span class="badge bg-success">Pronto</span>
                                 {% else %}
                                     <span class="badge bg-warning text-dark">Em Obras</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if imovel.destaque %}
+                                <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> Sim</span>
+                                {% else %}
+                                <span class="badge bg-light text-dark border"><i class="far fa-star"></i> Não</span>
                                 {% endif %}
                             </td>
                             <td class="align-middle">

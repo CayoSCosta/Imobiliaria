@@ -32,6 +32,9 @@ def index(request):
         max_area=Max('unidades__area_m2')     
     ).prefetch_related('imagens', 'unidades')
 
+    # Destaques para o Hero (Carrossel)
+    destaques = imoveis.filter(destaque=True)[:5] # Pegar os 5 primeiros destaques
+
     # Filtros
     termo = request.GET.get('termo')
     tipo = request.GET.get('tipo')
@@ -116,6 +119,7 @@ def index(request):
 
     context = {
         'imoveis': page_obj, 
+        'destaques': destaques,
         'termo_selecionado': termo,
         'tipo_selecionado': tipo,
         'status_selecionado': status,

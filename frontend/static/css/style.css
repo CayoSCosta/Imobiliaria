@@ -343,7 +343,7 @@ body {
 }
 
 .footer-logo img {
-    filter: brightness(0) invert(1);
+    /* filter: brightness(0) invert(1); Commeted out to keep original colors */
     opacity: 0.9;
 }
 

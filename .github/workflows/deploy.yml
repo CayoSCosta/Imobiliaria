@@ -1,0 +1,42 @@
+name: Deploy Imobidon
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Executar comandos no servidor via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Entra na pasta do projeto
+            cd ~/imobiliaria
+            
+            # Ignora mudanças de permissão de arquivos no servidor
+            git config core.fileMode false
+            
+            # Puxa a versão mais nova do GitHub
+            git pull origin master
+            
+            # Reconstrói os containers se houver mudança no Dockerfile ou requirements
+            docker compose up -d --build
+            
+            # Roda as migrações do banco de dados (Django)
+            docker compose exec -T web python backend/manage.py migrate
+            
+            # Coleta os arquivos estáticos (CSS, JS, Imagens)
+            docker compose exec -T web python backend/manage.py collectstatic --noinput
+            
+            # Limpa imagens antigas que não estão sendo usadas para economizar espaço no VPS
+            docker image prune -f

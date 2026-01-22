@@ -678,8 +678,18 @@ function openModalMapa() {
     const modal = document.getElementById('modal-mapa');
     const iframe = document.getElementById('iframe-mapa-modal');
     
+    // Tenta pegar coordenadas se existirem
+    const lat = "{{ imovel.latitude|default_if_none:'' }}".replace(',', '.');
+    const lng = "{{ imovel.longitude|default_if_none:'' }}".replace(',', '.');
+
     if (!iframe.src) {
-        iframe.src = "https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&t=&z=15&ie=UTF8&iwloc=&output=embed";
+        if (lat && lng) {
+            // Street View via coordenadas (hack output=svembed)
+            iframe.src = `https://maps.google.com/maps?layer=c&cbll=${lat},${lng}&cbp=12,0,0,0,0&output=svembed`;
+        } else {
+            // Fallback busca por endereço
+            iframe.src = "https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&layer=c&output=svembed";
+        }
     }
     
     modal.style.display = 'flex';

@@ -77,6 +77,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'imoveis.context_processors.whatsapp_settings',
+                'imoveis.context_processors.bairros_footer',
             ],
         },
     },

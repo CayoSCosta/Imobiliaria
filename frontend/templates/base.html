@@ -47,7 +47,7 @@
                     </div>
 
                     <!-- Coluna 2: Links Rápidos -->
-                    <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <div class="col-lg-4 col-md-6 mb-4 mb-md-0">
                         <h4 class="footer-title">Links Rápidos</h4>
                         <ul class="footer-links">
                             <li><a href="{% url 'home' %}">Imóveis</a></li>
@@ -55,18 +55,6 @@
                             <li><a href="{% url 'fale_conosco' %}">Fale Conosco</a></li>
                             <li><a href="{% url 'duvidas_frequentes' %}">Dúvidas Frequentes</a></li>
                             <li><a href="{% url 'simulacao_financiamento' %}">Simulação de Financiamento</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Coluna 3: Regiões -->
-                    <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
-                        <h4 class="footer-title">Regiões</h4>
-                        <ul class="footer-links">
-                            <li><a href="{% url 'home' %}?termo=Morumbi">Morumbi</a></li>
-                            <li><a href="{% url 'home' %}?termo=Brooklin">Brooklin</a></li>
-                            <li><a href="{% url 'home' %}?termo=Moema">Moema</a></li>
-                            <li><a href="{% url 'home' %}?termo=Vila Andrade">Vila Andrade</a></li>
-                            <li><a href="{% url 'home' %}?termo=Campo Limpo">Campo Limpo</a></li>
                         </ul>
                     </div>
 
@@ -93,6 +81,25 @@
                         </ul>
                     </div>
                 </div>
+
+                {% if bairros_footer %}
+                <div class="row mt-5 border-top pt-5">
+                    <div class="col-12 mb-3">
+                        <h4 class="footer-title">Imóveis por Bairro</h4>
+                    </div>
+                    {% for bairro in bairros_footer %}
+                        {% if forloop.counter0|divisibleby:5 %}
+                        <div class="col-6 col-md-4 col-lg-2 mb-3">
+                            <ul class="footer-links">
+                        {% endif %}
+                                <li><a href="{% url 'home' %}?termo={{ bairro }}">{{ bairro }}</a></li>
+                        {% if forloop.counter|divisibleby:5 or forloop.last %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
             </div>
         </div>
 

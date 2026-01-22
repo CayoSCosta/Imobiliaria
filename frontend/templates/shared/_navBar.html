@@ -12,35 +12,28 @@
         <div class="collapse navbar-collapse" id="navbarContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Apartamentos
+                <li class="nav-item nav-separator">
+                    <a class="nav-link" href="{% url 'home' %}?status=EM_OBRA" title="Principais lançamentos imobiliários, selecionados com critério estratégico.">
+                        Lançamentos
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'home' %}?status=EM_OBRA">Em Obras</a></li>
-                        <li><a class="dropdown-item" href="{% url 'home' %}?status=PRONTO">Prontos</a></li>
-                    </ul>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Links Úteis
+                <li class="nav-item nav-separator">
+                    <a class="nav-link" href="{% url 'home' %}?status=PRONTO" title="Oportunidades em imóveis prontos com liquidez e bom custo-benefício.">
+                        Prontos
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'sobre_nos' %}">Sobre nós</a></li>
-                        {% comment %} <li><a class="dropdown-item" href="{% url 'blog_list' %}">Blog</a></li> {% endcomment %}
-                        <li><a class="dropdown-item" href="{% url 'duvidas_frequentes' %}">Dúvidas Frequentes</a></li>
-                    </ul>
                 </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Simuladores
+                <li class="nav-item nav-separator">
+                    <a class="nav-link" href="{% url 'home' %}?termo=investimento" title="Estratégias de investimento e alavancagem patrimonial através de imóveis.">
+                        Rentabilidade
                     </a>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'simulacao_financiamento' %}">Financiamento</a></li>
-                        <li><a class="dropdown-item" href="{% url 'simulacao_mcmv' %}">Minha casa minha vida</a></li>
-                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link text-nowrap" href="{% url 'home' %}?tipo=MCMV" title="Principais opções dentro do programa, com orientação completa.">
+                        Minha Casa Minha Vida
+                    </a>
                 </li>
 
                 {% if user.is_staff %}
@@ -61,7 +54,7 @@
                 {% endif %}
 
                 <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                    <a href="{% url 'fale_conosco' %}" class="btn nav-btn-contato w-100">Fale conosco</a>
+                    <a href="{% url 'fale_conosco' %}" class="btn nav-btn-contato w-100" title="Clique e saiba mais.">Fale conosco</a>
                 </li>
             </ul>
         </div>

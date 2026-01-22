@@ -21,14 +21,9 @@
                     </div>
                     <h3 class="card-title fw-bold mb-3">Imóveis</h3>
                     <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidades e fotos.</p>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary rounded-pill fw-bold">
-                            Acessar Imóveis
-                        </a>
-                        <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-outline-secondary btn-sm rounded-pill">
-                            <i class="fas fa-cloud-download-alt"></i> Importar da Órulo
-                        </a>
-                    </div>
+                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary w-100 rounded-pill fw-bold">
+                        Acessar Imóveis
+                    </a>
                 </div>
             </div>
         </div>
@@ -61,6 +56,27 @@
                     <a href="{% url 'custom_admin_blog_list' %}" class="btn btn-warning w-100 rounded-pill fw-bold text-white">
                         Gerenciar Blog
                     </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Gestão Órulo -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-body p-4 text-center">
+                    <div style="background-color: rgba(23, 162, 184, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <i class="fas fa-network-wired fa-2x text-info"></i>
+                    </div>
+                    <h3 class="card-title fw-bold mb-3">Gestão Órulo</h3>
+                    <p class="card-text text-muted mb-4">Gerencie a integração com o sistema Órulo e importe imóveis.</p>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'custom_admin_orulo_list' %}" class="btn btn-info w-100 rounded-pill fw-bold text-white">
+                            Acessar Gestão Órulo
+                        </a>
+                        <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-outline-info btn-sm rounded-pill">
+                            <i class="fas fa-cloud-download-alt"></i> Importar da Órulo
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

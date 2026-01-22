@@ -13,17 +13,13 @@
                     <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'custom_admin_index' %}">Visão Geral</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if 'imoveis' in request.path and not 'orulo' in request.path %}active{% endif %}" href="{% url 'custom_admin_imoveis_list' %}">Imóveis</a>
+                    <a class="nav-link text-primary {% if 'imoveis' in request.path and not 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_imoveis_list' %}">
+                        <i class="fas fa-home me-1"></i>Imóveis
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if 'leads' in request.path %}active{% endif %}" href="{% url 'custom_admin_leads_list' %}">Leads</a>
-                </li>
-                <li class="nav-item d-flex align-items-center">
-                    <div class="vr bg-secondary mx-2 h-50 my-auto"></div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-info {% if 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_orulo_list' %}">
-                        <i class="fas fa-network-wired me-1"></i>Gestão Órulo
+                    <a class="nav-link text-success {% if 'leads' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_leads_list' %}">
+                        <i class="fas fa-users me-1"></i>Leads
                     </a>
                 </li>
             </ul>

@@ -23,7 +23,7 @@ def fix_sequences():
                     # Ajusta o valor atual da sequence para o MAX(id) da tabela
                     cursor.execute(f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM {table};")
         except Exception as e:
-            logger.warning(f"Erro ao tentar corrigir sequências do banco: {e}")
+            logger.warning(f"Erro ao tentar corrigir sequências do banco: {str(e)}")
 
 def get_orulo_auth_header():
     """
@@ -43,7 +43,7 @@ def get_orulo_auth_header():
         data = response.json()
         return {"Authorization": f"Bearer {data['access_token']}"}
     except requests.RequestException as e:
-        logger.error(f"Erro na autenticação Órulo: {e}")
+        logger.error(f"Erro na autenticação Órulo: {str(e)}")
         return None
 
 def importar_imoveis_orulo(paginas=1, progress_callback=None):
@@ -226,7 +226,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                         pass 
 
                 except Exception as ex_typ:
-                    logger.warning(f"Erro ao buscar tipologias do imóvel {orulo_id}: {ex_typ}")
+                    logger.warning(f"Erro ao buscar tipologias do imóvel {orulo_id}: {str(ex_typ)}")
 
                 # Se não criou nenhuma unidade via tipologia, usamos o método antigo (fallback)
                 if not imovel.unidades.exists():
@@ -271,7 +271,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                        images_data = resp_img.json()
                        images_list = images_data.get('images', [])
                 except Exception as ex_img:
-                    logger.warning(f"Erro ao buscar imagens dedicadas do imóvel {orulo_id}: {ex_img}")
+                    logger.warning(f"Erro ao buscar imagens dedicadas do imóvel {orulo_id}: {str(ex_img)}")
 
                 # 2. Se vazio, tenta detail (fallback antigo)
                 # MODIFICADO: Valida se a lista de imagens tem URLs
@@ -294,7 +294,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                            if not fallback_images:
                                fallback_images = detail_data.get('mockups', [])
                     except Exception as ex_detail:
-                        logger.warning(f"Erro ao buscar detalhes do imóvel {orulo_id}: {ex_detail}")
+                        logger.warning(f"Erro ao buscar detalhes do imóvel {orulo_id}: {str(ex_detail)}")
                 
                 if not images_list and fallback_images:
                     images_list = fallback_images
@@ -340,7 +340,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                             imagem_obj.imagem.save(filename, ContentFile(r.content), save=True)
                             imported_images_count += 1
                     except Exception as e:
-                        logger.warning(f"Erro ao baixar imagem {img_url}: {e}")
+                        logger.warning(f"Erro ao baixar imagem {img_url}: {str(e)}")
 
                 # --- Importar Plantas (Floor Plans) ---
                 try:
@@ -370,10 +370,10 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                                         )
                                         imagem_obj.imagem.save(filename, ContentFile(r_plan.content), save=True)
                                except Exception as e_plan:
-                                   logger.warning(f"Erro ao baixar planta {plan_url}: {e_plan}")
+                                   logger.warning(f"Erro ao baixar planta {plan_url}: {str(e_plan)}")
 
                 except Exception as ex_plans:
-                    logger.warning(f"Erro ao buscar plantas do imóvel {orulo_id}: {ex_plans}")
+                    logger.warning(f"Erro ao buscar plantas do imóvel {orulo_id}: {str(ex_plans)}")
 
 
                 total_importados += 1
@@ -487,7 +487,7 @@ def sincronizar_imovel_orulo(imovel_id):
                     if count_units_new > 0:
                         result['changes'].append(f"{count_units_new} novas tipologias/unidades importadas.")
         except Exception as e_typ:
-            logger.warning(f"Erro sync typologies: {e_typ}")
+            logger.warning(f"Erro sync typologies: {str(e_typ)}")
 
 
         # --- B. Sincronizar Imagens (Com Fallback) ---
@@ -502,7 +502,7 @@ def sincronizar_imovel_orulo(imovel_id):
                 if resp_img.status_code == 200:
                     images_list = resp_img.json().get('images', [])
             except Exception as ex_img:
-                logger.warning(f"Erro ao buscar imagens dedicadas no sync: {ex_img}")
+                logger.warning(f"Erro ao buscar imagens dedicadas no sync: {str(ex_img)}")
 
             # 2. Fallback para dados locais (do detail response)
             # Verifica se 'images' tem dados válidos. 
@@ -562,7 +562,7 @@ def sincronizar_imovel_orulo(imovel_id):
                 if count_img > 0:
                     result['changes'].append(f"{count_img} imagens atualizadas do servidor.")
         except Exception as e_img:
-            logger.warning(f"Erro sync imagens: {e_img}")
+            logger.warning(f"Erro sync imagens: {str(e_img)}")
 
 
         # --- C. Sincronizar Plantas ---
@@ -643,7 +643,7 @@ def sincronizar_imovel_orulo(imovel_id):
                      if count_plans > 0:
                          result['changes'].append(f"{count_plans} plantas processadas e associadas a unidades.")
         except Exception as e_plan:
-             logger.warning(f"Erro sync plantas: {e_plan}")
+             logger.warning(f"Erro sync plantas: {str(e_plan)}")
 
 
         # --- D. Sincronizar Arquivos ---
@@ -699,7 +699,7 @@ def sincronizar_imovel_orulo(imovel_id):
                  if count_files > 0:
                      result['changes'].append(f"{count_files} arquivos documentais baixados.")
         except Exception as e_files:
-             logger.warning(f"Erro sync arquivos: {e_files}")
+             logger.warning(f"Erro sync arquivos: {str(e_files)}")
         if not result['changes']:
             result['changes'].append("Nenhuma alteração detectada nos dados básicos.")
 
@@ -711,6 +711,6 @@ def sincronizar_imovel_orulo(imovel_id):
         result['message'] = "Imóvel não encontrado localmente."
         return False, result
     except Exception as e:
-        logger.error(f"Erro ao sincronizar imóvel {imovel_id}: {e}")
+        logger.error(f"Erro ao sincronizar imóvel {imovel_id}: {str(e)}")
         result['message'] = f"Erro interno: {str(e)}"
         return False, result

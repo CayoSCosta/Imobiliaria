@@ -184,18 +184,16 @@
         font-size: 1.8rem;
     }
 
-    /* SIDEBAR (Sem sticky por enquanto pois adicionamos o mapa e ficaria muito alto) */
+    /* SIDEBAR estática (sem fixar durante rolagem) */
     .sidebar-contact {
-        position: relative;
-        /* position: sticky; */
-        /* top: 20px; */
+        position: static;
         height: fit-content;
         background: #fff;
         border: 1px solid var(--border-color);
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         z-index: 100;
-        margin-top: -150px; /* Pull up over the carousel */
+        margin-top: 0;
     }
 
     @media (max-width: 992px) {
@@ -283,6 +281,26 @@
         }
         /* Ajuste para o rodapé não cobrir conteúdo */
         body { padding-bottom: 80px; } 
+    }
+
+    /* Botões flutuantes (desktop) */
+    .detail-float {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .detail-float.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    @media (max-width: 991px) {
+        .detail-float {
+            display: none;
+        }
     }
 
 </style>
@@ -560,6 +578,15 @@
     </div>
 </div>
 
+<!-- Botões flutuantes (aparecem ao rolar) -->
+<button id="backToTop" class="back-to-top detail-float" title="Voltar ao início">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<a id="detailWhatsappFloat" href="{{ whatsapp_url }}" target="_blank" class="whatsapp-float detail-float" title="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
 <script>
     // Inicializa o Carrossel do Header (Carrossel principal da página)
     document.addEventListener('DOMContentLoaded', function() {
@@ -588,6 +615,26 @@
             },
             // autoplay: { delay: 4000 } // Opcional
         });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const backToTopBtn = document.getElementById('backToTop');
+        const whatsappFloat = document.getElementById('detailWhatsappFloat');
+
+        const toggleFloatingButtons = () => {
+            const shouldShow = window.scrollY > 300;
+            if (backToTopBtn) backToTopBtn.classList.toggle('show', shouldShow);
+            if (whatsappFloat) whatsappFloat.classList.toggle('show', shouldShow);
+        };
+
+        window.addEventListener('scroll', toggleFloatingButtons);
+        toggleFloatingButtons();
+
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
     });
 
 let swiperInstance;

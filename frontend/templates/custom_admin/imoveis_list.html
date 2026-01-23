@@ -202,6 +202,30 @@
     </div>
 </div>
 
+<!-- Botões flutuantes (aparecem ao rolar) -->
+<button id="backToTop" class="back-to-top admin-float" title="Voltar ao início">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<a id="adminWhatsappFloat" href="https://wa.me/{{ WHATSAPP_NUMERO }}" class="whatsapp-float admin-float" target="_blank" title="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+    .admin-float {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: all 0.3s ease;
+    }
+
+    .admin-float.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+</style>
+
 <script>
     function confirmDelete(id, title) {
         document.getElementById('imovel-title').innerText = title;
@@ -209,5 +233,25 @@
         var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         myModal.show();
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const backToTopBtn = document.getElementById('backToTop');
+        const whatsappFloat = document.getElementById('adminWhatsappFloat');
+
+        const toggleFloatingButtons = () => {
+            const shouldShow = window.scrollY > 300;
+            if (backToTopBtn) backToTopBtn.classList.toggle('show', shouldShow);
+            if (whatsappFloat) whatsappFloat.classList.toggle('show', shouldShow);
+        };
+
+        window.addEventListener('scroll', toggleFloatingButtons);
+        toggleFloatingButtons();
+
+        if (backToTopBtn) {
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    });
 </script>
 {% endblock %}

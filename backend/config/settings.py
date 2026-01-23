@@ -28,7 +28,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-o0()6mgdg2kj4m770+p@ootqgr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,76.13.80.168' ).split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,76.13.80.168' ).split(',')
+# settings.py
+ALLOWED_HOSTS = ['imobidom.cloud', 'www.imobidom.cloud', '76.13.80.168', 'localhost', '127.0.0.1']
 
 
 
@@ -161,3 +163,7 @@ WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO')
 ORULO_CLIENT_ID = os.getenv('ORULO_CLIENT_ID', "seu_client_id_aqui")
 ORULO_CLIENT_SECRET = os.getenv('ORULO_CLIENT_SECRET', "seu_client_secret_aqui")
 ORULO_BASE_URL = os.getenv('ORULO_BASE_URL', "https://www.orulo.com.br/api/v2")
+
+# settings.py
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True

@@ -23,7 +23,10 @@ jobs:
             cd ~/imobiliaria
             git config core.fileMode false
             git pull origin master
-            docker compose up -d --build
+            # O --force-recreate garante que o Docker não ignore mudanças de config
+            docker compose up -d --build --force-recreate
+            # Roda as migrações e coleta estáticos no container novo
             docker compose exec -T web python backend/manage.py migrate
             docker compose exec -T web python backend/manage.py collectstatic --noinput
+            # Limpa imagens antigas para não encher o disco da VPS
             docker image prune -f

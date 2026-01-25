@@ -167,3 +167,7 @@ ORULO_BASE_URL = os.getenv('ORULO_BASE_URL', "https://www.orulo.com.br/api/v2")
 # settings.py
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
+
+# Garante que cookies de login e CSRF só viajem por HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True

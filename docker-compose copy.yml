@@ -1,21 +1,6 @@
 version: '3.8'
 
 services:
-  # --- O PORTEIRO (PROXY) ---
-  proxy:
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      - '80:80'   # Porta do site
-      - '81:81'   # Painel de controle
-      - '443:443' # Porta SSL
-    volumes:
-      - ./proxy_data:/data
-      - ./letsencrypt:/etc/letsencrypt
-    networks:
-      - imobidom_net
-
-  # --- A APLICAÇÃO (DJANGO) ---
   web:
     build: .
     command: sh -c "python backend/manage.py collectstatic --noinput && gunicorn --chdir backend --bind 0.0.0.0:8000 config.wsgi:application"
@@ -25,26 +10,44 @@ services:
       - media_volume:/app/backend/media
     env_file:
       - .env
+    ports:
+      - "8000" # Expondo para o Nginx Proxy Manager acessar
     environment:
       - DB_HOST=db
     depends_on:
       - db
     restart: always
     networks:
-      - imobidom_net
+      - imobidom_bridge
+      - default
 
-  # --- O BANCO DE DADOS ---
   db:
     image: postgres:15
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
     restart: always
     networks:
-      - imobidom_net
+      - default
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./deploy/nginx-docker.conf:/etc/nginx/conf.d/default.conf
+      - static_volume:/app/staticfiles
+      - media_volume:/app/backend/media
+    # ports:
+    #   - "80:80"
+    depends_on:
+      - web
+    restart: always
+    networks:
+      - imobidom_bridge
 
 volumes:
   postgres_data:
@@ -52,5 +55,5 @@ volumes:
   media_volume:
 
 networks:
-  imobidom_net:
-    driver: bridge
+  imobidom_bridge:
+    external: true

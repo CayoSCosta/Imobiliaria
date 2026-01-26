@@ -11,7 +11,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8000:8000" # Expondo para o Nginx Proxy Manager acessar
+      - "8000" # Expondo para o Nginx Proxy Manager acessar
     environment:
       - DB_HOST=db
     depends_on:
@@ -46,6 +46,8 @@ services:
     depends_on:
       - web
     restart: always
+    networks:
+      - imobidom_bridge
 
 volumes:
   postgres_data:

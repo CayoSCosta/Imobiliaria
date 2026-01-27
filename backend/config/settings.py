@@ -30,7 +30,7 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 # ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,76.13.80.168' ).split(',')
 # settings.py
-ALLOWED_HOSTS = ['imobidom.cloud', 'www.imobidom.cloud', '76.13.80.168', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['imobidom.cloud', 'www.imobidom.cloud', '76.13.80.168', 'localhost', '127.0.0.1', 'imobidon.com.br', 'www.imobidon.com.br']
 
 
 
@@ -158,6 +158,19 @@ MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 LOGIN_REDIRECT_URL = 'custom_admin_index'
 
 WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO')
+
+# E-mail (notificações de leads)
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+LEAD_NOTIFICATION_EMAILS = [
+    e.strip() for e in os.getenv('LEAD_NOTIFICATION_EMAILS', '').split(',') if e.strip()
+]
 
 # Orulo API Settings
 ORULO_CLIENT_ID = os.getenv('ORULO_CLIENT_ID', "seu_client_id_aqui")

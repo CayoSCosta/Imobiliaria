@@ -27,7 +27,7 @@
                 </div>
                 <div>
                     <h5 class="fw-bold mb-1">WhatsApp</h5>
-                    <p class="text-muted mb-0"><a href="https://wa.me/{{ WHATSAPP_NUMERO }}" target="_blank" class="text-decoration-none text-muted">(11)96176-9270</a></p>
+                    <p class="text-muted mb-0"><a href="https://wa.me/{{ WHATSAPP_NUMERO }}" target="_blank" class="text-decoration-none text-muted" onclick="registrarWhatsappContatoFaleConosco()">(11)96176-9270</a></p>
                     <small class="text-muted">Atendimento rápido</small>
                 </div>
             </div>
@@ -126,4 +126,31 @@
 </script>
 {% endif %}
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function registrarWhatsappContatoFaleConosco() {
+    const payload = {
+        origem: 'WhatsApp - Fale Conosco',
+        mensagem: 'Clique no WhatsApp - Fale Conosco'
+    };
+
+    try {
+        if (navigator.sendBeacon) {
+            const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+            navigator.sendBeacon('/api/whatsapp-click/', blob);
+        } else {
+            fetch('/api/whatsapp-click/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                keepalive: true
+            });
+        }
+    } catch (e) {
+        console.error('Falha ao registrar clique no WhatsApp', e);
+    }
+}
+</script>
 {% endblock %}

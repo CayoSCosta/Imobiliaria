@@ -1,4 +1,6 @@
+
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Sobre Nós - ImobiDom{% endblock %}
 
@@ -7,16 +9,16 @@
     <div class="row align-items-center mb-5">
         <div class="col-lg-6">
             <h1 class="display-4 fw-bold mb-4">Consultoria Inteligente para a <span class="text-primary">Sua Próxima Conquista</span></h1>
-            <p class="lead text-muted">Na ImobiDom, não apenas listamos imóveis; entregamos uma assessoria estratégica completa para quem busca segurança e precisão no mercado imobiliário de São Paulo.</p>
+            <p class="lead text-muted">Na ImobiDom, não apenas listamos imóveis; Entregamos uma assessoria estratégica completa para quem busca segurança e precisão no mercado imobiliário de São Paulo.</p>
             <p>Nascemos para transformar a experiência de compra e venda, unindo a expertise de mercado com ferramentas digitais avançadas para encontrar o imóvel ideal com mais agilidade e transparência.</p>
             <p>Nosso diferencial está na curadoria minuciosa e na análise de dados que orientam cada decisão. Seja para moradia ou investimento, atuamos como parceiros estratégicos, guiando você desde a seleção do perfil ideal até a assinatura do contrato, garantindo uma conquista sólida e sem burocracias desnecessárias.</p>
         </div>
         <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sobre Nós" class="img-fluid rounded-4 shadow">
+            <img src="{% static 'img/sobre_nos.jpg' %}" alt="Sobre Nós" class="img-fluid rounded-4 shadow">
         </div>
     </div>
 
-    <div class="row g-4 py-5">
+    {% comment %} <div class="row g-4 py-5">
         <div class="col-md-4 text-center">
             <div class="p-4 bg-light rounded-3 h-100">
                 <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
@@ -38,6 +40,6 @@
                 <p>Utilizamos as melhores ferramentas digitais para agilizar processos e melhorar sua experiência.</p>
             </div>
         </div>
-    </div>
+    </div> {% endcomment %}
 </div>
 {% endblock %}

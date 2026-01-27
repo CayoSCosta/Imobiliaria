@@ -4,16 +4,51 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.paginator import Paginator
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 import json
 import csv
 from django.utils import timezone
 from .models import Lead, Acompanhamento
 from .serializers import LeadSerializer
 from .forms import AcompanhamentoForm
+from imoveis.models import Imovel
 
 class LeadCreateView(generics.CreateAPIView):
     queryset = Lead.objects.all()
     serializer_class = LeadSerializer
+
+
+@csrf_exempt
+@require_POST
+def registrar_whatsapp_contato(request):
+    try:
+        data = json.loads(request.body or '{}')
+    except json.JSONDecodeError:
+        data = {}
+
+    imovel_id = data.get('imovel')
+    origem = data.get('origem') or 'WhatsApp'
+    mensagem = data.get('mensagem') or 'Contato via WhatsApp'
+    nome = data.get('nome') or 'Contato via WhatsApp'
+    telefone = data.get('telefone') or 'Não informado'
+    email = data.get('email')
+
+    imovel = None
+    if imovel_id:
+        imovel = Imovel.objects.filter(id=imovel_id).first()
+
+    Lead.objects.create(
+        nome=nome,
+        telefone=telefone,
+        email=email,
+        origem=origem,
+        tipo_contato='whatsapp',
+        mensagem=mensagem,
+        imovel=imovel,
+        status='novo',
+    )
+
+    return JsonResponse({'success': True})
 
 @staff_member_required
 def custom_admin_leads_list(request):

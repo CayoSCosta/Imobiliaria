@@ -164,6 +164,8 @@ def simulacao_financiamento(request):
         Lead.objects.create(
             nome=nome,
             telefone=telefone,
+            email=email,
+            origem='Simulador Financiamento',
             mensagem=conteudo,
             status='novo'
         )
@@ -185,6 +187,8 @@ def simulacao_mcmv(request):
         Lead.objects.create(
             nome=nome,
             telefone=telefone,
+            email=email,
+            origem='Simulador MCMV',
             mensagem=conteudo,
             status='novo'
         )
@@ -206,6 +210,8 @@ def fale_conosco(request):
         Lead.objects.create(
             nome=nome,
             telefone=telefone,
+            email=email,
+            origem='Fale Conosco',
             mensagem=conteudo_completo,
             tipo_contato='whatsapp', # Padrão
             status='novo'

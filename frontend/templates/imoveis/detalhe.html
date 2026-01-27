@@ -185,15 +185,26 @@
     }
 
     /* SIDEBAR estática (sem fixar durante rolagem) */
+    .sidebar-column {
+        position: relative;
+    }
+
     .sidebar-contact {
-        position: static;
+        position: relative;
         height: fit-content;
         background: #fff;
         border: 1px solid var(--border-color);
         border-radius: 16px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        z-index: 100;
+        z-index: 200;
         margin-top: 0;
+    }
+
+    /* Sobrepor o carrossel no desktop */
+    @media (min-width: 992px) {
+        .sidebar-contact {
+            margin-top: -140px;
+        }
     }
 
     @media (max-width: 992px) {
@@ -248,6 +259,7 @@
         height: 300px; /* Mobile */
         margin-bottom: 40px;
         position: relative;
+        z-index: 1;
     }
 
     @media (min-width: 768px) {
@@ -457,7 +469,7 @@
                 </div>
                 
                 <div style="padding: 0 20px 20px;">
-                    <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp"
+                    <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (card)')"
                         style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%;">
                         <i class="fab fa-whatsapp"></i> Falar agora com um especialista
                     </a>
@@ -563,7 +575,7 @@
     </div>
 </div>
 
-<a href="{{ whatsapp_url }}" target="_blank" class="mobile-floating-cta btn btn-success py-3 rounded-pill fw-bold text-white text-decoration-none justify-content-center align-items-center gap-2">
+<a href="{{ whatsapp_url }}" target="_blank" class="mobile-floating-cta btn btn-success py-3 rounded-pill fw-bold text-white text-decoration-none justify-content-center align-items-center gap-2" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (mobile)')">
     <i class="fab fa-whatsapp fa-lg"></i> Falar com Especialista
 </a>
 
@@ -583,7 +595,7 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<a id="detailWhatsappFloat" href="{{ whatsapp_url }}" target="_blank" class="whatsapp-float detail-float" title="Fale conosco no WhatsApp">
+<a id="detailWhatsappFloat" href="{{ whatsapp_url }}" target="_blank" class="whatsapp-float detail-float" title="Fale conosco no WhatsApp" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (float)')">
     <i class="fab fa-whatsapp"></i>
 </a>
 
@@ -755,6 +767,34 @@ function openModalContato(e) {
 
 function closeModalContato() {
     document.getElementById('modal-contato').style.display = 'none';
+}
+
+function registrarWhatsappContato(imovelId, imovelTitulo, origem) {
+    const payload = {
+        imovel: imovelId,
+        origem: origem,
+        mensagem: `Clique no WhatsApp - ${imovelTitulo}`
+    };
+
+    try {
+        if (navigator.sendBeacon) {
+            const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+            navigator.sendBeacon('/api/whatsapp-click/', blob);
+        } else {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            fetch('/api/whatsapp-click/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(csrfToken ? { 'X-CSRFToken': csrfToken } : {})
+                },
+                body: JSON.stringify(payload),
+                keepalive: true
+            });
+        }
+    } catch (e) {
+        console.error('Falha ao registrar clique no WhatsApp', e);
+    }
 }
 
 async function enviarContato(e) {

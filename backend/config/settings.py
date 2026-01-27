@@ -185,4 +185,11 @@ USE_X_FORWARDED_HOST = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-CSRF_TRUSTED_ORIGINS=https://imobidon.com.br,https://www.imobidon.com.br,http://imobidon.com.br,http://www.imobidon.com.br
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.getenv(
+        'CSRF_TRUSTED_ORIGINS',
+        'https://imobidon.com.br,https://www.imobidon.com.br,http://imobidon.com.br,http://www.imobidon.com.br'
+    ).split(',')
+    if o.strip()
+]

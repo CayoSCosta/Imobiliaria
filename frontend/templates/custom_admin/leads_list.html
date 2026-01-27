@@ -160,18 +160,41 @@
         color: #172b4d;
         border-radius: 3px;
     }
+
+    @media (max-width: 991px) {
+        .container-fluid {
+            height: auto;
+            overflow: visible;
+        }
+
+        .kanban-board {
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: visible;
+            height: auto;
+        }
+
+        .kanban-column {
+            flex: 1 1 auto;
+            width: 100%;
+        }
+
+        .kanban-items {
+            max-height: none;
+        }
+    }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4 px-3">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-3 admin-page-header">
         <div>
             <h1 class="h3 mb-0">Gestão de Leads</h1>
             <p class="text-muted small mb-0">Arraste os cards para mudar o status</p>
         </div>
-        <div>
+        <div class="admin-page-actions">
             <a href="{% url 'exportar_leads_csv' %}" class="btn btn-success btn-sm me-2">
                 <i class="fas fa-file-csv me-1"></i> Exportar CSV
             </a>

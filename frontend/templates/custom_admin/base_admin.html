@@ -14,5 +14,37 @@
         border-radius: 10px;
         border: none;
     }
+
+    .admin-page-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .admin-page-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .admin-filter-actions {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 576px) {
+        .admin-page-actions .btn {
+            width: 100%;
+        }
+
+        .admin-filter-actions {
+            align-items: stretch !important;
+        }
+
+        .admin-filter-actions .btn,
+        .admin-filter-actions a.btn {
+            width: 100%;
+            margin-left: 0 !important;
+        }
+    }
 </style>
 {% endblock %}

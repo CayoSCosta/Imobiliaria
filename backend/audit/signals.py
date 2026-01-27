@@ -11,6 +11,7 @@ import json
 from decimal import Decimal
 from datetime import date, datetime, time
 from uuid import UUID
+from django.db.models.fields.files import FieldFile
 
 # Convert objects to serializable format
 def clean_value(value):
@@ -18,6 +19,8 @@ def clean_value(value):
         return str(value)
     if isinstance(value, (date, datetime, time)):
         return value.isoformat()
+    if isinstance(value, FieldFile):
+        return value.name or ''
     if hasattr(value, 'id'): # Foreign Keys
         return value.id
     if hasattr(value, 'all'): # ManyRelatedManager (skipped in model_to_dict usually but just in case)

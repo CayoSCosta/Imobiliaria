@@ -184,3 +184,5 @@ USE_X_FORWARDED_HOST = True
 # Garante que cookies de login e CSRF só viajem por HTTPS
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+CSRF_TRUSTED_ORIGINS=https://imobidon.com.br,https://www.imobidon.com.br,http://imobidon.com.br,http://www.imobidon.com.br

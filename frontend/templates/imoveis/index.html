@@ -386,7 +386,7 @@
 
                 <select name="status">
                     <option value="">Status da Obra</option>
-                    <option value="EM_OBRA" {% if status_selecionado == "EM_OBRA" %}selected{% endif %}>Em Obras</option>
+                    <option value="EM_OBRA" {% if status_selecionado == "EM_OBRA" %}selected{% endif %}>Lançamento</option>
                     <option value="PRONTO" {% if status_selecionado == "PRONTO" %}selected{% endif %}>Pronto</option>
                 </select>
 
@@ -526,7 +526,6 @@
                     {% if imovel.preco %}
                     A partir de R$ {{ imovel.preco|intcomma }}
                     {% else %}
-                    Sob consulta
                     {% endif %}
                 </div>
                 <div class="titulo-imovel">{{ imovel.titulo }}</div>
@@ -556,13 +555,42 @@
     {% endfor %}
 </div>
 
-<!-- Botão Ver Mais -->
-{% if imoveis.has_next %}
-<div class="container my-5 text-center">
-    <button id="btn-ver-mais" class="btn btn-primary btn-lg rounded-pill px-5" 
-            data-next-url="?page={{ imoveis.next_page_number }}{% if bairro_selecionado %}&bairro={{ bairro_selecionado }}{% endif %}{% if cidade_selecionada %}&cidade={{ cidade_selecionada }}{% endif %}{% if tipo_selecionado %}&tipo={{ tipo_selecionado }}{% endif %}{% if quartos_selecionados %}&quartos={{ quartos_selecionados }}{% endif %}">
-        Ver Mais Imóveis
-    </button>
+<!-- Paginação -->
+{% if imoveis.paginator.num_pages > 1 %}
+<div class="container my-5">
+    <nav aria-label="Paginação de imóveis">
+        <ul class="pagination justify-content-center flex-wrap gap-2">
+            {% if imoveis.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ imoveis.previous_page_number }}{% if termo_selecionado %}&termo={{ termo_selecionado }}{% endif %}{% if tipo_selecionado %}&tipo={{ tipo_selecionado }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if quartos_selecionados %}&quartos={{ quartos_selecionados }}{% endif %}{% if vagas_selecionadas %}&vagas={{ vagas_selecionadas }}{% endif %}{% if banheiros_selecionados %}&banheiros={{ banheiros_selecionados }}{% endif %}{% if suites_selecionadas %}&suites={{ suites_selecionadas }}{% endif %}{% if area_min_selecionada %}&area_min={{ area_min_selecionada }}{% endif %}{% if area_max_selecionada %}&area_max={{ area_max_selecionada }}{% endif %}{% if preco_min_selecionado %}&preco_min={{ preco_min_selecionado }}{% endif %}{% if preco_max_selecionado %}&preco_max={{ preco_max_selecionado }}{% endif %}">
+                    &laquo;
+                </a>
+            </li>
+            {% endif %}
+
+            {% for page_num in imoveis.paginator.page_range %}
+                {% if page_num == imoveis.number %}
+                <li class="page-item active" aria-current="page">
+                    <span class="page-link">{{ page_num }}</span>
+                </li>
+                {% elif page_num >= imoveis.number|add:-2 and page_num <= imoveis.number|add:2 %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_num }}{% if termo_selecionado %}&termo={{ termo_selecionado }}{% endif %}{% if tipo_selecionado %}&tipo={{ tipo_selecionado }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if quartos_selecionados %}&quartos={{ quartos_selecionados }}{% endif %}{% if vagas_selecionadas %}&vagas={{ vagas_selecionadas }}{% endif %}{% if banheiros_selecionados %}&banheiros={{ banheiros_selecionados }}{% endif %}{% if suites_selecionadas %}&suites={{ suites_selecionadas }}{% endif %}{% if area_min_selecionada %}&area_min={{ area_min_selecionada }}{% endif %}{% if area_max_selecionada %}&area_max={{ area_max_selecionada }}{% endif %}{% if preco_min_selecionado %}&preco_min={{ preco_min_selecionado }}{% endif %}{% if preco_max_selecionado %}&preco_max={{ preco_max_selecionado }}{% endif %}">
+                        {{ page_num }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if imoveis.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ imoveis.next_page_number }}{% if termo_selecionado %}&termo={{ termo_selecionado }}{% endif %}{% if tipo_selecionado %}&tipo={{ tipo_selecionado }}{% endif %}{% if status_selecionado %}&status={{ status_selecionado }}{% endif %}{% if quartos_selecionados %}&quartos={{ quartos_selecionados }}{% endif %}{% if vagas_selecionadas %}&vagas={{ vagas_selecionadas }}{% endif %}{% if banheiros_selecionados %}&banheiros={{ banheiros_selecionados }}{% endif %}{% if suites_selecionadas %}&suites={{ suites_selecionadas }}{% endif %}{% if area_min_selecionada %}&area_min={{ area_min_selecionada }}{% endif %}{% if area_max_selecionada %}&area_max={{ area_max_selecionada }}{% endif %}{% if preco_min_selecionado %}&preco_min={{ preco_min_selecionado }}{% endif %}{% if preco_max_selecionado %}&preco_max={{ preco_max_selecionado }}{% endif %}">
+                    &raquo;
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endif %}
 
@@ -619,52 +647,6 @@
             });
         }
     });
-
-    // Lógica do Ver Mais
-    const btnVerMais = document.getElementById('btn-ver-mais');
-    if (btnVerMais) {
-        btnVerMais.addEventListener('click', function() {
-            const url = this.getAttribute('data-next-url');
-            if (!url) return;
-            
-            const originalContent = this.innerHTML;
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
-            this.disabled = true;
-
-            fetch(url)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(html, 'text/html');
-                    const newItems = doc.querySelectorAll('.grid article');
-                    const grid = document.querySelector('.grid');
-
-                    if(newItems.length > 0) {
-                        newItems.forEach(item => grid.appendChild(item));
-                        
-                        // Inicializa Swiper nos novos elementos
-                        initSwipers(grid);
-
-                        // Verifica se existe próxima página no HTML retornado
-                        const newBtn = doc.querySelector('#btn-ver-mais');
-                        if (newBtn) {
-                            this.setAttribute('data-next-url', newBtn.getAttribute('data-next-url'));
-                            this.innerHTML = originalContent;
-                            this.disabled = false;
-                        } else {
-                            this.remove();
-                        }
-                    } else {
-                        this.remove();
-                    }
-                })
-                .catch(err => {
-                    console.error('Erro:', err);
-                    this.innerHTML = originalContent;
-                    this.disabled = false;
-                });
-        });
-    }
 
     function getLocation() {
         if (navigator.geolocation) {

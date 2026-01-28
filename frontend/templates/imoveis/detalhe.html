@@ -13,7 +13,7 @@
     }
 
     .container-detalhe {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 20px;
     }
@@ -103,6 +103,41 @@
         color: var(--text-light);
         font-size: 1.1rem;
         margin-bottom: 30px;
+    }
+
+    .resumo-imovel {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 20px;
+        padding: 18px 0 10px;
+        border-bottom: 1px solid var(--border-color);
+        margin-bottom: 10px;
+        overflow-x: auto;
+    }
+
+    .resumo-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 140px;
+    }
+
+    .resumo-item i {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+    .resumo-item .resumo-label {
+        font-size: 0.95rem;
+        color: var(--text-light);
+        font-weight: 600;
+    }
+
+    .resumo-item .resumo-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-main);
+        line-height: 1.2;
     }
 
     /* --- CARD DE UNIDADE REFATORADO (MODELO SOLICITADO) --- */
@@ -358,6 +393,106 @@
                 
             </div>
 
+            <div class="resumo-imovel">
+                <div class="resumo-item">
+                    <i class="fas fa-ruler-combined"></i>
+                    <div>
+                        <div class="resumo-label">Área</div>
+                        <div class="resumo-value">
+                            {% if imovel.min_area and imovel.max_area %}
+                                {% if imovel.min_area == imovel.max_area %}
+                                    {{ imovel.min_area }} m²
+                                {% else %}
+                                    {{ imovel.min_area }} - {{ imovel.max_area }} m²
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resumo-item">
+                    <i class="fas fa-building"></i>
+                    <div>
+                        <div class="resumo-label">Estágio</div>
+                        <div class="resumo-value">{{ imovel.get_status_display }}</div>
+                    </div>
+                </div>
+
+                <div class="resumo-item">
+                    <i class="fas fa-bed"></i>
+                    <div>
+                        <div class="resumo-label">Dormitórios</div>
+                        <div class="resumo-value">
+                            {% if imovel.min_quartos and imovel.max_quartos %}
+                                {% if imovel.min_quartos == imovel.max_quartos %}
+                                    {{ imovel.min_quartos }}
+                                {% else %}
+                                    {{ imovel.min_quartos }} - {{ imovel.max_quartos }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resumo-item">
+                    <i class="fas fa-bath"></i>
+                    <div>
+                        <div class="resumo-label">Suítes</div>
+                        <div class="resumo-value">
+                            {% if imovel.min_suites and imovel.max_suites %}
+                                {% if imovel.min_suites == imovel.max_suites %}
+                                    {{ imovel.min_suites }}
+                                {% else %}
+                                    {{ imovel.min_suites }} - {{ imovel.max_suites }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resumo-item">
+                    <i class="fas fa-shower"></i>
+                    <div>
+                        <div class="resumo-label">Banheiros</div>
+                        <div class="resumo-value">
+                            {% if imovel.min_banheiros and imovel.max_banheiros %}
+                                {% if imovel.min_banheiros == imovel.max_banheiros %}
+                                    {{ imovel.min_banheiros }}
+                                {% else %}
+                                    {{ imovel.min_banheiros }} - {{ imovel.max_banheiros }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resumo-item">
+                    <i class="fas fa-car"></i>
+                    <div>
+                        <div class="resumo-label">Vagas</div>
+                        <div class="resumo-value">
+                            {% if imovel.min_vagas and imovel.max_vagas %}
+                                {% if imovel.min_vagas == imovel.max_vagas %}
+                                    {{ imovel.min_vagas }}
+                                {% else %}
+                                    {{ imovel.min_vagas }} - {{ imovel.max_vagas }}
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {% comment %} <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;"> {% endcomment %}
             <hr/>
 
@@ -428,6 +563,12 @@
                                     <span class="spec-label">Banheiros</span>
                                     <div class="spec-value"><i class="fas fa-shower"></i> {{ unidade.banheiros }}</div>
                                 </div>
+                                {% if unidade.suites > 0 %}
+                                <div class="spec-item">
+                                    <span class="spec-label">Suítes</span>
+                                    <div class="spec-value"><i class="fas fa-bath"></i> {{ unidade.suites }}</div>
+                                </div>
+                                {% endif %}
                                 {% if unidade.vagas > 0 %}
                                 <div class="spec-item">
                                     <span class="spec-label">Vagas</span>

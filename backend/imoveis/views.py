@@ -222,7 +222,18 @@ def fale_conosco(request):
 def imovel_detalhe(request, slug):
 # Adicionamos 'unidades__imagens' para trazer as fotos de cada planta
     imovel = get_object_or_404(
-        Imovel.objects.prefetch_related('unidades__imagens', 'imagens'), 
+        Imovel.objects.prefetch_related('unidades__imagens', 'imagens').annotate(
+            min_area=Min('unidades__area_m2'),
+            max_area=Max('unidades__area_m2'),
+            min_quartos=Min('unidades__quartos'),
+            max_quartos=Max('unidades__quartos'),
+            min_suites=Min('unidades__suites'),
+            max_suites=Max('unidades__suites'),
+            min_banheiros=Min('unidades__banheiros'),
+            max_banheiros=Max('unidades__banheiros'),
+            min_vagas=Min('unidades__vagas'),
+            max_vagas=Max('unidades__vagas'),
+        ), 
         slug=slug, 
         ativo=True
     )

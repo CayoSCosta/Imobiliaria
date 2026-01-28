@@ -154,6 +154,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                     imovel.descricao = building.get('description') or f"Empreendimento {nome}."
                     imovel.tipo = tipo_imovel
                     imovel.status = status_imovel
+                    imovel.preco = Decimal(min_price) if float(min_price or 0) > 0 else imovel.preco
                     imovel.bairro = district
                     imovel.bairro_oficial = address.get('area')
                     imovel.cidade = city
@@ -172,6 +173,7 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                         descricao=building.get('description') or f"Empreendimento {nome}.",
                         tipo=tipo_imovel,
                         status=status_imovel,
+                        preco=Decimal(min_price) if float(min_price or 0) > 0 else None,
                         bairro=district,
                         bairro_oficial=address.get('area'),
                         cidade=city,
@@ -213,7 +215,6 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                                 Unidade.objects.create(
                                     imovel=imovel,
                                     titulo=f"{typology.get('type', 'Unidade')} - {typology.get('reference', '') or typology.get('id')}",
-                                    preco=Decimal(price),
                                     area_m2=int(area),
                                     quartos=int(typology.get('bedrooms', 0)),
                                     banheiros=int(typology.get('bathrooms', 0)),
@@ -248,7 +249,6 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                         Unidade.objects.create(
                             imovel=imovel,
                             titulo=f"Unidade Padrão - {nome}",
-                            preco=Decimal(min_price),
                             area_m2=int(min_area),
                             quartos=int(quartos),
                             banheiros=int(banheiros),
@@ -465,15 +465,18 @@ def sincronizar_imovel_orulo(imovel_id):
                 if typologies:
                     # Estratégia: Atualizar existentes por título ou criar novas
                     count_units_new = 0
+                    min_price = None
                     for typ in typologies:
                          nome_unidade = f"{typ.get('type', 'Unidade')} - {typ.get('reference', '') or typ.get('id')}"
                          price = Decimal(typ.get('discount_price') or typ.get('original_price') or 0)
+                         if price and price > 0:
+                             if min_price is None or price < min_price:
+                                 min_price = price
                          
                          unit_obj, created = Unidade.objects.update_or_create(
                              imovel=imovel,
                              titulo=nome_unidade,
                              defaults={
-                                 'preco': price,
                                  'area_m2': int(typ.get('private_area') or typ.get('total_area') or 0),
                                  'quartos': int(typ.get('bedrooms', 0)),
                                  'banheiros': int(typ.get('bathrooms', 0)),
@@ -486,6 +489,9 @@ def sincronizar_imovel_orulo(imovel_id):
                     
                     if count_units_new > 0:
                         result['changes'].append(f"{count_units_new} novas tipologias/unidades importadas.")
+                    if min_price and (not imovel.preco or min_price != imovel.preco):
+                        imovel.preco = min_price
+                        imovel.save(update_fields=['preco'])
         except Exception as e_typ:
             logger.warning(f"Erro sync typologies: {str(e_typ)}")
 

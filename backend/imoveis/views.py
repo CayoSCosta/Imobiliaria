@@ -25,7 +25,6 @@ from django.core.paginator import Paginator
 
 def index(request):
     imoveis = Imovel.objects.filter(ativo=True).annotate(
-        menor_preco=Min('unidades__preco'),
         min_quartos=Min('unidades__quartos'),
         max_quartos=Max('unidades__quartos'), 
         min_area=Min('unidades__area_m2'),
@@ -107,10 +106,10 @@ def index(request):
         imoveis = imoveis.filter(unidades__area_m2__lte=area_max).distinct()
 
     if preco_min:
-        imoveis = imoveis.filter(unidades__preco__gte=preco_min).distinct()
+        imoveis = imoveis.filter(preco__gte=preco_min).distinct()
 
     if preco_max:
-        imoveis = imoveis.filter(unidades__preco__lte=preco_max).distinct()
+        imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página

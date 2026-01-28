@@ -51,7 +51,6 @@ class UnidadeForm(forms.ModelForm):
         exclude = ['imovel', 'criado_em']
         labels = {
             'titulo': 'Título da Unidade',
-            'preco': 'Preço (R$)',
             'area_m2': 'Área (m²)',
             'quartos': 'Quartos',
             'banheiros': 'Banheiros',
@@ -99,13 +98,18 @@ class ImovelForm(forms.ModelForm):
 
     class Meta:
         model = Imovel
-        fields = ['titulo', 'descricao', 'tipo', 'status', 'destaque', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
+        fields = ['titulo', 'descricao', 'tipo', 'status', 'destaque', 'preco', 'preco_m2', 'condominio', 'iptu', 'parcela', 'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'ativo']
         labels = {
             'titulo': 'Título do Empreendimento',
             'descricao': 'Descrição',
             'tipo': 'Tipo',
             'status': 'Status da Obra',
             'destaque': 'Destaque?',
+            'preco': 'Preço (R$)',
+            'preco_m2': 'Preço do m² (R$)',
+            'condominio': 'Condomínio (R$)',
+            'iptu': 'IPTU (R$)',
+            'parcela': 'Parcela (R$)',
             'rua': 'Endereço (Rua/Av)',
             'numero': 'Número',
             'bairro': 'Bairro Comercial',

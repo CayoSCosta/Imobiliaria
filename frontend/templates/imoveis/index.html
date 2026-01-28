@@ -523,8 +523,8 @@
             <div class="card-info">
                 <div class="bairro-tag"><i class="fas fa-map-marker-alt"></i> {{ imovel.bairro }}</div>
                 <div class="preco">
-                    {% if imovel.menor_preco %}
-                    A partir de R$ {{ imovel.menor_preco|intcomma }}
+                    {% if imovel.preco %}
+                    A partir de R$ {{ imovel.preco|intcomma }}
                     {% else %}
                     Sob consulta
                     {% endif %}

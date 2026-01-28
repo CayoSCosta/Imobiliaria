@@ -419,11 +419,6 @@
 
                         <div class="unidade-detalhes">
                             <h4>{{ unidade.titulo }} {{ unidade.area_m2 }}m²</h4>
-                            {% if unidade.preco > 0 %}
-                                <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">
-                                    R$ {{ unidade.preco|intcomma }}
-                                </div>
-                            {% endif %}
                             <div class="unidade-specs">
                                 <div class="spec-item">
                                     <span class="spec-label">Dormitórios</span>
@@ -464,8 +459,13 @@
                 <div style="margin-bottom: 20px; padding: 0 20px;">
                     <span style="display: block; font-size: 0.9rem; color: var(--text-light);">A partir de</span>
                     <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
-                        {% if preco_inicial %} R$ {{ preco_inicial|intcomma }} {% else %} Sob consulta {% endif %}
+                        {% if imovel.preco %} R$ {{ imovel.preco|intcomma }} {% else %} Sob consulta {% endif %}
                     </span>
+                    {% if imovel.parcela %}
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: var(--text-main); font-weight: 600;">
+                        Parcelas a partir de R$ {{ imovel.parcela|intcomma }}
+                    </div>
+                    {% endif %}
                 </div>
                 
                 <div style="padding: 0 20px 20px;">

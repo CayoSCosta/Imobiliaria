@@ -21,7 +21,6 @@
                     <thead class="table-light">
                         <tr>
                             <th class="ps-4">Título</th>
-                            <th>Preço (R$)</th>
                             <th>Área (m²)</th>
                             <th>Quartos</th>
                             <th>Status</th>
@@ -32,7 +31,6 @@
                         {% for unidade in unidades %}
                         <tr>
                             <td class="ps-4 align-middle fw-medium">{{ unidade.titulo }}</td>
-                            <td class="align-middle">R$ {{ unidade.preco|intcomma }}</td>
                             <td class="align-middle">{{ unidade.area_m2 }} m²</td>
                             <td class="align-middle">{{ unidade.quartos }}</td>
                             <td class="align-middle">

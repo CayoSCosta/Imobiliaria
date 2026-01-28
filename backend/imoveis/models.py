@@ -51,6 +51,11 @@ class Imovel(models.Model):
         verbose_name="Status da Obra"
     )
     destaque = models.BooleanField(default=False, verbose_name="Destaque", help_text="Exibe este imóvel com destaque na Home e nas buscas")
+    preco = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Preço")
+    preco_m2 = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Preço do m²")
+    condominio = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Condomínio")
+    iptu = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="IPTU")
+    parcela = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Parcela")
     bairro = models.CharField(max_length=100, verbose_name="Bairro (Comercial)")
     bairro_oficial = models.CharField(max_length=100, blank=True, null=True, verbose_name="Bairro (Oficial)", help_text="Bairro de registro (ex: Cidade Monções)")
     cidade = models.CharField(max_length=100, default='São Paulo')
@@ -100,7 +105,6 @@ class Unidade(models.Model):
     )
 
     titulo = models.CharField(max_length=255)
-    preco = models.DecimalField(max_digits=12, decimal_places=2)
 
     area_m2 = models.PositiveIntegerField()
     quartos = models.PositiveIntegerField()

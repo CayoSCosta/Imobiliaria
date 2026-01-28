@@ -37,7 +37,7 @@ class ImagePreviewMixin:
 # FILTRO DE PREÇO
 # =========================
 class FaixaPrecoFilter(admin.SimpleListFilter):
-    title = 'Faixa de Preço (Unidades)'
+    title = 'Faixa de Preço (Empreendimento)'
     parameter_name = 'faixa_preco'
     def lookups(self, request, model_admin):
         return (
@@ -47,10 +47,10 @@ class FaixaPrecoFilter(admin.SimpleListFilter):
             ('1000+', 'Acima de R$ 1 milhão'),
         )
     def queryset(self, request, queryset):
-        if self.value() == '0-300': return queryset.filter(unidades__preco__lte=300000).distinct()
-        if self.value() == '300-600': return queryset.filter(unidades__preco__range=(300000, 600000)).distinct()
-        if self.value() == '600-1000': return queryset.filter(unidades__preco__range=(600000, 1000000)).distinct()
-        if self.value() == '1000+': return queryset.filter(unidades__preco__gte=1000000).distinct()
+        if self.value() == '0-300': return queryset.filter(preco__lte=300000).distinct()
+        if self.value() == '300-600': return queryset.filter(preco__range=(300000, 600000)).distinct()
+        if self.value() == '600-1000': return queryset.filter(preco__range=(600000, 1000000)).distinct()
+        if self.value() == '1000+': return queryset.filter(preco__gte=1000000).distinct()
 
 # =========================
 # INLINES
@@ -73,7 +73,7 @@ class UnidadeInline(admin.TabularInline):
     model = Unidade
     extra = 1
     show_change_link = True
-    fields = ('titulo', 'preco', 'area_m2', 'quartos', 'banheiros', 'suites', 'vagas', 'ativo')
+    fields = ('titulo', 'area_m2', 'quartos', 'banheiros', 'suites', 'vagas', 'ativo')
 
 # =========================
 # ADMINS (MANTENHA ESTES)
@@ -81,7 +81,7 @@ class UnidadeInline(admin.TabularInline):
 @admin.register(Unidade)
 class UnidadeAdmin(admin.ModelAdmin): 
     # Remova o 'preview' da lista por enquanto para o erro sumir
-    list_display = ('titulo', 'imovel', 'preco', 'quartos', 'area_m2', 'ativo')
+    list_display = ('titulo', 'imovel', 'quartos', 'area_m2', 'ativo')
     list_filter = ('ativo', 'quartos', 'imovel')
     inlines = [ImagemUnidadeInline]
 

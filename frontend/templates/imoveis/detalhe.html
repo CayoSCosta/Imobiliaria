@@ -455,31 +455,48 @@
 
         <div class="sidebar-column">
             <aside class="sidebar-contact">
-                <h4 style="margin-bottom: 20px; padding: 20px 20px 0;">Fale com um especialista</h4>
-                <div style="margin-bottom: 20px; padding: 0 20px;">
-                    <span style="display: block; font-size: 0.9rem; color: var(--text-light);">A partir de</span>
-                    <span style="font-size: 1.8rem; font-weight: 800; color: var(--primary-color);">
-                        {% if imovel.preco %} R$ {{ imovel.preco|intcomma }} {% endif %}
-                    </span>
-                    {% if imovel.parcela %}
-                    <div style="margin-top: 6px; font-size: 0.95rem; color: var(--text-main); font-weight: 600;">
-                        Parcelas a partir de R$ {{ imovel.parcela|intcomma }}
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <div style="padding: 0 20px 20px;">
+                <h4 style="margin-bottom: 10px; padding: 20px 20px 0;">Tenho interesse</h4>
+                <p style="color: #666; margin-bottom: 15px; padding: 0 20px;">Preencha seus dados para receber mais informações sobre <strong>{{ imovel.titulo }}</strong>.</p>
+
+                {% comment %} <div style="padding: 0 20px 10px;">
                     <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (card)')"
-                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%;">
+                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; width: 100%;">
                         <i class="fab fa-whatsapp"></i> Falar agora com um especialista
                     </a>
-                    <button onclick="openModalContato(event)" class="btn-whatsapp"
-                        onmouseover="this.style.background='#0254d1'" 
-                        onmouseout="this.style.background='#0365f8'"
-                        style="background: #0365f8; color: white; border: none; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 15px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 15px; font-size: 1rem; transition: background 0.3s ease;">
-                        <i class="fa-solid fa-circle-info"></i> Quero mais informações
+                </div> {% endcomment %}
+
+                <form onsubmit="enviarContato(event)" style="display: flex; flex-direction: column; gap: 12px; padding: 10px 20px 20px;">
+                    {% csrf_token %}
+                    <div>
+                        <label for="sidebar-contato-nome" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Nome</label>
+                        <input type="text" id="sidebar-contato-nome" name="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    
+                    <div>
+                        <label for="sidebar-contato-telefone" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Telefone / WhatsApp</label>
+                        <input type="tel" id="sidebar-contato-telefone" name="contato-telefone" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Preferência de contato</label>
+                        <div style="display: flex; gap: 20px; align-items: center;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="contato-pref" value="WhatsApp" checked> WhatsApp
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="contato-pref" value="Ligação"> Ligação
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; margin-top: 6px; transition: background 0.2s;">
+                        <i class="fa-regular fa-paper-plane"></i> Enviar Solicitação
                     </button>
-                </div>
+                    <a href="{{ whatsapp_url }}" target="_blank" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (form sidebar)')"
+                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; margin-top: 8px;">
+                        <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                    </a>
+                </form>
             </aside>
 
             <div class="mapa-wrapper" style="margin-top: 30px; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
@@ -544,12 +561,12 @@
             {% csrf_token %}
             <div>
                 <label for="contato-nome" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Nome</label>
-                <input type="text" id="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                <input type="text" id="contato-nome" name="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
             </div>
             
             <div>
                 <label for="contato-telefone" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Telefone / WhatsApp</label>
-                <input type="tel" id="contato-telefone" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
+                <input type="tel" id="contato-telefone" name="contato-telefone" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
             </div>
             
             <div>
@@ -564,13 +581,13 @@
                 </div>
             </div>
 
-            <p style="font-size: 0.8rem; color: #666; margin-top: 15px; margin-bottom: 5px; line-height: 1.4; text-align: center;">
-                Ao enviar concordo com os <a href="{% url 'termos_de_uso' %}" target="_blank" style="color: #0365f8; text-decoration: underline;">termos de uso</a> e <a href="{% url 'politica_de_privacidade' %}" target="_blank" style="color: #0365f8; text-decoration: underline;">política de privacidade</a>, para contatar os próximos anunciantes e afirmo ter mais de 18 anos
-            </p>
-
             <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; transition: background 0.2s;">
                 <i class="fab fa-whatsapp"></i> Enviar Solicitação
             </button>
+            <a href="{{ whatsapp_url }}" target="_blank" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (form modal)')"
+                style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; margin-top: 10px;">
+                <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+            </a>
         </form>
     </div>
 </div>
@@ -805,9 +822,12 @@ async function enviarContato(e) {
     btnSubmit.disabled = true;
     btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
-    const nome = document.getElementById('contato-nome').value;
-    const telefone = document.getElementById('contato-telefone').value;
-    const pref = document.querySelector('input[name="contato-pref"]:checked').value;
+    const nomeInput = e.target.querySelector('[name="contato-nome"]');
+    const telefoneInput = e.target.querySelector('[name="contato-telefone"]');
+    const prefInput = e.target.querySelector('input[name="contato-pref"]:checked');
+    const nome = nomeInput ? nomeInput.value : '';
+    const telefone = telefoneInput ? telefoneInput.value : '';
+    const pref = prefInput ? prefInput.value : 'WhatsApp';
     const imovel = "{{ imovel.titulo }}";
     const imovelId = "{{ imovel.id }}";
     
@@ -837,7 +857,10 @@ async function enviarContato(e) {
             throw new Error('Falha no envio');
         }
 
-        closeModalContato();
+        const modalContato = document.getElementById('modal-contato');
+        if (modalContato && modalContato.style.display === 'flex') {
+            closeModalContato();
+        }
         
         // Show Toast
         const toastEl = document.getElementById('liveToast');
@@ -845,8 +868,8 @@ async function enviarContato(e) {
         toast.show();
         
         // Limpar formulário
-        document.getElementById('contato-nome').value = '';
-        document.getElementById('contato-telefone').value = '';
+        if (nomeInput) nomeInput.value = '';
+        if (telefoneInput) telefoneInput.value = '';
 
     } catch (error) {
         console.error('Erro ao processar contato:', error);

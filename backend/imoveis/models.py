@@ -40,7 +40,7 @@ class Imovel(models.Model):
     ]
 
     titulo = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
     descricao = models.TextField()
     instalacoes = models.ManyToManyField(Instalacao, blank=True, related_name="imoveis")
     tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
@@ -61,7 +61,7 @@ class Imovel(models.Model):
     cidade = models.CharField(max_length=100, default='São Paulo')
     uf = models.CharField(max_length=2, default='SP', verbose_name="UF")
     rua = models.CharField(max_length=255, blank=True, null=True)
-    numero = models.CharField(max_length=50, blank=True, null=True)
+    numero = models.CharField(max_length=100, blank=True, null=True)
     cep = models.CharField(max_length=10, blank=True, null=True, verbose_name="CEP")
     
     # Geolocalização

@@ -111,6 +111,9 @@ def index(request):
     if preco_max:
         imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
+    # Ordenação padrão para garantir consistência na paginação
+    imoveis = imoveis.order_by('-id')
+
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página
     page_number = request.GET.get('page')

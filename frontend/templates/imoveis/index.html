@@ -112,19 +112,20 @@
 
     /* --- FILTRO AGORA DENTRO DO HERO --- */
     .filtro-container {
-        max-width: 1100px;
+        max-width: 850px;
         width: 100%;
         padding: 0 20px;
     }
 
     .filtro {
         display: grid;
-        grid-template-columns: 2.5fr 1fr 1fr 0.8fr auto;
+        grid-template-columns: 1fr auto auto;
         gap: 15px;
         background: var(--white);
         padding: 20px;
         border-radius: 12px;
         box-shadow: var(--shadow);
+        align-items: center;
     }
 
     .filtro input,
@@ -377,14 +378,14 @@
         <form method="get">
             <div class="filtro">
                 <div class="input-wrapper">
-                    <input type="text" name="termo" placeholder="🔍 Bairro, Condomínio ou Cidade"
+                    <input type="text" name="termo" placeholder="🔍 Bairro ou Condomínio"
                         value="{{ termo_selecionado|default:'' }}">
                     <button type="button" class="btn-location-icon" onclick="getLocation()" title="Buscar imóveis próximos a mim">
                         <i class="fas fa-map-marker-alt"></i>
                     </button>
                 </div>
 
-                <select name="status">
+                {% comment %} <select name="status">
                     <option value="">Status da Obra</option>
                     <option value="EM_OBRA" {% if status_selecionado == "EM_OBRA" %}selected{% endif %}>Lançamento</option>
                     <option value="PRONTO" {% if status_selecionado == "PRONTO" %}selected{% endif %}>Pronto</option>
@@ -395,14 +396,14 @@
                     <option value="MCMV" {% if tipo_selecionado == "MCMV" %}selected{% endif %}>Econômico (MCMV)</option>
                     <option value="MEDIO" {% if tipo_selecionado == "MEDIO" %}selected{% endif %}>Médio Padrão</option>
                     <option value="ALTO" {% if tipo_selecionado == "ALTO" %}selected{% endif %}>Alto Padrão</option>
-                </select>
-
-                <button type="button" class="btn-filtros-extra" data-bs-toggle="modal" data-bs-target="#filtrosModal">
-                    <i class="fas fa-sliders-h"></i> Filtros
-                </button>
+                </select> {% endcomment %}
 
                 <button type="submit">
                     <i class="fas fa-search"></i> Buscar
+                </button>
+
+                <button type="button" class="btn-filtros-extra" data-bs-toggle="modal" data-bs-target="#filtrosModal">
+                    <i class="fas fa-plus"></i> Filtros
                 </button>
             </div>
 

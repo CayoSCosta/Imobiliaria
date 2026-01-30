@@ -4,23 +4,17 @@
 {% block title %}Minha Casa Minha Vida | Imobidom{% endblock %}
 
 {% block content %}
-<section class="py-5 bg-dark text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static 'images/bg-mcmv.jpg' %}') center/cover;">
+<section class="py-5 bg-dark text-white" style="background-color: #0b0d10 !important;">
     <div class="container text-center py-4">
-        <h1 class="display-4 fw-bold">Seu Sonho da Casa Própria Começa Aqui</h1>
-        <p class="lead mb-4">Descubra em qual categoria sua renda se encaixa e veja as oportunidades exclusivas.</p>
+        <h1 class="display-4 fw-bold mb-3">Seu Sonho da Casa Própria Começa Aqui</h1>
+        <p class="lead mb-4 text-light opacity-75">Descubra em qual categoria sua renda se encaixa e veja as oportunidades exclusivas.</p>
         
-        <div class="row justify-content-center g-2 mt-4">
-            <div class="col-auto">
-                <a href="?categoria=HIS1#imoveis-mcmv" class="btn {% if categoria_ativa == 'HIS1' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 4,8k (HIS 1)</a>
-            </div>
-            <div class="col-auto">
-                <a href="?categoria=HIS2#imoveis-mcmv" class="btn {% if categoria_ativa == 'HIS2' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 9,7k (HIS 2)</a>
-            </div>
-            <div class="col-auto">
-                <a href="?categoria=HMP#imoveis-mcmv" class="btn {% if categoria_ativa == 'HMP' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 16,2k (HMP)</a>
-            </div>
-            <div class="col-auto">
-                <a href="?" class="btn btn-primary rounded-pill px-4">Ver Todos</a>
+        <div class="d-flex flex-column align-items-center gap-3 mt-5" style="max-width: 400px; margin: 0 auto;">
+            <a href="?categoria=HIS1#imoveis-mcmv" class="btn btn-outline-light rounded-pill w-100 py-2">Até R$ 4,8k (HIS 1)</a>
+            <a href="?categoria=HIS2#imoveis-mcmv" class="btn btn-outline-light rounded-pill w-100 py-2">Até R$ 9,7k (HIS 2)</a>
+            <div class="d-flex w-100 gap-2">
+                <a href="?categoria=HMP#imoveis-mcmv" class="btn btn-outline-light rounded-pill flex-grow-1 py-2">Até R$ 16,2k (HMP)</a>
+                <a href="?" class="btn btn-primary rounded-pill px-4 py-2">Ver Todos</a>
             </div>
         </div>
     </div>
@@ -138,4 +132,37 @@
         </a>
     </div>
 </section>
+
+<!-- Botões flutuantes -->
+<button id="backToTop" class="back-to-top" title="Voltar ao início">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<a href="https://wa.me/{{ WHATSAPP_NUMERO }}?text=Olá! Gostaria de saber mais sobre o programa Minha Casa Minha Vida e ver opções de imóveis." 
+   target="_blank" 
+   class="whatsapp-float" 
+   title="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const backToTopBtn = document.getElementById('backToTop');
+
+        const toggleBackToTop = () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        };
+
+        window.addEventListener('scroll', toggleBackToTop);
+        toggleBackToTop(); // Check on load
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+</script>
 {% endblock %}

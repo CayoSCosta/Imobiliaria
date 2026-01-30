@@ -198,6 +198,17 @@ def simulacao_mcmv(request):
 
     return render(request, 'simuladores/mcmv.html')
 
+def pagina_mcmv(request):
+    # Imóveis do tipo Minha Casa Minha Vida
+    imoveis = Imovel.objects.filter(ativo=True, tipo='MCMV').prefetch_related('imagens', 'unidades').annotate(
+        min_quartos=Min('unidades__quartos'),
+        max_quartos=Max('unidades__quartos'), 
+        min_area=Min('unidades__area_m2'),
+        max_area=Max('unidades__area_m2')     
+    ).order_by('-criado_em')
+
+    return render(request, 'imoveis/pagina_mcmv.html', {'imoveis': imoveis})
+
 def fale_conosco(request):
     if request.method == 'POST':
         nome = request.POST.get('nome')
@@ -309,6 +320,7 @@ def custom_admin_imoveis_list(request):
     }
 
     return render(request, 'custom_admin/imoveis_list.html', context)
+
 @staff_member_required
 def custom_admin_delete_imovel(request, imovel_id):
     """Exclui um imóvel específico"""
@@ -342,6 +354,7 @@ def custom_admin_sync_orulo_imovel(request, imovel_id):
         messages.error(request, resultado['message'])
         
     return redirect('custom_admin_orulo_list')
+
 @staff_member_required
 def custom_admin_imovel_imagens(request, imovel_id):
     imovel = get_object_or_404(Imovel, pk=imovel_id)

@@ -11,6 +11,7 @@ from .views import (
     duvidas_frequentes,
     simulacao_financiamento,
     simulacao_mcmv,
+    pagina_mcmv,
     fale_conosco,
     ImovelListAPIView,
     ImovelDetailAPIView,
@@ -48,9 +49,10 @@ urlpatterns = [
     path('termos-de-uso/', termos_de_uso, name='termos_de_uso'),
     path('politica-de-privacidade/', politica_de_privacidade, name='politica_de_privacidade'),
     # path('blog/', blog, name='blog'), # Removido, agora no app blog
-    path('duvidas-frequentes/', duvidas_frequentes, name='duvidas_frequentes'),
+    # path('duvidas-frequentes/', duvidas_frequentes, name='duvidas_frequentes'),
     path('simulacao/financiamento/', simulacao_financiamento, name='simulacao_financiamento'),
     path('simulacao/minha-casa-minha-vida/', simulacao_mcmv, name='simulacao_mcmv'),
+    path('minha-casa-minha-vida/', pagina_mcmv, name='pagina_mcmv'),
     path('fale-conosco/', fale_conosco, name='fale_conosco'),
 
     # ======================

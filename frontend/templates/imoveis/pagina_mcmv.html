@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Minha Casa Minha Vida | Imobidom{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-dark text-white" style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('{% static 'images/bg-mcmv.jpg' %}') center/cover;">
+    <div class="container text-center py-4">
+        <h1 class="display-4 fw-bold">Seu Sonho da Casa Própria Começa Aqui</h1>
+        <p class="lead mb-4">Descubra em qual categoria sua renda se encaixa e veja as oportunidades exclusivas.</p>
+        
+        <div class="row justify-content-center g-2 mt-4">
+            <div class="col-auto">
+                <a href="?categoria=HIS1#imoveis-mcmv" class="btn {% if categoria_ativa == 'HIS1' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 4,8k (HIS 1)</a>
+            </div>
+            <div class="col-auto">
+                <a href="?categoria=HIS2#imoveis-mcmv" class="btn {% if categoria_ativa == 'HIS2' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 9,7k (HIS 2)</a>
+            </div>
+            <div class="col-auto">
+                <a href="?categoria=HMP#imoveis-mcmv" class="btn {% if categoria_ativa == 'HMP' %}btn-success{% else %}btn-outline-light{% endif %} rounded-pill px-4">Até R$ 16,2k (HMP)</a>
+            </div>
+            <div class="col-auto">
+                <a href="?" class="btn btn-primary rounded-pill px-4">Ver Todos</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="text-primary mb-3"><i class="fas fa-wallet fa-3x"></i></div>
+                        <h5 class="fw-bold">1. Qual sua renda?</h5>
+                        <p class="small text-muted">O governo subsidia parte do valor para famílias com renda até R$ 9.726,00. É o empurrão que faltava!</p>
+                        <hr>
+                        <div class="text-start small">
+                            <div class="d-flex justify-content-between mb-1"><span>HIS 1:</span> <strong>Até R$ 4.863</strong></div>
+                            <div class="d-flex justify-content-between"><span>HIS 2:</span> <strong>Até R$ 9.726</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm border-bottom border-primary border-4">
+                    <div class="card-body text-center p-4">
+                        <div class="text-warning mb-3"><i class="fas fa-home fa-3x"></i></div>
+                        <h5 class="fw-bold">2. O que você pode comprar?</h5>
+                        <p class="small text-muted">Existem tetos de preço para garantir que o imóvel seja realmente acessível e com juros baixos.</p>
+                        <hr>
+                        <div class="text-start small">
+                            <div class="d-flex justify-content-between mb-1"><span>MCMV:</span> <strong>Até R$ 350 mil</strong></div>
+                            <div class="d-flex justify-content-between"><span>HMP:</span> <strong>Até R$ 537 mil</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="text-success mb-3"><i class="fas fa-shield-alt fa-3x"></i></div>
+                        <h5 class="fw-bold">3. Sua Segurança</h5>
+                        <p class="small text-muted">Esses imóveis são para moradia própria. Isso garante um condomínio mais tranquilo e familiar para sua família.</p>
+                        <div class="badge bg-light text-dark border p-2 mt-2 w-100">Juros reduzidos e uso do FGTS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="imoveis-mcmv" class="pt-4">
+            <div class="d-flex justify-content-between align-items-end mb-4">
+                <div>
+                    <h2 class="fw-bold">Oportunidades Selecionadas</h2>
+                    <p class="text-muted">Mostrando {{ imoveis.count }} imóveis para o seu perfil.</p>
+                </div>
+                {% if categoria_ativa %}
+                    <a href="?" class="btn btn-sm btn-outline-secondary mb-3">Limpar Filtro</a>
+                {% endif %}
+            </div>
+
+            <div class="row g-4">
+                {% for imovel in imoveis %}
+                <div class="col-12 col-md-6 col-lg-4">
+                    <article class="card h-100 shadow-sm border-0 position-relative overflow-hidden">
+                        <div class="position-absolute top-0 end-0 m-3 z-2">
+                            <span class="badge bg-success px-3 py-2 shadow">Enquadrado {{ imovel.categoria_enquadramento }}</span>
+                        </div>
+
+                        <div class="ratio ratio-16x9">
+                            {% with imovel.imagens.all|first as img %}
+                                <img src="{{ img.imagem.url }}" class="object-fit-cover" alt="{{ imovel.titulo }}">
+                            {% endwith %}
+                        </div>
+
+                        <div class="card-body">
+                            <p class="text-primary fw-bold small mb-1">{{ imovel.bairro }}</p>
+                            <h5 class="card-title fw-bold">{{ imovel.titulo }}</h5>
+                            
+                            <div class="my-3">
+                                <span class="text-muted small d-block">A partir de:</span>
+                                <span class="h4 fw-bold text-primary">R$ {{ imovel.preco|intcomma }}</span>
+                                <br>
+                                <span class="badge bg-light text-success border border-success mt-1">
+                                    <i class="fas fa-check-circle me-1"></i> Entrada facilitada
+                                </span>
+                            </div>
+
+                            <div class="d-flex gap-3 text-muted small mb-3">
+                                <span><i class="fas fa-bed me-1"></i> {{ imovel.min_quartos }} dorms</span>
+                                <span><i class="fas fa-ruler-combined me-1"></i> {{ imovel.min_area }}m²</span>
+                            </div>
+
+                            <a href="{% url 'imovel_detalhe' imovel.slug %}" class="btn btn-outline-dark w-100 rounded-pill">Ver Detalhes</a>
+                        </div>
+                    </article>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <p class="lead">Nenhum imóvel encontrado nesta categoria.</p>
+                    <a href="?" class="btn btn-primary">Ver todas as opções</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 bg-primary text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold">Ficou com dúvida sobre seu enquadramento?</h2>
+        <p>Eu sou especialista em crédito imobiliário e posso fazer sua simulação agora mesmo.</p>
+        <a href="https://wa.me/{{ WHATSAPP_NUMERO }}?text=Quero saber meu enquadramento no MCMV" class="btn btn-light btn-lg rounded-pill px-5 shadow mt-3">
+            <i class="fab fa-whatsapp me-2 text-success"></i>Falar com Especialista
+        </a>
+    </div>
+</section>
+{% endblock %}

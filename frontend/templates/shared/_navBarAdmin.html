@@ -10,11 +10,16 @@
         <div class="collapse navbar-collapse" id="navbarNavAdmin">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'custom_admin_index' %}">Visão Geral</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'custom_admin_index' %}" style="color: white;">Visão Geral</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link text-primary {% if 'imoveis' in request.path and not 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_imoveis_list' %}">
                         <i class="fas fa-home me-1"></i>Imóveis
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning {% if 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_orulo_list' %}">
+                        <i class="fas fa-users me-1"></i>Órulo
                     </a>
                 </li>
                 <li class="nav-item">
@@ -35,7 +40,7 @@
                         <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white me-2" style="width: 32px; height: 32px;">
                             {{ user.first_name|first|default:user.username|first|upper }}
                         </div>
-                        <span>{{ user.get_full_name|default:user.username }}</span>
+                        <span style="color: white;">{{ user.get_full_name|default:user.username }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="adminUserDropdown">
                         <li><span class="dropdown-header">Logado como {{ user.username }}</span></li>

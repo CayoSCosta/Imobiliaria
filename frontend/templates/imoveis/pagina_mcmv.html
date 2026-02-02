@@ -4,17 +4,103 @@
 {% block title %}Minha Casa Minha Vida | Imobidom{% endblock %}
 
 {% block content %}
-<section class="py-5 bg-dark text-white" style="background-color: #0b0d10 !important;">
-    <div class="container text-center py-4">
-        <h1 class="display-4 fw-bold mb-3">Seu Sonho da Casa Própria Começa Aqui</h1>
-        <p class="lead mb-4 text-light opacity-75">Descubra em qual categoria sua renda se encaixa e veja as oportunidades exclusivas.</p>
-        
-        <div class="d-flex flex-column align-items-center gap-3 mt-5" style="max-width: 400px; margin: 0 auto;">
-            <a href="?categoria=HIS1#imoveis-mcmv" class="btn btn-outline-light rounded-pill w-100 py-2">Até R$ 4,8k (HIS 1)</a>
-            <a href="?categoria=HIS2#imoveis-mcmv" class="btn btn-outline-light rounded-pill w-100 py-2">Até R$ 9,7k (HIS 2)</a>
-            <div class="d-flex w-100 gap-2">
-                <a href="?categoria=HMP#imoveis-mcmv" class="btn btn-outline-light rounded-pill flex-grow-1 py-2">Até R$ 16,2k (HMP)</a>
-                <a href="?" class="btn btn-primary rounded-pill px-4 py-2">Ver Todos</a>
+<style>
+    .mcmv-hero {
+        background: #f4f6f9;
+        position: relative;
+        overflow: hidden;
+    }
+    .mcmv-hero::before {
+        content: "";
+        position: absolute;
+        right: -120px;
+        top: -120px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(13,110,253,0.15), rgba(13,110,253,0));
+        border-radius: 50%;
+    }
+    .mcmv-hero .title-pill {
+        display: inline-block;
+        background: #ffffff;
+        border-radius: 999px;
+        padding: 6px 16px;
+        box-shadow: 0 8px 24px rgba(13, 110, 253, 0.12);
+    }
+    .mcmv-hero .benefit-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        height: 100%;
+    }
+    .mcmv-hero .benefit-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(220, 53, 69, 0.08);
+        color: #dc3545;
+        font-size: 20px;
+    }
+    .mcmv-hero .hero-media {
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 14px;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    }
+    .mcmv-hero .hero-media img {
+        border-radius: 18px;
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<section class="mcmv-hero py-5">
+    <div class="container py-4">
+        <div class="row justify-content-center g-4">
+            <div class="col-lg-10">
+                <!-- <div class="title-pill text-primary fw-semibold mb-3">Programa</div> -->
+                <h1 class="display-5 fw-bold text-dark mb-3">Minha Casa Minha Vida</h1>
+                <p class="lead text-secondary mb-4">
+                    Aqui você encontra condições especiais para realizar o sonho do apartamento próprio, com opções para diferentes perfis de renda.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <div class="benefit-icon mb-3"><i class="fas fa-users"></i></div>
+                            <p class="fw-bold mb-1">Renda familiar a partir de</p>
+                            <p class="mb-0 text-danger fw-bold">R$ 1.800,00 <span class="text-muted fw-normal">(*5)</span></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <div class="benefit-icon mb-3" style="color:#0d6efd;background:rgba(13,110,253,0.08);">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <p class="fw-bold mb-1">Entrada facilitada</p>
+                            <p class="mb-0 text-primary fw-bold">utilizando seu FGTS <span class="text-muted fw-normal">(*4)</span></p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="benefit-card">
+                            <div class="benefit-icon mb-3" style="color:#198754;background:rgba(25,135,84,0.08);">
+                                <i class="fas fa-piggy-bank"></i>
+                            </div>
+                            <p class="fw-bold mb-1">Subsídio de até</p>
+                            <p class="mb-0 text-success fw-bold">R$ 55 mil <span class="text-muted fw-normal">(1)</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="{% url 'simulacao_mcmv' %}" class="btn btn-primary rounded-pill px-4">Fazer simulação</a>
+                    <a href="?categoria=HIS1#imoveis-mcmv" class="btn btn-outline-primary rounded-pill px-4">Ver imóveis MCMV</a>
+                </div> -->
             </div>
         </div>
     </div>
@@ -22,49 +108,6 @@
 
 <section class="py-5 bg-light">
     <div class="container">
-        <div class="row g-4 mb-5">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="text-primary mb-3"><i class="fas fa-wallet fa-3x"></i></div>
-                        <h5 class="fw-bold">1. Qual sua renda?</h5>
-                        <p class="small text-muted">O governo subsidia parte do valor para famílias com renda até R$ 9.726,00. É o empurrão que faltava!</p>
-                        <hr>
-                        <div class="text-start small">
-                            <div class="d-flex justify-content-between mb-1"><span>HIS 1:</span> <strong>Até R$ 4.863</strong></div>
-                            <div class="d-flex justify-content-between"><span>HIS 2:</span> <strong>Até R$ 9.726</strong></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm border-bottom border-primary border-4">
-                    <div class="card-body text-center p-4">
-                        <div class="text-warning mb-3"><i class="fas fa-home fa-3x"></i></div>
-                        <h5 class="fw-bold">2. O que você pode comprar?</h5>
-                        <p class="small text-muted">Existem tetos de preço para garantir que o imóvel seja realmente acessível e com juros baixos.</p>
-                        <hr>
-                        <div class="text-start small">
-                            <div class="d-flex justify-content-between mb-1"><span>MCMV:</span> <strong>Até R$ 350 mil</strong></div>
-                            <div class="d-flex justify-content-between"><span>HMP:</span> <strong>Até R$ 537 mil</strong></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4">
-                        <div class="text-success mb-3"><i class="fas fa-shield-alt fa-3x"></i></div>
-                        <h5 class="fw-bold">3. Sua Segurança</h5>
-                        <p class="small text-muted">Esses imóveis são para moradia própria. Isso garante um condomínio mais tranquilo e familiar para sua família.</p>
-                        <div class="badge bg-light text-dark border p-2 mt-2 w-100">Juros reduzidos e uso do FGTS</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div id="imoveis-mcmv" class="pt-4">
             <div class="d-flex justify-content-between align-items-end mb-4">
                 <div>

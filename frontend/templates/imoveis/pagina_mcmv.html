@@ -59,48 +59,59 @@
     }
 </style>
 
-<section class="mcmv-hero py-5">
-    <div class="container py-4">
-        <div class="row justify-content-center g-4">
-            <div class="col-lg-10">
-                <!-- <div class="title-pill text-primary fw-semibold mb-3">Programa</div> -->
-                <h1 class="display-5 fw-bold text-dark mb-3">Minha Casa Minha Vida</h1>
+<section class="mcmv-hero">
+    <div class="mcmv-hero-bg d-none d-lg-block"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <br/>
+                <br/>
+                <h1 class="display-4 fw-black text-dark mb-3">Sua casa própria com o <span class="text-primary">Minha Casa Minha Vida</span></h1>
                 <p class="lead text-secondary mb-4">
-                    Aqui você encontra condições especiais para realizar o sonho do apartamento próprio, com opções para diferentes perfis de renda.
+                    Transformamos o sonho da casa própria em realidade. Converse agora com especialistas.
                 </p>
 
-                <div class="row g-3">
+                <div class="d-flex flex-wrap gap-3 mb-5">
+                    <a href="#imoveis-mcmv" class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg">
+                        Ver Opções
+                    </a>
+                    <a href="https://wa.me/{{ WHATSAPP_NUMERO }}?text=Olá! Gostaria de falar com um especialista sobre o Minha Casa Minha Vida" target="_blank" class="btn btn-white btn-lg rounded-pill px-4 shadow-sm text-success border border-success">
+                        <i class="fab fa-whatsapp me-2"></i> Tirar Dúvidas
+                    </a>
+                </div>
+
+                <div class="row g-4 mb-5">
                     <div class="col-md-4">
                         <div class="benefit-card">
-                            <div class="benefit-icon mb-3"><i class="fas fa-users"></i></div>
-                            <p class="fw-bold mb-1">Renda familiar a partir de</p>
-                            <p class="mb-0 text-danger fw-bold">R$ 1.800,00 <span class="text-muted fw-normal">(*5)</span></p>
+                            <div class="benefit-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h6 class="fw-bold mb-1">Renda inicial</h6>
+                            <p class="mb-0 text-danger fw-bold">R$ 1.800,00*</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="benefit-card">
-                            <div class="benefit-icon mb-3" style="color:#0d6efd;background:rgba(13,110,253,0.08);">
+                            <div class="benefit-icon bg-primary bg-opacity-10 text-primary">
                                 <i class="fas fa-wallet"></i>
                             </div>
-                            <p class="fw-bold mb-1">Entrada facilitada</p>
-                            <p class="mb-0 text-primary fw-bold">utilizando seu FGTS <span class="text-muted fw-normal">(*4)</span></p>
+                            <h6 class="fw-bold mb-1">Use seu FGTS</h6>
+                            <p class="mb-0 text-primary fw-bold">Entrada Zero*</p>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="benefit-card">
-                            <div class="benefit-icon mb-3" style="color:#198754;background:rgba(25,135,84,0.08);">
+                            <div class="benefit-icon bg-success bg-opacity-10 text-success">
                                 <i class="fas fa-piggy-bank"></i>
                             </div>
-                            <p class="fw-bold mb-1">Subsídio de até</p>
-                            <p class="mb-0 text-success fw-bold">R$ 55 mil <span class="text-muted fw-normal">(1)</span></p>
+                            <h6 class="fw-bold mb-1">Subsídio</h6>
+                            <p class="mb-0 text-success fw-bold">Até R$ 55 mil</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- <div class="d-flex flex-wrap gap-2 mt-4">
-                    <a href="{% url 'simulacao_mcmv' %}" class="btn btn-primary rounded-pill px-4">Fazer simulação</a>
-                    <a href="?categoria=HIS1#imoveis-mcmv" class="btn btn-outline-primary rounded-pill px-4">Ver imóveis MCMV</a>
-                </div> -->
+            </div>
+            <div class="col-lg-5 d-none d-lg-block">
+                <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Home" class="img-fluid rounded-5 shadow-lg">
             </div>
         </div>
     </div>

@@ -32,6 +32,8 @@ class Imovel(models.Model):
         ('MCMV', 'Minha Casa Minha Vida'),
         ('MEDIO', 'Médio Padrão'),
         ('ALTO', 'Alto Padrão'),
+        ('LOTEAMENTO', 'Loteamento'),
+        ('HARAS', 'Haras / Rural'),
     ]
 
     STATUS_CHOICES = [
@@ -56,6 +58,16 @@ class Imovel(models.Model):
     condominio = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Condomínio")
     iptu = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="IPTU")
     parcela = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Parcela")
+    
+    # Adicionar campo para área total do terreno
+    area_total = models.DecimalField(
+        max_digits=12, 
+        decimal_places=2, 
+        blank=True, 
+        null=True, 
+        verbose_name="Área Total do Terreno"
+    )
+
     bairro = models.CharField(max_length=100, verbose_name="Bairro (Comercial)")
     bairro_oficial = models.CharField(max_length=100, blank=True, null=True, verbose_name="Bairro (Oficial)", help_text="Bairro de registro (ex: Cidade Monções)")
     cidade = models.CharField(max_length=100, default='São Paulo')
@@ -107,10 +119,10 @@ class Unidade(models.Model):
     titulo = models.CharField(max_length=255)
 
     area_m2 = models.PositiveIntegerField()
-    quartos = models.PositiveIntegerField()
-    banheiros = models.PositiveIntegerField()
-    suites = models.PositiveIntegerField()
-    vagas = models.PositiveIntegerField()
+    quartos = models.PositiveIntegerField(default=0, blank=True, null=True)
+    banheiros = models.PositiveIntegerField(default=0, blank=True, null=True)
+    suites = models.PositiveIntegerField(default=0, blank=True, null=True)
+    vagas = models.PositiveIntegerField(default=0, blank=True, null=True)
 
     ativo = models.BooleanField(default=True)  
 

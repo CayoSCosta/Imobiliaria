@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
+from datetime import date
 import os
+import random
 
 def get_imovel_upload_path(instance, filename):
     """
@@ -37,8 +39,9 @@ class Imovel(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('EM_OBRA', 'Lançamento'),
+        ('EM_OBRA', 'Em Construção'),
         ('PRONTO', 'Pronto'),
+        ('LANCAMENTO', 'Lançamento'),
     ]
 
     titulo = models.CharField(max_length=255)
@@ -80,6 +83,16 @@ class Imovel(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, blank=True, null=True)
 
+    # Campos de Controle Interno
+    data_lancamento = models.DateField(blank=True, null=True, verbose_name="Data de Lançamento")
+    unidades_por_andar = models.PositiveIntegerField(blank=True, null=True, verbose_name="Unidades por Andar")
+    data_entrega = models.DateField(blank=True, null=True, verbose_name="Data de Entrega")
+    total_unidades = models.PositiveIntegerField(blank=True, null=True, verbose_name="Total de Unidades")
+    numero_andares = models.PositiveIntegerField(blank=True, null=True, verbose_name="Número de Andares")
+    area_laje = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Área da Laje")
+    construtora = models.CharField(max_length=255, blank=True, null=True, verbose_name="Construtora")
+    atualizado_em = models.DateTimeField(auto_now=True, verbose_name="Atualizado em")
+
     # Integração Orulo
     orulo_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name="ID Órulo")
     is_orulo = models.BooleanField(default=False, verbose_name="Importado da Órulo")
@@ -89,6 +102,9 @@ class Imovel(models.Model):
     criado_em = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+        if self.data_entrega and self.data_entrega <= date.today():
+             self.status = 'PRONTO'
+
         if not self.slug:
             base_slug = slugify(f"{self.titulo}-{self.bairro}")
             slug = base_slug
@@ -110,13 +126,19 @@ class Imovel(models.Model):
         return f'{self.titulo} - {self.bairro}'
 
 class Unidade(models.Model):
+    TITULO_CHOICES = [
+        ('Apartamento', 'Apartamento'),
+        ('Cobertura', 'Cobertura'),
+        ('Lote', 'Lote'),
+    ]
+
     imovel = models.ForeignKey(
         Imovel,
         related_name='unidades',
         on_delete=models.CASCADE
     )
 
-    titulo = models.CharField(max_length=255)
+    titulo = models.CharField(max_length=255, choices=TITULO_CHOICES, default='Apartamento')
 
     area_m2 = models.PositiveIntegerField()
     quartos = models.PositiveIntegerField(default=0, blank=True, null=True)
@@ -145,6 +167,11 @@ class ImagemImovel(models.Model):
     principal = models.BooleanField(default=False)
     ordem = models.PositiveIntegerField(default=0)
 
+    def save(self, *args, **kwargs):
+        if self.ordem == 0:
+            self.ordem = random.randint(1, 1000)
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Imagem do Imóvel'
         verbose_name_plural = 'Imagens dos Imóveis'
@@ -162,6 +189,11 @@ class ImagemUnidade(models.Model):
     imagem = models.ImageField(upload_to=get_unidade_upload_path)
     principal = models.BooleanField(default=False)
     ordem = models.PositiveIntegerField(default=0)
+
+    def save(self, *args, **kwargs):
+        if self.ordem == 0:
+            self.ordem = random.randint(1, 1000)
+        super().save(*args, **kwargs)
 
     class Meta:
             verbose_name = 'Imagem da Unidade'

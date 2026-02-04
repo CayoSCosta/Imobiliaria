@@ -2,13 +2,13 @@
 
 {% block title %}{% if imovel %}Editar{% else %}Novo{% endif %} Empreendimento{% endblock %}
 
-{% block content %}
-<div class="container py-5" style="max-width: 800px;">
+{% block admin_content %}
+<div class="container-fluid">
     <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">
         &larr; Voltar para lista
     </a>
     
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-success text-white">
             <h2 class="h4 mb-0">{% if imovel %}Editar{% else %}Novo{% endif %} Empreendimento</h2>
         </div>
@@ -17,125 +17,208 @@
                 {% csrf_token %}
                 
                 <div class="accordion" id="imovelFormAccordion">
+                    
+                    <!-- 1. Sobre -->
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingSobre">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSobre" aria-expanded="true" aria-controls="collapseSobre">
-                                Sobre
+                                Sobre o Imóvel
                             </button>
                         </h2>
                         <div id="collapseSobre" class="accordion-collapse collapse show" aria-labelledby="headingSobre" data-bs-parent="#imovelFormAccordion">
                             <div class="accordion-body">
                                 <div class="row">
-                                    {% for field in form %}
-                                    {% if field.name == 'titulo' or field.name == 'descricao' or field.name == 'tipo' or field.name == 'status' or field.name == 'destaque' or field.name == 'ativo' %}
-                                    {% if field.name == 'destaque' or field.name == 'ativo' %}
-                                    <div class="col-12 col-md-6 mb-3">
-                                        <div class="form-check">
-                                            {{ field }}
-                                            <label class="form-check-label" for="{{ field.id_for_label }}">
-                                                {{ field.label }}
-                                            </label>
-                                            {% if field.help_text %}
-                                            <div class="form-text">{{ field.help_text }}</div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    {% else %}
-                                    {% if field.name == 'titulo' or field.name == 'descricao' %}
                                     <div class="col-12 mb-3">
-                                    {% else %}
-                                    <div class="col-12 col-md-6 mb-3">
-                                    {% endif %}
-                                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}
-                                        <div class="form-text">{{ field.help_text }}</div>
-                                        {% endif %}
-                                        {% if field.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {{ field.errors }}
-                                        </div>
-                                        {% endif %}
+                                        <label class="form-label fw-bold">{{ form.titulo.label }}</label>
+                                        {{ form.titulo }}
+                                        {{ form.titulo.errors }}
                                     </div>
-                                    {% endif %}
-                                    {% endif %}
-                                    {% endfor %}
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.tipo.label }}</label>
+                                        {{ form.tipo }}
+                                        {{ form.tipo.errors }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.status.label }}</label>
+                                        {{ form.status }}
+                                        {{ form.status.errors }}
+                                    </div>
+
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">{{ form.descricao.label }}</label>
+                                        {{ form.descricao }}
+                                        {{ form.descricao.errors }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch ps-0">
+                                            <div class="d-flex align-items-center">
+                                                {{ form.destaque }}
+                                                <label class="form-check-label ms-2" for="{{ form.destaque.id_for_label }}">
+                                                    {{ form.destaque.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-text mt-1">{{ form.destaque.help_text }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch ps-0">
+                                            <div class="d-flex align-items-center">
+                                                {{ form.ativo }}
+                                                <label class="form-check-label ms-2" for="{{ form.ativo.id_for_label }}">
+                                                    {{ form.ativo.label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- 2. Localização -->
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingValores">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValores" aria-expanded="false" aria-controls="collapseValores">
-                                Valores
+                        <h2 class="accordion-header" id="headingLoc">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoc" aria-expanded="false" aria-controls="collapseLoc">
+                                Localização
                             </button>
                         </h2>
-                        <div id="collapseValores" class="accordion-collapse collapse" aria-labelledby="headingValores" data-bs-parent="#imovelFormAccordion">
+                        <div id="collapseLoc" class="accordion-collapse collapse" aria-labelledby="headingLoc" data-bs-parent="#imovelFormAccordion">
                             <div class="accordion-body">
                                 <div class="row">
-                                    {% for field in form %}
-                                    {% if field.name == 'preco' or field.name == 'preco_m2' or field.name == 'condominio' or field.name == 'iptu' or field.name == 'parcela' %}
-                                    <div class="col-12 col-md-4 mb-3">
-                                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}
-                                        <div class="form-text">{{ field.help_text }}</div>
-                                        {% endif %}
-                                        {% if field.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {{ field.errors }}
-                                        </div>
-                                        {% endif %}
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.rua.label }}</label>
+                                        {{ form.rua }}
                                     </div>
-                                    {% endif %}
-                                    {% endfor %}
+                                    <div class="col-md-2 mb-3">
+                                        <label class="form-label fw-bold">{{ form.numero.label }}</label>
+                                        {{ form.numero }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.cep.label }}</label>
+                                        {{ form.cep }} <!-- Adicionado ao Form -->
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.bairro.label }}</label>
+                                        {{ form.bairro }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.bairro_oficial.label }}</label>
+                                        {{ form.bairro_oficial }}
+                                        <div class="form-text">{{ form.bairro_oficial.help_text }}</div>
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        <label class="form-label fw-bold">{{ form.cidade.label }}</label>
+                                        {{ form.cidade }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.uf.label }}</label>
+                                        {{ form.uf }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- 3. Dados Financeiros -->
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingEndereco">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEndereco" aria-expanded="false" aria-controls="collapseEndereco">
-                                Endereço
+                        <h2 class="accordion-header" id="headingFin">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFin" aria-expanded="false" aria-controls="collapseFin">
+                                Dados Financeiros
                             </button>
                         </h2>
-                        <div id="collapseEndereco" class="accordion-collapse collapse" aria-labelledby="headingEndereco" data-bs-parent="#imovelFormAccordion">
+                        <div id="collapseFin" class="accordion-collapse collapse" aria-labelledby="headingFin" data-bs-parent="#imovelFormAccordion">
                             <div class="accordion-body">
                                 <div class="row">
-                                    {% for field in form %}
-                                    {% if field.name == 'rua' or field.name == 'numero' or field.name == 'bairro' or field.name == 'bairro_oficial' or field.name == 'cidade' or field.name == 'uf' or field.name == 'cep' %}
-                                    {% if field.name == 'rua' %}
-                                    <div class="col-12 col-md-8 mb-3">
-                                    {% elif field.name == 'numero' or field.name == 'uf' or field.name == 'cep' %}
-                                    <div class="col-12 col-md-4 mb-3">
-                                    {% else %}
-                                    <div class="col-12 col-md-6 mb-3">
-                                    {% endif %}
-                                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
-                                        {{ field }}
-                                        {% if field.help_text %}
-                                        <div class="form-text">{{ field.help_text }}</div>
-                                        {% endif %}
-                                        {% if field.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {{ field.errors }}
-                                        </div>
-                                        {% endif %}
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.preco.label }}</label>
+                                        {{ form.preco }}
                                     </div>
-                                    {% endif %}
-                                    {% endfor %}
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.preco_m2.label }}</label>
+                                        {{ form.preco_m2 }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.parcela.label }}</label>
+                                        {{ form.parcela }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.condominio.label }}</label>
+                                        {{ form.condominio }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.iptu.label }}</label>
+                                        {{ form.iptu }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- 4. Ficha Técnica e Controle (NOVO) -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingFicha">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFicha" aria-expanded="false" aria-controls="collapseFicha">
+                                Ficha Técnica e Controle
+                            </button>
+                        </h2>
+                        <div id="collapseFicha" class="accordion-collapse collapse" aria-labelledby="headingFicha" data-bs-parent="#imovelFormAccordion">
+                            <div class="accordion-body">
+                                <div class="row">
+                                     <div class="col-12 mb-3">
+                                        <label class="form-label fw-bold">{{ form.construtora.label }}</label>
+                                        {{ form.construtora }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.data_lancamento.label }}</label>
+                                        {{ form.data_lancamento }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.data_entrega.label }}</label>
+                                        {{ form.data_entrega }}
+                                    </div>
+
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.unidades_por_andar.label }}</label>
+                                        {{ form.unidades_por_andar }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.total_unidades.label }}</label>
+                                        {{ form.total_unidades }}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-bold">{{ form.numero_andares.label }}</label>
+                                        {{ form.numero_andares }}
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.area_laje.label }}</label>
+                                        {{ form.area_laje }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">{{ form.area_total.label }}</label>
+                                        {{ form.area_total }}
+                                    </div>
+                                    
+                                     {% if imovel and imovel.atualizado_em %}
+                                    <div class="col-12 mt-3 text-muted small">
+                                        <i class="fas fa-clock me-1"></i> Última atualização: {{ imovel.atualizado_em|date:"d/m/Y H:i" }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-success btn-lg">
-                        {% if imovel %}Salvar Alterações{% else %}Salvar e Continuar (Imagens){% endif %}
+                <div class="mt-4 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i> Salvar Empreendimento
                     </button>
+                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-link text-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

@@ -244,9 +244,20 @@
         font-size: 1.8rem;
     }
 
-    /* SIDEBAR estática (sem fixar durante rolagem) */
+    /* SIDEBAR STICKY (NOVO LAYOUT) */
     .sidebar-column {
-        position: relative;
+        position: relative; /* Container da coluna */
+        height: 100%; /* Garante que a coluna ocupe toda a altura do grid para o sticky ter onde correr */
+    }
+
+    .sidebar-wrapper {
+        position: -webkit-sticky; /* Suporte Safari */
+        position: sticky;
+        top: 130px; /* Fica abaixo do navbar com margem */
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 0; /* Espaçamento controlado pelas margens dos filhos */
     }
 
     .sidebar-contact {
@@ -262,8 +273,9 @@
 
     /* Sobrepor o carrossel no desktop */
     @media (min-width: 992px) {
-        .sidebar-contact {
-            margin-top: -140px;
+        .sidebar-wrapper {
+            margin-top: -140px; /* Sobe para sobrepor a imagem */
+            margin-bottom: 20px;
         }
     }
 
@@ -274,6 +286,7 @@
         .unidade-foto-box { flex: 0 0 auto; width: 100%; }
         .unidade-specs { gap: 20px; flex-wrap: wrap; }
         .sidebar-contact { margin-top: 0; z-index: 1; } /* Reset for mobile */
+        .sidebar-wrapper { position: static; } /* Desativa sticky no mobile */
     }
 
     @media (max-width: 768px) {
@@ -478,23 +491,21 @@
             </div>
 
             <div class="resumo-imovel">
+                {% if imovel.max_area %}
                 <div class="resumo-item">
                     <i class="fas fa-ruler-combined"></i>
                     <div>
                         <div class="resumo-label">Área</div>
                         <div class="resumo-value">
-                            {% if imovel.min_area and imovel.max_area %}
-                                {% if imovel.min_area == imovel.max_area %}
-                                    {{ imovel.min_area }} m²
-                                {% else %}
-                                    {{ imovel.min_area }} - {{ imovel.max_area }} m²
-                                {% endif %}
+                            {% if imovel.min_area == imovel.max_area %}
+                                {{ imovel.min_area }} m²
                             {% else %}
-                                -
+                                {{ imovel.min_area }} - {{ imovel.max_area }} m²
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
                 <div class="resumo-item">
                     <i class="fas fa-building"></i>
@@ -504,77 +515,69 @@
                     </div>
                 </div>
 
+                {% if imovel.max_quartos %}
                 <div class="resumo-item">
                     <i class="fas fa-bed"></i>
                     <div>
                         <div class="resumo-label">Dormitórios</div>
                         <div class="resumo-value">
-                            {% if imovel.min_quartos and imovel.max_quartos %}
-                                {% if imovel.min_quartos == imovel.max_quartos %}
-                                    {{ imovel.min_quartos }}
-                                {% else %}
-                                    {{ imovel.min_quartos }} - {{ imovel.max_quartos }}
-                                {% endif %}
+                            {% if imovel.min_quartos == imovel.max_quartos %}
+                                {{ imovel.min_quartos }}
                             {% else %}
-                                -
+                                {{ imovel.min_quartos }} - {{ imovel.max_quartos }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
+                {% if imovel.max_suites %}
                 <div class="resumo-item">
                     <i class="fas fa-bath"></i>
                     <div>
                         <div class="resumo-label">Suítes</div>
                         <div class="resumo-value">
-                            {% if imovel.min_suites and imovel.max_suites %}
-                                {% if imovel.min_suites == imovel.max_suites %}
-                                    {{ imovel.min_suites }}
-                                {% else %}
-                                    {{ imovel.min_suites }} - {{ imovel.max_suites }}
-                                {% endif %}
+                            {% if imovel.min_suites == imovel.max_suites %}
+                                {{ imovel.min_suites }}
                             {% else %}
-                                -
+                                {{ imovel.min_suites }} - {{ imovel.max_suites }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
+                {% if imovel.max_banheiros %}
                 <div class="resumo-item">
                     <i class="fas fa-shower"></i>
                     <div>
                         <div class="resumo-label">Banheiros</div>
                         <div class="resumo-value">
-                            {% if imovel.min_banheiros and imovel.max_banheiros %}
-                                {% if imovel.min_banheiros == imovel.max_banheiros %}
-                                    {{ imovel.min_banheiros }}
-                                {% else %}
-                                    {{ imovel.min_banheiros }} - {{ imovel.max_banheiros }}
-                                {% endif %}
+                            {% if imovel.min_banheiros == imovel.max_banheiros %}
+                                {{ imovel.min_banheiros }}
                             {% else %}
-                                -
+                                {{ imovel.min_banheiros }} - {{ imovel.max_banheiros }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
+                {% if imovel.max_vagas %}
                 <div class="resumo-item">
                     <i class="fas fa-car"></i>
                     <div>
                         <div class="resumo-label">Vagas</div>
                         <div class="resumo-value">
-                            {% if imovel.min_vagas and imovel.max_vagas %}
-                                {% if imovel.min_vagas == imovel.max_vagas %}
-                                    {{ imovel.min_vagas }}
-                                {% else %}
-                                    {{ imovel.min_vagas }} - {{ imovel.max_vagas }}
-                                {% endif %}
+                            {% if imovel.min_vagas == imovel.max_vagas %}
+                                {{ imovel.min_vagas }}
                             {% else %}
-                                -
+                                {{ imovel.min_vagas }} - {{ imovel.max_vagas }}
                             {% endif %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
             </div>
 
             {% comment %} <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 30px 0;"> {% endcomment %}
@@ -639,14 +642,18 @@
                         <div class="unidade-detalhes">
                             <h4>{{ unidade.titulo }} {{ unidade.area_m2 }}m²</h4>
                             <div class="unidade-specs">
+                                {% if unidade.quartos > 0 %}
                                 <div class="spec-item">
                                     <span class="spec-label">Dormitórios</span>
                                     <div class="spec-value"><i class="fas fa-bed"></i> {{ unidade.quartos }}</div>
                                 </div>
+                                {% endif %}
+                                {% if unidade.banheiros > 0 %}
                                 <div class="spec-item">
                                     <span class="spec-label">Banheiros</span>
                                     <div class="spec-value"><i class="fas fa-shower"></i> {{ unidade.banheiros }}</div>
                                 </div>
+                                {% endif %}
                                 {% if unidade.suites > 0 %}
                                 <div class="spec-item">
                                     <span class="spec-label">Suítes</span>
@@ -679,75 +686,75 @@
         </main>
 
         <div class="sidebar-column">
-            <aside class="sidebar-contact">
-                <h4 style="margin-bottom: 10px; padding: 20px 20px 0;">Tenho interesse</h4>
-                <p style="color: #666; margin-bottom: 15px; padding: 0 20px;">Preencha seus dados para receber mais informações sobre <strong>{{ imovel.titulo }}</strong>.</p>
+            <div class="sidebar-wrapper">
+                <aside class="sidebar-contact">
+                    <h4 style="margin-bottom: 10px; padding: 20px 20px 0;">Tenho interesse</h4>
+                    <p style="color: #666; margin-bottom: 15px; padding: 0 20px;">Preencha seus dados para receber mais informações sobre <strong>{{ imovel.titulo }}</strong>.</p>
 
-                {% comment %} <div style="padding: 0 20px 10px;">
-                    <a href="{{ whatsapp_url }}" target="_blank" class="btn-whatsapp" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (card)')"
-                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; width: 100%;">
-                        <i class="fab fa-whatsapp"></i> Falar agora com um especialista
-                    </a>
-                </div> {% endcomment %}
-
-                <form onsubmit="enviarContato(event)" style="display: flex; flex-direction: column; gap: 12px; padding: 10px 20px 20px;">
-                    {% csrf_token %}
-                    <div>
-                        <label for="sidebar-contato-nome" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Nome</label>
-                        <input type="text" id="sidebar-contato-nome" name="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
-                    </div>
-                    
-                    <div>
-                        <label for="sidebar-contato-telefone" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Telefone / WhatsApp</label>
-                        <input type="tel" id="sidebar-contato-telefone" name="contato-telefone" placeholder="(00) 00000-0000" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" maxlength="15">
-                    </div>
-                    
-                    <div>
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Preferência de contato</label>
-                        <div style="display: flex; gap: 20px; align-items: center;">
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="contato-pref" value="WhatsApp" checked> WhatsApp
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="contato-pref" value="Ligação"> Ligação
-                            </label>
+                    <form onsubmit="enviarContato(event)" style="display: flex; flex-direction: column; gap: 12px; padding: 10px 20px 20px;">
+                        {% csrf_token %}
+                        <div>
+                            <label for="sidebar-contato-nome" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Nome</label>
+                            <input type="text" id="sidebar-contato-nome" name="contato-nome" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;">
                         </div>
+                        
+                        <div>
+                            <label for="sidebar-contato-telefone" style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Telefone / WhatsApp</label>
+                            <input type="tel" id="sidebar-contato-telefone" name="contato-telefone" placeholder="(00) 00000-0000" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;" maxlength="15">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #333;">Preferência de contato</label>
+                            <div style="display: flex; gap: 20px; align-items: center;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="contato-pref" value="WhatsApp" checked> WhatsApp
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="radio" name="contato-pref" value="Ligação"> Ligação
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; margin-top: 6px; transition: background 0.2s;">
+                            <i class="fa-regular fa-paper-plane"></i> Enviar Solicitação
+                        </button>
+                        <a href="{{ whatsapp_url }}" target="_blank" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (form sidebar)')"
+                            style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; margin-top: 8px;">
+                            <i class="fab fa-whatsapp"></i> Falar no WhatsApp
+                        </a>
+                    </form>
+                </aside>
+            
+
+                <div class="mapa-wrapper" style="margin-top: 30px; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: var(--text-main);">Localização</h4>
+                        <button onclick="openModalMapa()" class="btn-ver-rua" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #e0e0e0; color: var(--text-main); background: #fff; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
+                            <i class="fas fa-street-view"></i> Ver na Rua
+                        </button>
                     </div>
-
-                    <button type="submit" style="background: #0365f8; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; margin-top: 6px; transition: background 0.2s;">
-                        <i class="fa-regular fa-paper-plane"></i> Enviar Solicitação
-                    </button>
-                    <a href="{{ whatsapp_url }}" target="_blank" onclick="registrarWhatsappContato({{ imovel.id }}, '{{ imovel.titulo|escapejs }}', 'WhatsApp - detalhe (form sidebar)')"
-                        style="background: #25D366; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 1.05rem; margin-top: 8px;">
-                        <i class="fab fa-whatsapp"></i> Falar no WhatsApp
-                    </a>
-                </form>
-            </aside>
-
-            <div class="mapa-wrapper" style="margin-top: 30px; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h4 style="margin: 0; color: var(--text-main);">Localização</h4>
-                    <button onclick="openModalMapa()" class="btn-ver-rua" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #e0e0e0; color: var(--text-main); background: #fff; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
-                        <i class="fas fa-street-view"></i> Ver na Rua
-                    </button>
+                    <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px;">
+                        {% if imovel.rua %}{{ imovel.rua }}{% if imovel.numero and imovel.numero != 'None' %}, {{ imovel.numero }}{% endif %} - {% endif %}
+                        {{ imovel.bairro }}{% if imovel.bairro_oficial and imovel.bairro_oficial != imovel.bairro %} - {{ imovel.bairro_oficial }}{% endif %}
+                    </p>
+                    <div style="height: 300px; border-radius: 8px; overflow: hidden; background: #eee;">
+                            <iframe
+                            width="100%"
+                            height="100%"
+                            frameborder="0"
+                            style="border:0"
+                            src="https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
                 </div>
-                <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px;">
-                    {% if imovel.rua %}{{ imovel.rua }}{% if imovel.numero and imovel.numero != 'None' %}, {{ imovel.numero }}{% endif %} - {% endif %}
-                    {{ imovel.bairro }}{% if imovel.bairro_oficial and imovel.bairro_oficial != imovel.bairro %} - {{ imovel.bairro_oficial }}{% endif %}
-                </p>
-                <div style="height: 300px; border-radius: 8px; overflow: hidden; background: #eee;">
-                        <iframe
-                        width="100%"
-                        height="100%"
-                        frameborder="0"
-                        style="border:0"
-                        src="https://maps.google.com/maps?q={{ imovel.rua|default:'' }} {% if imovel.numero and imovel.numero != 'None' %}{{ imovel.numero }} {% endif %}{{ imovel.bairro_oficial|default:imovel.bairro }} {{ imovel.cidade }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
-                        allowfullscreen>
-                    </iframe>
-                </div>
-            </div>
+            </div> <!-- Fim Sticky Wrapper (Contact + Mapa) -->
         </div>
     </div>
+
+<script>
+    // Script de abas removido pois voltamos ao layout original
+</script>
 </div>
 
 <div id="lightbox" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999;">

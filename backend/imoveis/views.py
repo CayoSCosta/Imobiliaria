@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Min, Max, Q, F, Value, FloatField
+from django.db.models import Min, Max, Q, F, Value, FloatField, Count
 from django.db.models.functions import ACos, Cos, Radians, Sin, Cast
 from django.conf import settings
 from django.utils.text import slugify
@@ -285,8 +285,48 @@ def buscar_unidades_ajax(request):
 # =========================
 @staff_member_required
 def custom_admin_index(request):
-    """Dashboard principal que permite escolher entre Imóveis e Leads"""
-    return render(request, 'custom_admin/dashboard.html')
+    """Dashboard principal com gráficos e KPIs"""
+    
+    # KPIs
+    total_imoveis = Imovel.objects.count()
+    total_leads = Lead.objects.count()
+    
+    # Dados para Gráficos
+    
+    # 1. Imóveis por Tipo
+    imoveis_por_tipo = list(Imovel.objects.values('tipo').annotate(total=Count('tipo')).order_by('-total'))
+    
+    # 2. Imóveis por Status de Obra
+    imoveis_por_status = list(Imovel.objects.values('status').annotate(total=Count('status')).order_by('-total'))
+    
+    # 3. Leads por Status
+    leads_por_status = list(Lead.objects.values('status').annotate(total=Count('status')).order_by('-total'))
+
+    # Preparar dados para Chart.js (Arrays)
+    
+    # Helpers para labels legíveis
+    tipo_dict = dict(Imovel.TIPO_CHOICES)
+    status_imovel_dict = dict(Imovel.STATUS_CHOICES)
+    status_lead_dict = dict(Lead.STATUS_CHOICES)
+
+    context = {
+        'total_imoveis': total_imoveis,
+        'total_leads': total_leads,
+        
+        # Gráfico Imóveis por Tipo (Pie/Doughnut)
+        'chart_imovel_tipo_labels': [tipo_dict.get(x['tipo'], x['tipo']) for x in imoveis_por_tipo],
+        'chart_imovel_tipo_data': [x['total'] for x in imoveis_por_tipo],
+        
+        # Gráfico Imóveis por Status (Bar)
+        'chart_imovel_status_labels': [status_imovel_dict.get(x['status'], x['status']) for x in imoveis_por_status],
+        'chart_imovel_status_data': [x['total'] for x in imoveis_por_status],
+        
+        # Gráfico Leads por Status (Pie/Doughnut)
+        'chart_lead_status_labels': [status_lead_dict.get(x['status'], x['status']) for x in leads_por_status],
+        'chart_lead_status_data': [x['total'] for x in leads_por_status],
+    }
+    
+    return render(request, 'custom_admin/dashboard.html', context)
 
 @staff_member_required
 def custom_admin_imoveis_list(request):

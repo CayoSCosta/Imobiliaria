@@ -93,6 +93,7 @@ body {
 /* Espaçador para compensar a navbar fixa */
 .nav-spacer {
     height: 80px;
+    padding-bottom: 30px;
     display: block;
 }
 
@@ -196,7 +197,7 @@ body {
     100% { transform: scale(1); }
 }
 
-.nav-spacer { height: 80px; }
+.nav-spacer {height: 80px;}
 /* --- BADGES DE STATUS (Orulo Style) --- */
 .badge-status {
     padding: 6px 12px;

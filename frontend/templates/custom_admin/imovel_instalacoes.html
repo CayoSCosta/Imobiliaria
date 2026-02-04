@@ -2,11 +2,11 @@
 
 {% block title %}Instalações - {{ imovel.titulo }}{% endblock %}
 
-{% block content %}
-<div class="container py-5" style="max-width: 900px;">
+{% block admin_content %}
+<div class="container-fluid">
     <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">&larr; Voltar para lista</a>
     
-    <div class="card shadow-sm">
+    <div class="card shadow-sm mb-4">
         <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
             <h2 class="h4 mb-0">Instalações: {{ imovel.titulo }}</h2>
             <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#novaInstalacaoModal">
@@ -29,7 +29,7 @@
                         </label>
                     </div>
 
-                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3">
                         {% for checkbox in form.instalacoes %}
                         <div class="col">
                             <div class="form-check p-3 border rounded bg-light h-100 position-relative">

@@ -1,7 +1,52 @@
 {% extends 'base.html' %}
 
+{% block title %}Painel Administrativo{% endblock %}
+
 {% block navbar %}
-    {% include "shared/_navBarAdmin.html" %}
+    <!-- Navbar Mobile (só aparece em telas pequenas) -->
+    <nav class="navbar navbar-dark bg-dark d-md-none p-3 shadow-sm">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Painel Admin</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminSidebarMobile" aria-controls="adminSidebarMobile">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex w-100 overflow-hidden">
+    <!-- Sidebar Desktop -->
+    <div class="d-none d-md-block text-white bg-dark flex-shrink-0" style="width: 280px; min-height: calc(100vh - 76px);">
+         {% include "shared/_sidebarAdmin.html" %}
+    </div>
+
+    <!-- Sidebar Mobile Offcanvas -->
+    <div class="offcanvas offcanvas-start bg-dark text-white" tabindex="-1" id="adminSidebarMobile" aria-labelledby="adminSidebarMobileLabel">
+        <div class="offcanvas-header border-bottom border-secondary">
+            <h5 class="offcanvas-title" id="adminSidebarMobileLabel">Menu Admin</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+             {% include "shared/_sidebarAdmin.html" %}
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="flex-grow-1 bg-light d-flex flex-column" style="height: 100vh; overflow-y: auto;">
+        <div class="p-4 flex-grow-1">
+             {% block admin_content %}{% endblock %}
+        </div>
+        
+        <footer class="text-center text-muted py-3 mt-auto border-top bg-white">
+            <small>&copy; {% now "Y" %} Imobidon - Painel Administrativo</small>
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+    <!-- Footer removido no admin -->
 {% endblock %}
 
 {% block extra_css %}
@@ -9,10 +54,26 @@
     /* Estilos específicos do Admin */
     body {
         background-color: #f8f9fa;
+        overflow-x: hidden; /* Previne scroll horizontal */
     }
+    
+    /* Remove scroll da janela principal para usar scroll interno na div de conteudo */
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    
     .card {
-        border-radius: 10px;
+        border-radius: 12px;
         border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        overflow: hidden;
     }
 
     .admin-page-header {
@@ -35,11 +96,9 @@
         .admin-page-actions .btn {
             width: 100%;
         }
-
         .admin-filter-actions {
             align-items: stretch !important;
         }
-
         .admin-filter-actions .btn,
         .admin-filter-actions a.btn {
             width: 100%;

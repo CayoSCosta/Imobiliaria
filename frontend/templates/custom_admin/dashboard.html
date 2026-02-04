@@ -2,80 +2,44 @@
 
 {% block title %}Dashboard Admin{% endblock %}
 
-{% block content %}
-<div class="container py-5">
-    <div class="row mb-5">
-        <div class="col-12 text-center">
-            <h1 class="display-5 fw-bold text-primary">Painel Administrativo</h1>
-            <p class="lead text-muted">Gerencie imóveis e acompanhe seus leads em um só lugar.</p>
+{% block admin_content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-2 text-gray-800">Dashboard</h1>
+        <p class="mb-4 text-muted">Visão geral do sistema ImobiDom.</p>
+    </div>
+</div>
+
+<!-- KPIs -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100 py-2 border-start border-primary border-4" style="border-radius: 10px;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total de Imóveis</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_imoveis }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-building fa-2x text-gray-300 text-primary opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row justify-content-center g-4">
-        <!-- Card Imóveis -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-4 text-center">
-                    <div style="background-color: rgba(3, 101, 248, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-home fa-2x text-primary"></i>
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-0 shadow-sm h-100 py-2 border-start border-success border-4" style="border-radius: 10px;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total de Leads</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_leads }}</div>
                     </div>
-                    <h3 class="card-title fw-bold mb-3">Imóveis</h3>
-                    <p class="card-text text-muted mb-4">Gerencie seu portfólio, adicione novos empreendimentos, unidades e fotos.</p>
-                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-primary w-100 rounded-pill fw-bold">
-                        Acessar Imóveis
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card Leads -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-4 text-center">
-                    <div style="background-color: rgba(37, 211, 102, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-users fa-2x text-success"></i>
-                    </div>
-                    <h3 class="card-title fw-bold mb-3">Leads</h3>
-                    <p class="card-text text-muted mb-4">Visualize e gerencie os contatos recebidos através do site.</p>
-                    <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-success w-100 rounded-pill fw-bold">
-                        Acessar Leads
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card Blog -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-4 text-center">
-                    <div style="background-color: rgba(255, 193, 7, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-newspaper fa-2x text-warning"></i>
-                    </div>
-                    <h3 class="card-title fw-bold mb-3">Blog</h3>
-                    <p class="card-text text-muted mb-4">Gerencie postagens, notícias e espaços de publicidade do blog.</p>
-                    <a href="{% url 'custom_admin_blog_list' %}" class="btn btn-warning w-100 rounded-pill fw-bold text-white">
-                        Gerenciar Blog
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Card Gestão Órulo -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm border-0 transition-hover" style="border-radius: 16px; overflow: hidden;">
-                <div class="card-body p-4 text-center">
-                    <div style="background-color: rgba(23, 162, 184, 0.1); width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
-                        <i class="fas fa-network-wired fa-2x text-info"></i>
-                    </div>
-                    <h3 class="card-title fw-bold mb-3">Gestão Órulo</h3>
-                    <p class="card-text text-muted mb-4">Gerencie a integração com o sistema Órulo e importe imóveis.</p>
-                    <div class="d-grid gap-2">
-                        <a href="{% url 'custom_admin_orulo_list' %}" class="btn btn-info w-100 rounded-pill fw-bold text-white">
-                            Acessar Gestão Órulo
-                        </a>
-                        <a href="{% url 'custom_admin_importar_orulo' %}" class="btn btn-outline-info btn-sm rounded-pill">
-                            <i class="fas fa-cloud-download-alt"></i> Importar da Órulo
-                        </a>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300 text-success opacity-50"></i>
                     </div>
                 </div>
             </div>
@@ -83,13 +47,144 @@
     </div>
 </div>
 
-<style>
-    .transition-hover {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .transition-hover:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-</style>
+<!-- Charts Row -->
+<div class="row g-4">
+    <!-- Imóveis por Tipo -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card shadow-sm mb-4 h-100 border-0">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-primary">Imóveis por Tipo</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="imoveisTipoChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Imóveis por Status -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card shadow-sm mb-4 h-100 border-0">
+             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-primary">Imóveis por Status da Obra</h6>
+            </div>
+            <div class="card-body">
+                 <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="imoveisStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads por Status -->
+    <div class="col-xl-4 col-lg-6">
+        <div class="card shadow-sm mb-4 h-100 border-0">
+             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-success">Leads por Status</h6>
+            </div>
+            <div class="card-body">
+                 <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="leadsStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Configuração Comum
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#858796';
+        
+        // 1. Imóveis por Tipo
+        const ctxTipo = document.getElementById('imoveisTipoChart');
+        if (ctxTipo && {{ chart_imovel_tipo_data|length }} > 0) {
+            new Chart(ctxTipo.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: {{ chart_imovel_tipo_labels|safe }},
+                    datasets: [{
+                        data: {{ chart_imovel_tipo_data|safe }},
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617'],
+                        hoverBorderColor: "rgba(234, 236, 244, 1)",
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // 2. Imóveis por Status (Barra)
+        const ctxStatus = document.getElementById('imoveisStatusChart');
+        if (ctxStatus && {{ chart_imovel_status_data|length }} > 0) {
+            new Chart(ctxStatus.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {{ chart_imovel_status_labels|safe }},
+                    datasets: [{
+                        label: 'Imóveis',
+                        data: {{ chart_imovel_status_data|safe }},
+                        backgroundColor: '#4e73df',
+                        borderRadius: 5
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { precision: 0 },
+                            grid: {
+                                borderDash: [2],
+                                drawBorder: false,
+                                color: "#eaecf4",
+                                zeroLineColor: "#eaecf4",
+                                zeroLineBorderDash: [2]
+                            }
+                        },
+                         x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // 3. Leads por Status
+        const ctxLeads = document.getElementById('leadsStatusChart');
+        if (ctxLeads && {{ chart_lead_status_data|length }} > 0) {
+            new Chart(ctxLeads.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: {{ chart_lead_status_labels|safe }},
+                    datasets: [{
+                        data: {{ chart_lead_status_data|safe }},
+                        backgroundColor: ['#1cc88a', '#f6c23e', '#36b9cc', '#4e73df', '#e74a3b', '#858796'],
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                     plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

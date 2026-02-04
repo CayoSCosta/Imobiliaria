@@ -39,6 +39,7 @@ class Imovel(models.Model):
     ]
 
     STATUS_CHOICES = [
+        ('BREVE', 'Breve Lançamento'),
         ('EM_OBRA', 'Em Construção'),
         ('PRONTO', 'Pronto'),
         ('LANCAMENTO', 'Lançamento'),

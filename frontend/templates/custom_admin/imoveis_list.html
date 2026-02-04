@@ -82,10 +82,10 @@
                             </td>
 <!--                            <td class="align-middle">{{ imovel.get_status_display }}</td>-->
                             <td class="align-middle">
-                                {% if imovel.get_status_display == 'Pronto' %}
-                                    <span class="badge bg-success">Pronto</span>
+                                {% if imovel.status == 'PRONTO' %}
+                                    <span class="badge bg-success">{{ imovel.get_status_display }}</span>
                                 {% else %}
-                                    <span class="badge bg-warning text-dark">Lançamento</span>
+                                    <span class="badge bg-warning text-dark">{{ imovel.get_status_display }}</span>
                                 {% endif %}
                             </td>
                             <td class="align-middle">

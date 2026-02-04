@@ -215,7 +215,8 @@ body {
 .badge-status.em-obras,
 .badge-status.em_obras,
 .badge-status.planta,
-.badge-status.lancamento {
+.badge-status.lancamento,
+.badge-status.breve {
     background-color: #ffc107; /* Amarelo */
     color: #1e272e;
 }

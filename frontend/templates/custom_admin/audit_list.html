@@ -1,0 +1,278 @@
+{% extends 'custom_admin/base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Auditoria - Painel Administrativo{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4 admin-page-header">
+        <div>
+            <h1 class="h2">Log de Auditoria</h1>
+            <p class="text-muted">Histórico de ações no sistema.</p>
+        </div>
+        <div class="admin-page-actions">
+            {% if logs %}
+            <button type="button" class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#clearLogsModal">
+                <i class="fas fa-trash-alt me-1"></i> Limpar Logs
+            </button>
+            {% endif %}
+            <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Painel
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="user" class="form-label">Usuário</label>
+                    <input type="text" class="form-control" id="user" name="user" value="{{ user_filter|default:'' }}" placeholder="Buscar por usuário...">
+                </div>
+                <div class="col-md-3">
+                    <label for="action" class="form-label">Ação</label>
+                    <select class="form-select" id="action" name="action">
+                        <option value="">Todas</option>
+                        {% for valor, nome in action_choices %}
+                        <option value="{{ valor }}" {% if action_filter == valor %}selected{% endif %}>{{ nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end admin-filter-actions">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-1"></i> Filtrar
+                    </button>
+                    {% if user_filter or action_filter %}
+                    <a href="{% url 'custom_admin_audit_list' %}" class="btn btn-outline-secondary ms-2" title="Limpar filtros">
+                        <i class="fas fa-times"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Data/Hora</th>
+                            <th>Usuário</th>
+                            <th>Ação</th>
+                            <th>Objeto</th>
+                            <th>Alterações</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td class="ps-4 align-middle text-nowrap">{{ log.timestamp|date:"d/m/Y H:i" }}</td>
+                            <td class="align-middle">
+                                {% if log.user %}
+                                    {{ log.user.username }}
+                                {% else %}
+                                    <span class="text-muted">{{ log.user_email|default:"Sistema" }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                {% if log.action == 'CREATE' %}
+                                    <span class="badge bg-success">Criação</span>
+                                {% elif log.action == 'UPDATE' %}
+                                    <span class="badge bg-primary">Edição</span>
+                                {% elif log.action == 'DELETE' %}
+                                    <span class="badge bg-danger">Exclusão</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ log.action }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <small class="d-block text-muted">{{ log.content_type.model|upper }}</small>
+                                {{ log.object_repr }}
+                            </td>
+                            <td class="align-middle">
+                                {% if log.changes %}
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="showDetails('{{ log.changes|escapejs }}', '{{ log.action }}')">
+                                    Ver Detalhes
+                                </button>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td class="align-middle">
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('{{ log.id }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">Nenhum registro de auditoria encontrado.</div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer bg-white py-3">
+            <nav aria-label="Navegação da página">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if action_filter %}&action={{ action_filter }}{% endif %}" aria-label="Anterior">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if action_filter %}&action={{ action_filter }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if user_filter %}&user={{ user_filter }}{% endif %}{% if action_filter %}&action={{ action_filter }}{% endif %}" aria-label="Próximo">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal Detalhes -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Alteração</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detailsContent" class="bg-light p-3 rounded" style="max-height: 60vh; overflow-y: auto;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmação Exclusão Única -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este registro de auditoria?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Limpar Tudo -->
+<div class="modal fade" id="clearLogsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">Atenção!</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja <strong>EXCLUIR TODOS</strong> os logs de auditoria?</p>
+                <p class="text-danger small">Esta ação é irreversível.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'custom_admin_clear_audit_logs' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sim, Limpar Tudo</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDetails(changesString, actionType) {
+        let contentHtml = '';
+        try {
+            // Tenta tratar strings Python (ex: None, True) para JSON válido
+            const jsonString = changesString
+                .replace(/'/g, '"')
+                .replace(/\bNone\b/g, 'null')
+                .replace(/\bTrue\b/g, 'true')
+                .replace(/\bFalse\b/g, 'false');
+            
+            const parsed = JSON.parse(jsonString);
+
+            if (Object.keys(parsed).length === 0) {
+                contentHtml = '<p class="text-muted text-center my-3">Nenhuma alteração registrada.</p>';
+            } else {
+                contentHtml = '<table class="table table-sm table-bordered mb-0">';
+                contentHtml += '<thead class="table-light"><tr><th>Campo</th><th>Informação</th></tr></thead><tbody>';
+                
+                for (const [key, value] of Object.entries(parsed)) {
+                    contentHtml += `<tr><td class="fw-bold text-nowrap" style="width: 20%;">${key}</td>`;
+                    
+                    // Se for lista com 2 itens, assume [DE, PARA] (Edição)
+                    if (Array.isArray(value) && value.length === 2 && actionType === 'UPDATE') {
+                         contentHtml += `<td>
+                            <div class="text-secondary small text-decoration-line-through">De: ${value[0] === null ? 'vazio' : value[0]}</div>
+                            <div class="text-success fw-bold">Para: ${value[1] === null ? 'vazio' : value[1]}</div>
+                         </td>`;
+                    } else {
+                        // Criação ou outro tipo
+                         contentHtml += `<td>${value}</td>`;
+                    }
+                    contentHtml += '</tr>';
+                }
+                contentHtml += '</tbody></table>';
+            }
+
+        } catch (e) {
+            console.error(e);
+            contentHtml = `<pre>${changesString}</pre>`;
+        }
+        
+        document.getElementById('detailsContent').innerHTML = contentHtml;
+        var myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+        myModal.show();
+    }
+
+    function confirmDelete(id) {
+        document.getElementById('deleteForm').action = "/custom-admin/audit/" + id + "/delete/";
+        var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        myModal.show();
+    }
+</script>
+{% endblock %}

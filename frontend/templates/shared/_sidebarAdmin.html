@@ -35,6 +35,12 @@
                 Gestão Órulo
             </a>
         </li>
+        <li>
+            <a href="{% url 'custom_admin_audit_list' %}" class="nav-link text-white {% if 'audit' in request.path %}active{% endif %}">
+                <i class="fas fa-history me-2"></i>
+                Auditoria
+            </a>
+        </li>
     </ul>
     <hr>
     <div class="dropdown">

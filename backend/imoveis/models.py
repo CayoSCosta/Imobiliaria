@@ -53,7 +53,7 @@ class Imovel(models.Model):
     status = models.CharField(
         max_length=20, 
         choices=STATUS_CHOICES, 
-        default='PLANTA', 
+        default='BREVE', 
         verbose_name="Status da Obra"
     )
     destaque = models.BooleanField(default=False, verbose_name="Destaque", help_text="Exibe este imóvel com destaque na Home e nas buscas")

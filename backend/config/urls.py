@@ -18,6 +18,7 @@ urlpatterns = [
     path('', include('imoveis.urls')),
     path('', include('leads.urls')),
     path('', include('blog.urls')),
+    path('', include('audit.urls')),
 ]
 
 if settings.DEBUG:

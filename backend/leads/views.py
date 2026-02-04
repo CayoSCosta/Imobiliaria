@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import csv
 from django.utils import timezone
+from django.contrib import messages
 from .models import Lead, Acompanhamento
 from .serializers import LeadSerializer
 from .forms import AcompanhamentoForm
@@ -52,7 +53,7 @@ def registrar_whatsapp_contato(request):
 
 @staff_member_required
 def custom_admin_leads_list(request):
-    leads = Lead.objects.all().order_by('-data_criacao')
+    leads = Lead.objects.filter(ativo=True).order_by('-data_criacao')
     
     # Organiza os leads por status para o Kanban
     kanban_data = {
@@ -165,3 +166,20 @@ def exportar_leads_csv(request):
         ])
 
     return response
+
+@staff_member_required
+@require_POST
+def custom_admin_delete_lead(request, pk):
+    lead = get_object_or_404(Lead, pk=pk)
+    lead.delete()
+    messages.success(request, "Lead excluído permanentemente.")
+    return redirect('custom_admin_leads_list')
+
+@staff_member_required
+@require_POST
+def custom_admin_inactivate_lead(request, pk):
+    lead = get_object_or_404(Lead, pk=pk)
+    lead.ativo = False
+    lead.save()
+    messages.success(request, "Lead arquivado com sucesso.")
+    return redirect('custom_admin_leads_list')

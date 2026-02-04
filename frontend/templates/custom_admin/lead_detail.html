@@ -9,9 +9,17 @@
             <h1 class="h2">Detalhes do Lead</h1>
             <p class="text-muted">Informações e histórico de acompanhamento.</p>
         </div>
-        <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
-        </a>
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#inactivateModal">
+                <i class="fas fa-archive me-1"></i> Arquivar
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                <i class="fas fa-trash-alt me-1"></i> Excluir
+            </button>
+            <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
+            </a>
+        </div>
     </div>
 
     <div class="row">
@@ -175,6 +183,50 @@
                     Nenhum acompanhamento registrado ainda.
                 </div>
             {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirm Inactivate -->
+<div class="modal fade" id="inactivateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Arquivar Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Deseja arquivar este lead? Ele não aparecerá mais no quadro principal, mas os dados serão mantidos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'custom_admin_inactivate_lead' lead.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning">Arquivar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirm Delete -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Excluir Lead</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir permanentemente este lead? <strong>Esta ação não pode ser desfeita.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="post" action="{% url 'custom_admin_delete_lead' lead.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Excluir Permanentemente</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

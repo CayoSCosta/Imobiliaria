@@ -29,6 +29,7 @@ class Lead(models.Model):
     mensagem = models.TextField(blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True, verbose_name='Data de Criação')
     atendido = models.BooleanField(default=False)
+    ativo = models.BooleanField(default=True, verbose_name="Ativo")
 
     class Meta:
         ordering = ['-data_criacao']

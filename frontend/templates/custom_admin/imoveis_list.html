@@ -23,15 +23,11 @@
     <div class="card shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-3">
-                <div class="col-md-3">
-                    <label for="titulo" class="form-label">Título</label>
-                    <input type="text" class="form-control" id="titulo" name="titulo" value="{{ titulo_filtro|default:'' }}" placeholder="Buscar por título">
+                <div class="col-md-8">
+                    <label for="busca" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="busca" name="busca" value="{{ busca_filtro|default:'' }}" placeholder="Buscar por nome, cidade, bairro ou construtora...">
                 </div>
-                <div class="col-md-3">
-                    <label for="bairro" class="form-label">Bairro</label>
-                    <input type="text" class="form-control" id="bairro" name="bairro" value="{{ bairro_filtro|default:'' }}" placeholder="Buscar por bairro">
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label for="status" class="form-label">Status</label>
                     <select class="form-select" id="status" name="status">
                         <option value="">Todos os status</option>
@@ -40,11 +36,11 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-end admin-filter-actions">
+                <div class="col-md-2 d-flex align-items-end admin-filter-actions">
                     <button type="submit" class="btn btn-primary w-100">
                         <i class="fas fa-search me-1"></i> Filtrar
                     </button>
-                    {% if titulo_filtro or bairro_filtro or status_filtro %}
+                    {% if busca_filtro or status_filtro %}
                     <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary ms-2" title="Limpar filtros">
                         <i class="fas fa-times"></i>
                     </a>
@@ -139,7 +135,7 @@
                 <ul class="pagination justify-content-center mb-0">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if titulo_filtro %}&titulo={{ titulo_filtro }}{% endif %}{% if bairro_filtro %}&bairro={{ bairro_filtro }}{% endif %}" aria-label="Anterior">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if busca_filtro %}&busca={{ busca_filtro }}{% endif %}{% if status_filtro %}&status={{ status_filtro }}{% endif %}" aria-label="Anterior">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
@@ -156,14 +152,14 @@
                             </li>
                         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}{% if titulo_filtro %}&titulo={{ titulo_filtro }}{% endif %}{% if bairro_filtro %}&bairro={{ bairro_filtro }}{% endif %}">{{ num }}</a>
+                                <a class="page-link" href="?page={{ num }}{% if busca_filtro %}&busca={{ busca_filtro }}{% endif %}{% if status_filtro %}&status={{ status_filtro }}{% endif %}">{{ num }}</a>
                             </li>
                         {% endif %}
                     {% endfor %}
 
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if titulo_filtro %}&titulo={{ titulo_filtro }}{% endif %}{% if bairro_filtro %}&bairro={{ bairro_filtro }}{% endif %}" aria-label="Próximo">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if busca_filtro %}&busca={{ busca_filtro }}{% endif %}{% if status_filtro %}&status={{ status_filtro }}{% endif %}" aria-label="Próximo">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>

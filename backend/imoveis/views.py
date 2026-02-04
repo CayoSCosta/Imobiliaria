@@ -333,15 +333,18 @@ def custom_admin_imoveis_list(request):
     imoveis_list = Imovel.objects.all().order_by('-criado_em')
 
     # Filtros
-    titulo = request.GET.get('titulo')
-    bairro = request.GET.get('bairro')
+    busca = request.GET.get('busca')
     status = request.GET.get('status')
 
-    if titulo:
-        imoveis_list = imoveis_list.filter(Q(titulo__icontains=titulo) | Q(slug__icontains=slugify(titulo)))
-    
-    if bairro:
-        imoveis_list = imoveis_list.filter(Q(bairro__icontains=bairro) | Q(slug__icontains=slugify(bairro)))
+    if busca:
+        imoveis_list = imoveis_list.filter(
+            Q(titulo__icontains=busca) | 
+            Q(bairro__icontains=busca) |
+            Q(bairro_oficial__icontains=busca) |
+            Q(cidade__icontains=busca) |
+            Q(construtora__icontains=busca) |
+            Q(slug__icontains=slugify(busca))
+        )
 
     if status:
         imoveis_list = imoveis_list.filter(status=status)
@@ -353,8 +356,7 @@ def custom_admin_imoveis_list(request):
     context = {
         'imoveis': page_obj, 
         'page_obj': page_obj,
-        'titulo_filtro': titulo,
-        'bairro_filtro': bairro,
+        'busca_filtro': busca,
         'status_filtro': status,
         'status_choices': Imovel.STATUS_CHOICES,
     }

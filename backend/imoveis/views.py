@@ -252,11 +252,7 @@ def imovel_detalhe(request, slug):
         ativo=True
     )
 
-    mensagem = (
-        f"Olá! Tenho interesse no imóvel "
-        f"{imovel.titulo} - {imovel.bairro}. "
-        f"Link: {request.build_absolute_uri()}"
-    )
+    mensagem = f"Olá gostaria de mais informações a respeito do imóvel {imovel.titulo}"
 
     whatsapp_url = (
         f"https://wa.me/{settings.WHATSAPP_NUMERO}"

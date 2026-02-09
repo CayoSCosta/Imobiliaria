@@ -6,7 +6,7 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     # ADMIN
-    path('admin/', admin.site.urls),
+    path('painel/', admin.site.urls),
     
     # AUTH
     path('accounts/', include('django.contrib.auth.urls')),

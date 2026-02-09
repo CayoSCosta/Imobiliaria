@@ -225,7 +225,7 @@
 <script>
     function confirmDelete(id, title) {
         document.getElementById('imovel-title').innerText = title;
-        document.getElementById('delete-form').action = "/custom-admin/imoveis/" + id + "/delete/";
+        document.getElementById('delete-form').action = "/gerenciador/imoveis/" + id + "/delete/";
         var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         myModal.show();
     }

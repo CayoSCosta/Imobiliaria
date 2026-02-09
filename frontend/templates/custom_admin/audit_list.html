@@ -270,7 +270,7 @@
     }
 
     function confirmDelete(id) {
-        document.getElementById('deleteForm').action = "/custom-admin/audit/" + id + "/delete/";
+        document.getElementById('deleteForm').action = "/gerenciador/audit/" + id + "/delete/";
         var myModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         myModal.show();
     }

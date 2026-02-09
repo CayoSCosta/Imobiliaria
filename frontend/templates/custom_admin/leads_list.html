@@ -332,7 +332,7 @@
         });
 
         function updateStatus(leadId, newStatus, fromContainer, toContainer) {
-            fetch(`/custom-admin/leads/${leadId}/update-status/`, {
+            fetch(`/gerenciador/leads/${leadId}/update-status/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

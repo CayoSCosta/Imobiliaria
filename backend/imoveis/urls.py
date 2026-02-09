@@ -37,9 +37,9 @@ from .views import (
 )
 
 urlpatterns = [
-    path('custom-admin/orulo/', custom_admin_orulo_list, name='custom_admin_orulo_list'),
-    path('custom-admin/orulo/sync/<int:imovel_id>/', custom_admin_sync_orulo_imovel, name='custom_admin_sync_orulo_imovel'),
-    path('custom-admin/orulo/progress/', check_import_progress, name='check_import_progress'),
+    path('gerenciador/orulo/', custom_admin_orulo_list, name='custom_admin_orulo_list'),
+    path('gerenciador/orulo/sync/<int:imovel_id>/', custom_admin_sync_orulo_imovel, name='custom_admin_sync_orulo_imovel'),
+    path('gerenciador/orulo/progress/', check_import_progress, name='check_import_progress'),
 
     # ======================
     # FRONTEND (HTML)
@@ -58,23 +58,23 @@ urlpatterns = [
     # ======================
     # CUSTOM ADMIN
     # ======================
-    path('custom-admin/', custom_admin_index, name='custom_admin_index'),
-    path('custom-admin/importar-orulo/', custom_admin_importar_orulo, name='custom_admin_importar_orulo'),  # Nova rota
-    path('custom-admin/imoveis/', custom_admin_imoveis_list, name='custom_admin_imoveis_list'),
-    path('custom-admin/novo/', custom_admin_criar_imovel, name='custom_admin_criar_imovel'),
-    path('custom-admin/editar/<int:imovel_id>/', custom_admin_editar_imovel, name='custom_admin_editar_imovel'),
-    path('custom-admin/imovel/<int:imovel_id>/imagens/', custom_admin_imovel_imagens, name='custom_admin_imovel_imagens'),    path('custom-admin/imoveis/<int:imovel_id>/delete/', custom_admin_delete_imovel, name='custom_admin_delete_imovel'),    path('custom-admin/imagem/<int:imagem_id>/delete/', custom_admin_delete_imagem, name='custom_admin_delete_imagem'),
+    path('gerenciador/', custom_admin_index, name='custom_admin_index'),
+    path('gerenciador/importar-orulo/', custom_admin_importar_orulo, name='custom_admin_importar_orulo'),  # Nova rota
+    path('gerenciador/imoveis/', custom_admin_imoveis_list, name='custom_admin_imoveis_list'),
+    path('gerenciador/novo/', custom_admin_criar_imovel, name='custom_admin_criar_imovel'),
+    path('gerenciador/editar/<int:imovel_id>/', custom_admin_editar_imovel, name='custom_admin_editar_imovel'),
+    path('gerenciador/imovel/<int:imovel_id>/imagens/', custom_admin_imovel_imagens, name='custom_admin_imovel_imagens'),    path('gerenciador/imoveis/<int:imovel_id>/delete/', custom_admin_delete_imovel, name='custom_admin_delete_imovel'),    path('gerenciador/imagem/<int:imagem_id>/delete/', custom_admin_delete_imagem, name='custom_admin_delete_imagem'),
     
-    path('custom-admin/imovel/<int:imovel_id>/arquivos/', custom_admin_imovel_arquivos, name='custom_admin_imovel_arquivos'),
-    path('custom-admin/arquivo/<int:arquivo_id>/delete/', custom_admin_delete_arquivo, name='custom_admin_delete_arquivo'),
+    path('gerenciador/imovel/<int:imovel_id>/arquivos/', custom_admin_imovel_arquivos, name='custom_admin_imovel_arquivos'),
+    path('gerenciador/arquivo/<int:arquivo_id>/delete/', custom_admin_delete_arquivo, name='custom_admin_delete_arquivo'),
 
-    path('custom-admin/imovel/<int:imovel_id>/unidades/', custom_admin_imovel_unidades, name='custom_admin_imovel_unidades'),
-    path('custom-admin/imovel/<int:imovel_id>/unidades/nova/', custom_admin_criar_unidade, name='custom_admin_criar_unidade'),
-    path('custom-admin/unidade/<int:unidade_id>/editar/', custom_admin_editar_unidade, name='custom_admin_editar_unidade'),
-    path('custom-admin/unidade/<int:unidade_id>/delete/', custom_admin_delete_unidade, name='custom_admin_delete_unidade'),
+    path('gerenciador/imovel/<int:imovel_id>/unidades/', custom_admin_imovel_unidades, name='custom_admin_imovel_unidades'),
+    path('gerenciador/imovel/<int:imovel_id>/unidades/nova/', custom_admin_criar_unidade, name='custom_admin_criar_unidade'),
+    path('gerenciador/unidade/<int:unidade_id>/editar/', custom_admin_editar_unidade, name='custom_admin_editar_unidade'),
+    path('gerenciador/unidade/<int:unidade_id>/delete/', custom_admin_delete_unidade, name='custom_admin_delete_unidade'),
 
-    path('custom-admin/imovel/<int:imovel_id>/instalacoes/', custom_admin_imovel_instalacoes, name='custom_admin_imovel_instalacoes'),
-    path('custom-admin/instalacoes/nova/', custom_admin_criar_instalacao, name='custom_admin_criar_instalacao'),
+    path('gerenciador/imovel/<int:imovel_id>/instalacoes/', custom_admin_imovel_instalacoes, name='custom_admin_imovel_instalacoes'),
+    path('gerenciador/instalacoes/nova/', custom_admin_criar_instalacao, name='custom_admin_criar_instalacao'),
 
     # ======================
     # API (JSON)

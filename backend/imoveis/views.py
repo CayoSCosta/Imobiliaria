@@ -4,8 +4,10 @@ from django.db.models import Min, Max, Q, F, Value, FloatField, Count
 from django.db.models.functions import ACos, Cos, Radians, Sin, Cast
 from django.conf import settings
 from django.utils.text import slugify
+from django.utils import timezone
+from datetime import timedelta
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade, ArquivoImovel
+from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade, ArquivoImovel, Visita
 from .serializers import ImovelSerializer
 from django.http import JsonResponse
 from leads.models import Lead
@@ -252,6 +254,12 @@ def imovel_detalhe(request, slug):
         ativo=True
     )
 
+    # Registrar visita (Contador de Visualizações)
+    session_key = f'viewed_imovel_{imovel.id}'
+    if not request.session.get(session_key):
+        Visita.objects.create(imovel=imovel)
+        request.session[session_key] = True
+
     mensagem = f"Olá gostaria de mais informações a respeito do imóvel {imovel.titulo}"
 
     whatsapp_url = (
@@ -297,6 +305,27 @@ def custom_admin_index(request):
     
     # 3. Leads por Status
     leads_por_status = list(Lead.objects.values('status').annotate(total=Count('status')).order_by('-total'))
+    
+    # 4. Visitas nos últimos 7 dias
+    hoje = timezone.now().date()
+    data_inicio = hoje - timedelta(days=6)
+    
+    visitas_por_dia = list(
+        Visita.objects.filter(data__range=[data_inicio, hoje])
+        .values('data')
+        .annotate(total=Count('id'))
+        .order_by('data')
+    )
+    
+    # Preencher dias vazios com 0
+    visitas_dict = {v['data']: v['total'] for v in visitas_por_dia}
+    chart_visitas_labels = []
+    chart_visitas_data = []
+    
+    for i in range(7):
+        data = data_inicio + timedelta(days=i)
+        chart_visitas_labels.append(data.strftime('%d/%m'))
+        chart_visitas_data.append(visitas_dict.get(data, 0))
 
     # Preparar dados para Chart.js (Arrays)
     
@@ -308,6 +337,9 @@ def custom_admin_index(request):
     context = {
         'total_imoveis': total_imoveis,
         'total_leads': total_leads,
+        
+        'chart_visitas_labels': chart_visitas_labels,
+        'chart_visitas_data': chart_visitas_data,
         
         # Gráfico Imóveis por Tipo (Pie/Doughnut)
         'chart_imovel_tipo_labels': [tipo_dict.get(x['tipo'], x['tipo']) for x in imoveis_por_tipo],

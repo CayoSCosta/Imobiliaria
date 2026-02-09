@@ -47,6 +47,22 @@
     </div>
 </div>
 
+<!-- Visitas Row -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
+                <h6 class="m-0 font-weight-bold text-info">Visitas aos Imóveis (Últimos 7 dias)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height: 300px;">
+                    <canvas id="visitasChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Charts Row -->
 <div class="row g-4">
     <!-- Imóveis por Tipo -->
@@ -181,6 +197,66 @@
                     maintainAspectRatio: false,
                      plugins: {
                         legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // 4. Visitas (Line Chart)
+        const ctxVisitas = document.getElementById('visitasChart');
+        if (ctxVisitas) {
+            new Chart(ctxVisitas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: {{ chart_visitas_labels|safe }},
+                    datasets: [{
+                        label: 'Visualizações',
+                        data: {{ chart_visitas_data|safe }},
+                        borderColor: '#36b9cc',
+                        backgroundColor: 'rgba(54, 185, 204, 0.05)',
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#36b9cc',
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: '#36b9cc',
+                        fill: true,
+                        tension: 0.3
+                    }],
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            ticks: { 
+                                precision: 0,
+                                stepSize: 1 
+                            },
+                             grid: {
+                                borderDash: [2],
+                                color: "#eaecf4",
+                                zeroLineColor: "#eaecf4",
+                            }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: "rgb(255,255,255)",
+                            bodyColor: "#858796",
+                            titleColor: '#6e707e',
+                            borderColor: '#dddfeb',
+                            borderWidth: 1,
+                            padding: 10,
+                            displayColors: false,
+                            intersect: false,
+                            mode: 'index',
+                            caretPadding: 10,
+                        }
                     }
                 }
             });

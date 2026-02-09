@@ -226,3 +226,16 @@ class ArquivoImovel(models.Model):
 
     def __str__(self):
         return self.nome
+
+class Visita(models.Model):
+    imovel = models.ForeignKey(Imovel, on_delete=models.CASCADE, related_name='visitas')
+    data = models.DateField(auto_now_add=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Visita'
+        verbose_name_plural = 'Visitas'
+
+    def __str__(self):
+        return f"{self.imovel.titulo} em {self.data}"
+

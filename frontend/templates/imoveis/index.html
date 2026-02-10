@@ -66,9 +66,10 @@
         margin-bottom: 20px;
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    
-    .hero p {
+
+    .hero h2 {
         font-size: 1.2rem;
+        font-weight: 500;
         margin-bottom: 30px;
         text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
@@ -172,10 +173,19 @@
         display: flex;
         align-items: center;
     }
-    
+
     .input-wrapper input {
         width: 100%;
+        padding-left: 40px !important;
         padding-right: 40px !important;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 12px;
+        color: #97a6b0;
+        font-size: 1rem;
+        pointer-events: none;
     }
 
     .btn-location-icon {
@@ -318,10 +328,10 @@
     }
 
     .btn-filtros-extra {
-        background: transparent;
-        color: var(--text-dark);
-        border: 1px solid #e0e0e0;
-        padding: 12px 15px;
+        background: var(--primary-color);
+        color: var(--white);
+        border: none;
+        padding: 12px 22px;
         border-radius: 8px;
         font-size: 14px;
         cursor: pointer;
@@ -331,12 +341,53 @@
         gap: 8px;
         transition: var(--transition);
         width: 100%;
+        box-shadow: 0 8px 18px rgba(215, 25, 32, 0.2);
     }
 
     .btn-filtros-extra:hover {
-        border-color: var(--primary-color);
-        color: var(--primary-color);
-        background: rgba(215, 25, 32, 0.05);
+        background: var(--primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .hero-qualifiers {
+        margin-top: 22px;
+        max-width: 950px;
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    .qualifier-intro {
+        color: var(--white);
+        font-weight: 600;
+        margin: 0 0 12px;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+    }
+
+    .qualifier-bar {
+        background: var(--white);
+        border-radius: 14px;
+        padding: 12px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        justify-content: center;
+        box-shadow: var(--shadow);
+    }
+
+    .qualifier-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        white-space: nowrap;
+    }
+
+    .qualifier-item i {
+        color: #63b34d;
+        font-size: 1.05rem;
     }
 
     /* Responsividade */
@@ -361,9 +412,13 @@
             padding: 0 15px;
         }
 
-        .hero p {
+        .hero h2 {
             padding: 0 15px;
             font-size: 1rem;
+        }
+
+        .qualifier-bar {
+            gap: 10px;
         }
     }
 </style>
@@ -371,19 +426,22 @@
 
 {% block content %}
 <section class="hero">
-    <h1>Assessoria imobiliária especializada</h1>
-    <h2>para quem quer morar bem ou investir melhor.</h2>
-    
-    <div class="filtro-container">
-        <form method="get">
-            <div class="filtro">
-                <div class="input-wrapper">
-                    <input type="text" name="termo" placeholder="🔍 Bairro ou Condomínio"
-                        value="{{ termo_selecionado|default:'' }}">
-                    <button type="button" class="btn-location-icon" onclick="getLocation()" title="Buscar imóveis próximos a mim">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </button>
-                </div>
+    <div class="hero-custom-overlay"></div>
+    <div class="hero-content">
+        <h1>Assessoria imobiliária especializada</h1>
+        <h2>para quem quer morar bem ou investir melhor.</h2>
+
+        <div class="filtro-container">
+            <form method="get">
+                <div class="filtro">
+                    <div class="input-wrapper">
+                        <span class="input-icon"><i class="fas fa-search"></i></span>
+                        <input type="text" name="termo" placeholder="Bairro ou Condomínio"
+                            value="{{ termo_selecionado|default:'' }}">
+                        <button type="button" class="btn-location-icon" onclick="getLocation()" title="Buscar imóveis próximos a mim">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                    </div>
 
                 {% comment %} <select name="status">
                     <option value="">Status da Obra</option>
@@ -398,25 +456,25 @@
                     <option value="ALTO" {% if tipo_selecionado == "ALTO" %}selected{% endif %}>Alto Padrão</option>
                 </select> {% endcomment %}
 
-                <button type="submit">
-                    <i class="fas fa-search"></i> Buscar
-                </button>
+                    <button type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
 
-                <button type="button" class="btn-filtros-extra" data-bs-toggle="modal" data-bs-target="#filtrosModal">
-                    <i class="fas fa-plus"></i> Filtros
-                </button>
-            </div>
+                    <button type="button" class="btn-filtros-extra" data-bs-toggle="modal" data-bs-target="#filtrosModal">
+                        <i class="fas fa-plus"></i> Filtros
+                    </button>
+                </div>
 
-            <!-- Modal de Filtros Avançados -->
-            <div class="modal fade" id="filtrosModal" tabindex="-1" aria-labelledby="filtrosModalLabel" aria-hidden="true" style="color: var(--text-dark); text-align: left;">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="filtrosModalLabel">Filtros Avançados</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row g-3">
+                <!-- Modal de Filtros Avançados -->
+                <div class="modal fade" id="filtrosModal" tabindex="-1" aria-labelledby="filtrosModalLabel" aria-hidden="true" style="color: var(--text-dark); text-align: left;">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="filtrosModalLabel">Filtros Avançados</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row g-3">
                                 <!-- Quartos -->
                                 <div class="col-md-4">
                                     <label class="form-label">Quartos</label>
@@ -490,14 +548,27 @@
 
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                            <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </form>
+        </div>
+
+        <div class="hero-qualifiers">
+            <p class="qualifier-intro">
+                Encontre as melhores oportunidades de acordo com o seu cronograma financeiro e perfil de moradia ou investimento.
+            </p>
+            <div class="qualifier-bar">
+                <span class="qualifier-item"><i class="fas fa-check-circle"></i> Até R$ 500 mil</span>
+                <span class="qualifier-item"><i class="fas fa-check-circle"></i> De R$ 500 mil a R$ 2 milhões</span>
+                <span class="qualifier-item"><i class="fas fa-check-circle"></i> De R$ 2 milhões a R$ 6 milhões</span>
+                <span class="qualifier-item"><i class="fas fa-check-circle"></i> Outros valores</span>
             </div>
-        </form>
+        </div>
     </div>
 </section>
 

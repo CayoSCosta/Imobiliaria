@@ -41,6 +41,7 @@
                         <tr>
                             <th class="ps-4">ID Órulo</th>
                             <th>Empreendimento</th>
+                            <th>Construtora</th>
                             <th>Bairro</th>
                             <th>Status</th>
                             <th>Atualizado em</th>
@@ -57,6 +58,7 @@
                                     <span class="badge bg-danger ms-2" title="Imóvel não existe mais na API">Removido na Origem</span>
                                 {% endif %}
                             </td>
+                            <td>{{ imovel.construtora|default:"-" }}</td>
                             <td>{{ imovel.bairro }}</td>
                             <td>
                                 {% if imovel.status == 'PRONTO' %}
@@ -86,9 +88,9 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
+                            <td colspan="7" class="text-center py-5 text-muted">
                                 <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                Nenhum imóvel importado encontrado.
+                                Nenhuma importação encontrada.
                             </td>
                         </tr>
                         {% endfor %}

@@ -7,8 +7,37 @@ from django.core.files.base import ContentFile
 from .models import Imovel, Unidade, ImagemImovel, ImagemUnidade, Instalacao, ArquivoImovel
 from decimal import Decimal
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
+
+def parse_orulo_date(date_value):
+    """
+    Tenta converter string de data da Órulo para objeto date do Python.
+    Suporta: YYYY-MM-DD, DD/MM/YYYY, MM/YYYY
+    """
+    if not date_value:
+        return None
+    
+    date_str = str(date_value).strip()
+    
+    formats = [
+        '%Y-%m-%d',      # 2022-09-15
+        '%d/%m/%Y',      # 15/09/2022
+        '%d-%m-%Y',      # 15-09-2022
+        '%Y/%m/%d',      # 2022/09/15
+        '%m/%Y',         # 09/2022
+        '%Y-%m',         # 2022-09
+    ]
+
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_str, fmt)
+            return dt.date()
+        except ValueError:
+            continue
+            
+    return None
 
 def fix_sequences():
     """
@@ -453,7 +482,24 @@ def sincronizar_imovel_orulo(imovel_id):
         if imovel.status != novo_status:
             result['changes'].append(f"Status atualizado de {imovel.status} para {novo_status}.")
             imovel.status = novo_status
-            imovel.save()
+
+        # --- NOVOS CAMPOS (Solicitados em 12/02/2026) ---
+        # Garantir que developer_name seja atribuido corretamente
+        developer_data = data.get('developer')
+        if developer_data and isinstance(developer_data, dict):
+             imovel.construtora = developer_data.get('name')
+        
+        # Datas com parser seguro
+        imovel.data_lancamento = parse_orulo_date(data.get('launch_date') or data.get('launched_at'))
+        imovel.data_entrega = parse_orulo_date(data.get('completion_date') or data.get('delivery_date') or data.get('delivered_at'))
+        
+        imovel.unidades_por_andar = data.get('units_per_floor')
+        imovel.total_unidades = data.get('total_units') or data.get('units_count')
+        imovel.numero_andares = data.get('floors') or data.get('floors_count')
+        imovel.area_total = data.get('land_area') # Área do Terreno
+        imovel.area_laje = data.get('standard_floor_area') # Área da Laje (se disponível)
+
+        imovel.save()
 
         # --- A. Sincronizar Tipologias (Unidades) ---
         try:

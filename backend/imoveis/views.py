@@ -9,7 +9,7 @@ from datetime import timedelta
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from .models import Imovel, Unidade, ImagemImovel, Instalacao, ImagemUnidade, ArquivoImovel, Visita
 from .serializers import ImovelSerializer
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from leads.models import Lead
 from .forms import (
     ImovelImagensForm, 
@@ -19,6 +19,9 @@ from .forms import (
     InstalacaoForm,
     ImovelArquivosForm
 )
+import openpyxl
+from openpyxl.utils import get_column_letter
+from datetime import datetime
 
 # =========================
 # FRONTEND (HTML)
@@ -757,3 +760,102 @@ def custom_admin_orulo_list(request):
     }
 
     return render(request, 'custom_admin/orulo_list.html', context)
+
+@staff_member_required
+def custom_admin_exportar_imoveis(request):
+    import openpyxl
+    from openpyxl.utils import get_column_letter
+
+    # Cria o Workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Imóveis Imobidon"
+
+    # Cabeçalho
+    headers = [
+        "ID", "Título", "Ref. Órulo", "Status", "Bairro", "Cidade", 
+        "Preço", "Construtora", "Data Lançamento", "Data Entrega",
+        "Área Terreno", "Área Laje", "Unidades/Andar", "Total Unidades", "Andares",
+        "Ativo", "Link Público"
+    ]
+    
+    for col_num, header in enumerate(headers, 1):
+        col_letter = get_column_letter(col_num)
+        cell = ws[f"{col_letter}1"]
+        cell.value = header
+        cell.font = openpyxl.styles.Font(bold=True)
+
+    # Dados
+    imoveis = Imovel.objects.all().order_by('-criado_em')
+    
+    # Aplica filtros se houver (mesma lógica da lista)
+    busca = request.GET.get("busca")
+    status = request.GET.get("status")
+    
+    if busca:
+        imoveis = imoveis.filter(
+            Q(titulo__icontains=busca) | 
+            Q(bairro__icontains=busca) | 
+            Q(bairro_oficial__icontains=busca) |
+            Q(cidade__icontains=busca) | 
+            Q(construtora__icontains=busca) |
+            Q(slug__icontains=slugify(busca))
+        )
+
+    if status:
+        imoveis = imoveis.filter(status=status)
+
+    for row_num, imovel in enumerate(imoveis, 2):
+        ws.cell(row=row_num, column=1, value=imovel.id)
+        ws.cell(row=row_num, column=2, value=imovel.titulo)
+        ws.cell(row=row_num, column=3, value=imovel.orulo_id if imovel.orulo_id else "Manual")
+        ws.cell(row=row_num, column=4, value=imovel.get_status_display())
+        ws.cell(row=row_num, column=5, value=imovel.bairro)
+        ws.cell(row=row_num, column=6, value=imovel.cidade)
+        ws.cell(row=row_num, column=7, value=float(imovel.preco) if imovel.preco and imovel.preco > 0 else 0)
+        ws.cell(row=row_num, column=8, value=imovel.construtora)
+        
+        # Datas formatadas
+        lanc = imovel.data_lancamento.strftime("%d/%m/%Y") if imovel.data_lancamento else ""
+        ent = imovel.data_entrega.strftime("%d/%m/%Y") if imovel.data_entrega else ""
+        
+        ws.cell(row=row_num, column=9, value=lanc)
+        ws.cell(row=row_num, column=10, value=ent)
+        
+        ws.cell(row=row_num, column=11, value=float(imovel.area_total) if imovel.area_total else "")
+        ws.cell(row=row_num, column=12, value=float(imovel.area_laje) if imovel.area_laje else "")
+        
+        ws.cell(row=row_num, column=13, value=imovel.unidades_por_andar)
+        ws.cell(row=row_num, column=14, value=imovel.total_unidades)
+        ws.cell(row=row_num, column=15, value=imovel.numero_andares)
+        
+        ws.cell(row=row_num, column=16, value="Sim" if imovel.ativo else "Não")
+        
+        try:
+            link = request.build_absolute_uri(f"/imovel/{imovel.slug}/")
+            cell_link = ws.cell(row=row_num, column=17, value=link)
+            cell_link.hyperlink = link
+            cell_link.style = "Hyperlink"
+        except:
+             pass
+
+    # Auto-ajuste de colunas
+    for col in ws.columns:
+        max_length = 0
+        column = col[0].column_letter # Get the column name
+        for cell in col:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except:
+                pass
+        adjusted_width = (max_length + 2)
+        if adjusted_width > 50: adjusted_width = 50
+        ws.column_dimensions[column].width = adjusted_width
+
+    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    filename = f"imoveis_imobidon_{datetime.now().strftime('%Y-%m-%d')}.xlsx"
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+    
+    wb.save(response)
+    return response

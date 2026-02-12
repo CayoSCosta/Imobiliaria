@@ -34,12 +34,14 @@ from .views import (
     custom_admin_orulo_list, # Lista Órulo
     custom_admin_sync_orulo_imovel, # Sync Unitário
     check_import_progress, # Ajax Progresso
+    custom_admin_exportar_imoveis, # Exportar Excel
 )
 
 urlpatterns = [
     path('gerenciador/orulo/', custom_admin_orulo_list, name='custom_admin_orulo_list'),
     path('gerenciador/orulo/sync/<int:imovel_id>/', custom_admin_sync_orulo_imovel, name='custom_admin_sync_orulo_imovel'),
     path('gerenciador/orulo/progress/', check_import_progress, name='check_import_progress'),
+    path('gerenciador/imoveis/exportar/', custom_admin_exportar_imoveis, name='custom_admin_exportar_imoveis'), # Novo endpoint
 
     # ======================
     # FRONTEND (HTML)

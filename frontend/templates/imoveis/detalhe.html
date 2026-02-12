@@ -2,6 +2,22 @@
 {% load static %}
 {% load humanize %}
 
+{% block title %}
+{% if imovel.seo_title %}
+{{ imovel.seo_title }}
+{% else %}
+{{ imovel.titulo }} | {{ imovel.bairro }} | Imobidon
+{% endif %}
+{% endblock %}
+
+{% block description %}
+{% if imovel.seo_description %}
+{{ imovel.seo_description }}
+{% else %}
+{{ imovel.titulo }} em {{ imovel.bairro }}. {{ imovel.get_status_display }}. Saiba mais sobre este imóvel de {% if imovel.min_area %}{{ imovel.min_area }}m²{% endif %} com {% if imovel.min_quartos %}{{ imovel.min_quartos }} quartos{% endif %}.
+{% endif %}
+{% endblock %}
+
 {% block extra_css %}
 <style>
     :root {
@@ -457,12 +473,14 @@
             {% for img in imovel.imagens.all %}
             <div class="swiper-slide">
                 <img src="{{ img.imagem.url }}" 
+                     alt="{{ imovel.titulo }} - {{ imovel.bairro }} - Foto {{ forloop.counter }}"
                      style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" 
                      onclick="openLightbox({{ forloop.counter0 }})">
             </div>
             {% empty %}
             <div class="swiper-slide">
                 <img src="https://placehold.co/1200x800?text=Sem+Imagem+Disponível&font=roboto" 
+                     alt="Sem imagem disponível para {{ imovel.titulo }}"
                      style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             {% endfor %}
@@ -584,7 +602,7 @@
             <hr/>
 
             <div style="margin-top: 40px;">
-                <h4>Sobre o empreendimento</h4>
+                <h2>Sobre o empreendimento</h2>
                 <div id="descricao-wrapper" style="position: relative;">
                     <div id="descricao-content" style="max-height: 150px; overflow: hidden; transition: max-height 0.5s ease;">
                         <p class="text-secondary">{{ imovel.descricao|linebreaks }}</p>
@@ -599,7 +617,7 @@
             <hr/>
 
             <div class="instalacoes-section" style="margin-top: 40px;">
-                <h4>Lazer e Facilidades</h4>
+                <h2>Lazer e Facilidades</h2>
                 
                 <div id="instalacoes-wrapper" style="position: relative;">
                     <div id="instalacoes-content" style="{% if imovel.instalacoes.count > 8 %}max-height: 110px; overflow: hidden;{% endif %} transition: max-height 0.5s ease;">
@@ -628,14 +646,14 @@
 
             <hr/>
 
-            <h4>Plantas e Disponibilidade</h4>
+            <h2>Plantas e Disponibilidade</h2>
                 <div class="unidades-grid">
                     {% for unidade in imovel.unidades.all %}
                     <div class="unidade-card {% if forloop.counter > 2 %}unidade-oculta{% endif %}" onclick="changeGallery('{{ unidade.id }}')" {% if forloop.counter > 2 %}style="display:none;"{% endif %}>
                         
                         <div class="unidade-foto-box">
                             {% with unidade.imagens.all|first as planta %}
-                                <img src="{% if planta %}{{ planta.imagem.url }}{% else %}https://placehold.co/600x400?text=Planta+Indisponível{% endif %}" alt="Planta">
+                                <img src="{% if planta %}{{ planta.imagem.url }}{% else %}https://placehold.co/600x400?text=Planta+Indisponível{% endif %}" alt="Planta da unidade {{ unidade.titulo }} - {{ imovel.titulo }}">
                             {% endwith %}
                         </div>
 
@@ -728,7 +746,7 @@
 
                 <div class="mapa-wrapper" style="margin-top: 30px; background: #fff; border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h4 style="margin: 0; color: var(--text-main);">Localização</h4>
+                        <h2 style="margin: 0; color: var(--text-main); font-size: 1.5rem;">Localização</h2>
                         <button onclick="openModalMapa()" class="btn-ver-rua" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px; border: 1px solid #e0e0e0; color: var(--text-main); background: #fff; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s;">
                             <i class="fas fa-street-view"></i> Ver na Rua
                         </button>
@@ -764,7 +782,7 @@
         <div class="swiper-wrapper" id="swiper-wrapper-main">
             {% for img in imovel.imagens.all %}
             <div class="swiper-slide" style="display:flex; align-items:center; justify-content:center;">
-                <img src="{{ img.imagem.url }}" style="max-width:90%; max-height:90%; object-fit:contain;">
+                <img src="{{ img.imagem.url }}" alt="{{ imovel.titulo }} - Imagem ampliada {{ forloop.counter }}" style="max-width:90%; max-height:90%; object-fit:contain;">
             </div>
             {% endfor %}
         </div>

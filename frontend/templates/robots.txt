@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /global-admin/
+Disallow: /painel/
+Disallow: /gerenciador/
+Allow: /
+
+Sitemap: https://www.imobidon.com.br/sitemap.xml

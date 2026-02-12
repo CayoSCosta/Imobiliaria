@@ -3,6 +3,9 @@ from django.utils.text import slugify
 from datetime import date
 import os
 import random
+from io import BytesIO # Novo
+from django.core.files.base import ContentFile # Novo
+from PIL import Image # Novo
 
 def get_imovel_upload_path(instance, filename):
     """
@@ -99,6 +102,10 @@ class Imovel(models.Model):
     is_orulo = models.BooleanField(default=False, verbose_name="Importado da Órulo")
     removido_na_origem = models.BooleanField(default=False, verbose_name="Removido na Órulo")
 
+    # SEO Fields
+    seo_title = models.CharField(max_length=255, blank=True, null=True, verbose_name="Título SEO", help_text="Título da página")
+    seo_description = models.TextField(blank=True, null=True, verbose_name="Descrição SEO", help_text="Meta Description para o Google")
+
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
 
@@ -169,6 +176,30 @@ class ImagemImovel(models.Model):
     ordem = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
+        # Conversão automática para WebP
+        if self.imagem:
+            try:
+                if hasattr(self.imagem, 'name') and not self.imagem.name.lower().endswith('.webp'):
+                    img = Image.open(self.imagem)
+                    
+                    if img.mode in ('RGBA', 'LA'):
+                        background = Image.new('RGB', img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[-1])
+                        img = background
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    
+                    buffer = BytesIO()
+                    img.save(buffer, format='WEBP', quality=80)
+                    
+                    filename = os.path.basename(self.imagem.name)
+                    name, _ = os.path.splitext(filename)
+                    new_filename = f"{name}.webp"
+                    
+                    self.imagem.save(new_filename, ContentFile(buffer.getvalue()), save=False)
+            except Exception as e:
+                print(f"Erro ao converter imagem {self.imagem.name} para WebP: {e}")
+
         if self.ordem == 0:
             self.ordem = random.randint(1, 1000)
         super().save(*args, **kwargs)
@@ -192,6 +223,30 @@ class ImagemUnidade(models.Model):
     ordem = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
+        # Conversão automática para WebP
+        if self.imagem:
+            try:
+                if hasattr(self.imagem, 'name') and not self.imagem.name.lower().endswith('.webp'):
+                    img = Image.open(self.imagem)
+                    
+                    if img.mode in ('RGBA', 'LA'):
+                        background = Image.new('RGB', img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[-1])
+                        img = background
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    
+                    buffer = BytesIO()
+                    img.save(buffer, format='WEBP', quality=80)
+                    
+                    filename = os.path.basename(self.imagem.name)
+                    name, _ = os.path.splitext(filename)
+                    new_filename = f"{name}.webp"
+                    
+                    self.imagem.save(new_filename, ContentFile(buffer.getvalue()), save=False)
+            except Exception as e:
+                print(f"Erro ao converter imagem {self.imagem.name} para WebP: {e}")
+
         if self.ordem == 0:
             self.ordem = random.randint(1, 1000)
         super().save(*args, **kwargs)

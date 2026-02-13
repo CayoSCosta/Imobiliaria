@@ -35,3 +35,8 @@ db.sqlite3
 # ========================
 media/
 staticfi
+letsencrypt/
+proxy_data/
+*.log
+__pycache__/
+.env

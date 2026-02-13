@@ -47,7 +47,7 @@
                         {% endif %}
 
                         <div class="card-text text-secondary mb-3">
-                            {{ post.conteudo|striptags|truncatewords:45 }}
+                            {{ post.conteudo|markdown|striptags|truncatewords:45 }}
                         </div>
 
                         <a href="{% url 'blog:public_post_detail' post.slug %}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">

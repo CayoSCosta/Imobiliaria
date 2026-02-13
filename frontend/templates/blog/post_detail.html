@@ -2,7 +2,7 @@
 {% load static humanize blog_tags %}
 
 {% block title %}{{ post.meta_title|default:post.titulo }} | Blog Imobidon{% endblock %}
-{% block description %}{{ post.meta_description|default:post.conteudo|striptags|truncatewords:30 }}{% endblock %}
+{% block description %}{{ post.meta_description|default:post.conteudo|markdown|striptags|truncatewords:30 }}{% endblock %}
 
 {% block content %}
 <section class="py-5 bg-white">
@@ -43,16 +43,54 @@
 
                 <!-- Content -->
                 <div class="post-content lh-lg mb-5 fs-5 text-dark text-break" style="font-family: 'Open Sans', sans-serif;">
-                    {{ post.conteudo|safe|linebreaks }}
+                    {{ post.conteudo|markdown }}
                 </div>
                 
-                <!-- Share (Placeholder) -->
-                <div class="d-flex align-items-center mb-5 p-4 bg-light rounded text-center justify-content-center">
-                    <span class="fw-bold me-3">Compartilhe:</span>
-                    <a href="#" class="btn btn-outline-primary btn-sm rounded-circle me-2"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="btn btn-outline-info btn-sm rounded-circle me-2"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="btn btn-outline-success btn-sm rounded-circle me-2"><i class="fab fa-whatsapp"></i></a>
-                    <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fab fa-linkedin-in"></i></a>
+                <!-- CTA Especialista -->
+                <div class="row justify-content-center my-5">
+                    <div class="col-lg-10">
+                        <div class="text-center mb-4">
+                           <h4 class="fw-bold">Fale comigo para acessar os melhores lançamentos e garantir seu investimento mais seguro na cidade de São Paulo.</h4>
+                        </div>
+
+                        <div class="bg-light p-4 rounded-3 mb-4 shadow-sm">
+                            <div class="text-center">
+                               <p class="text-muted mb-4 fw-semibold">Solicite informações completas com:</p>
+                               <ul class="list-unstyled text-muted text-start d-inline-block mx-auto">
+                                    <li class="mb-2">1. Solicite as melhores oportunidades</li>
+                                    <li class="mb-2">2. Receba um mapa completo, um guia do valor do m² de cada região em São Paulo</li>
+                                    <li class="mb-2">3. Solicite book com plantas, tabela de valores e Simulações de financiamento</li>
+                                    <li class="mb-2">4. Agende visita presencial ou virtual (quando disponível)</li>
+                               </ul>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3 mb-4">
+                             <a href="https://wa.me/{{ WHATSAPP_NUMERO }}?text=Olá,%20acabei%20de%20ler%20o%20seu%20post%20'{{ post.titulo }}'%20e%20gostaria%20de%20falar%20com%20um%20especialista." target="_blank" class="btn btn-primary btn-lg fw-bold py-3">Fale com um Consultor e Saiba Mais</a>
+                             <a href="{% url 'imoveis:fale_conosco' %}" class="btn btn-outline-primary btn-lg fw-bold py-3">Preencha o Formulário</a>
+                        </div>
+                        
+                        <p class="text-center text-muted small">Preencha o <strong>formulário</strong> ou fale diretamente pelo <strong>WhatsApp</strong> para garantir sua unidade.</p>
+                    </div>
+                </div>
+
+                <!-- Compartilhe -->
+                <div class="text-center mb-5 pt-4 border-top">
+                    <span class="fw-bold d-block mb-3">Compartilhe este post:</span>
+                    <div class="d-inline-flex justify-content-center">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Compartilhar no Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.titulo }}" target="_blank" class="btn btn-outline-info btn-sm rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Compartilhar no Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://api.whatsapp.com/send?text={{ post.titulo|urlencode }}%20{{ request.build_absolute_uri }}" target="_blank" class="btn btn-outline-success btn-sm rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Compartilhar no WhatsApp">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}&title={{ post.titulo }}" target="_blank" class="btn btn-outline-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;" title="Compartilhar no LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Related Posts -->

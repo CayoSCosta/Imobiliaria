@@ -1,8 +1,14 @@
 from django import template
 from django.db.models import Prefetch
+from django.utils.safestring import mark_safe
+import markdown
 from imoveis.models import Imovel, ImagemImovel
 
 register = template.Library()
+
+@register.filter(name='markdown')
+def markdown_format(text):
+    return mark_safe(markdown.markdown(text))
 
 @register.inclusion_tag('blog/partials/sidebar_imoveis_destaque.html')
 def exibir_imoveis_destaque(count=3):

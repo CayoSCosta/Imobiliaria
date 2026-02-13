@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load blog_tags %}
 
 {% block title %}{{ post.titulo }} - Blog{% endblock %}
 
@@ -18,7 +19,7 @@
             {% endif %}
 
             <div class="article-content" style="font-size: 1.1rem; line-height: 1.8;">
-                {{ post.conteudo|linebreaks }}
+                {{ post.conteudo|markdown }}
             </div>
 
             <hr class="my-5">

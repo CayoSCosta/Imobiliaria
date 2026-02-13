@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static humanize blog_tags %}
+
+{% block title %}Blog | Dicas e Notícias do Mercado Imobiliário{% endblock %}
+{% block description %}Acompanhe as últimas novidades, dicas e análises sobre o mercado imobiliário em nosso blog.{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content: Posts -->
+            <div class="col-lg-8">
+                
+                <h1 class="mb-4 fw-bold">Blog Imobiliário</h1>
+
+                {% if destaque_principal %}
+                <div class="card mb-5 border-0 shadow-sm overflow-hidden">
+                    {% if destaque_principal.imagem_capa %}
+                    <a href="{% url 'blog:public_post_detail' destaque_principal.slug %}">
+                        <img src="{{ destaque_principal.imagem_capa.url }}" class="card-img-top" alt="{{ destaque_principal.titulo }}" style="height: 400px; object-fit: cover;">
+                    </a>
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <small class="text-muted"><i class="far fa-calendar-alt me-2"></i>{{ destaque_principal.data_publicacao|date:"d M Y" }}</small>
+                            {% if destaque_principal.is_featured %}
+                            <span class="badge bg-warning text-dark ms-2">Destaque</span>
+                            {% endif %}
+                        </div>
+                        <h2 class="card-title h3"><a href="{% url 'blog:public_post_detail' destaque_principal.slug %}" class="text-dark text-decoration-none">{{ destaque_principal.titulo }}</a></h2>
+                        <p class="card-text text-muted">{{ destaque_principal.conteudo|striptags|truncatewords:40 }}</p>
+                        <a href="{% url 'blog:public_post_detail' destaque_principal.slug %}" class="btn btn-outline-primary">Ler mais</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="row g-4">
+                    {% for post in posts %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            {% if post.imagem_capa %}
+                            <a href="{% url 'blog:public_post_detail' post.slug %}">
+                                <img src="{{ post.imagem_capa.url }}" class="card-img-top" alt="{{ post.titulo }}" style="height: 200px; object-fit: cover;">
+                            </a>
+                            {% else %}
+                            <div class="bg-secondary" style="height: 200px;"></div>
+                            {% endif %}
+                            <div class="card-body">
+                                <small class="text-muted d-block mb-2">{{ post.data_publicacao|date:"d/m/Y" }}</small>
+                                <h5 class="card-title"><a href="{% url 'blog:public_post_detail' post.slug %}" class="text-dark text-decoration-none">{{ post.titulo }}</a></h5>
+                                <p class="card-text text-muted small">{{ post.conteudo|striptags|truncatewords:20 }}</p>
+                            </div>
+                            <div class="card-footer bg-white border-0 pt-0">
+                                <a href="{% url 'blog:public_post_detail' post.slug %}" class="text-primary fw-bold text-decoration-none small">Ler artigo <i class="fas fa-arrow-right ms-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted">Nenhum post encontrado.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Paginação (Simplificado) -->
+                {% if is_paginated %}
+                <nav class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a></li>
+                        {% endif %}
+                        <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                        {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Próximo</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 mt-5 mt-lg-0">
+                <div class="sticky-top" style="top: 2rem; z-index: 1;">
+                    
+                    <!-- 1. Imóveis em Destaque (Inclusion Tag) -->
+                    {% exibir_imoveis_destaque %}
+
+                    <!-- 2. Banners de Afiliados / Propagandas -->
+                    {% if propagandas %}
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white fw-bold">Parceiros</div>
+                        <div class="card-body p-0">
+                            {% for prop in propagandas %}
+                            <div class="p-3 border-bottom last-border-0">
+                                {% if prop.link_destino %}
+                                <a href="{{ prop.link_destino }}" target="_blank" rel="noopener noreferrer">
+                                    <img src="{{ prop.imagem.url }}" alt="{{ prop.titulo }}" class="img-fluid rounded w-100">
+                                </a>
+                                {% else %}
+                                <img src="{{ prop.imagem.url }}" alt="{{ prop.titulo }}" class="img-fluid rounded w-100">
+                                {% endif %}
+                                <div class="mt-2 text-center small text-muted">{{ prop.titulo }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- 3. Redes Sociais -->
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-white fw-bold">Siga-nos</div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="#" class="btn btn-outline-primary"><i class="fab fa-instagram me-2"></i> Instagram</a>
+                                <a href="#" class="btn btn-outline-primary"><i class="fab fa-facebook me-2"></i> Facebook</a>
+                                <a href="#" class="btn btn-outline-danger"><i class="fab fa-youtube me-2"></i> YouTube</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

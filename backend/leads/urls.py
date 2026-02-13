@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 from .views import LeadCreateView, custom_admin_leads_list, custom_admin_lead_detail, update_lead_status, exportar_leads_csv, registrar_whatsapp_contato
 
+app_name = 'leads'
+
 urlpatterns = [
     path('api/leads/', LeadCreateView.as_view(), name='lead-create'),
     path('api/whatsapp-click/', registrar_whatsapp_contato, name='whatsapp-click'),

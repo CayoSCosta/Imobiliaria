@@ -55,6 +55,8 @@ def index(request):
     # Geolocalização
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')
+    km = request.GET.get('km', '0')
+    geo_ativo = False
 
     if lat and lng:
         try:
@@ -79,6 +81,12 @@ def index(request):
                     Sin(Radians(Cast(F('latitude'), FloatField())))
                 )
             ).order_by('distance')
+
+            km_float = float(km)
+            if km_float > 0:
+                imoveis = imoveis.filter(distance__lte=km_float)
+
+            geo_ativo = True
             
         except ValueError:
             pass # Ignora se lat/lng inválidos
@@ -117,7 +125,8 @@ def index(request):
         imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
     # Ordenação padrão para garantir consistência na paginação
-    imoveis = imoveis.order_by('-id')
+    if not geo_ativo:
+        imoveis = imoveis.order_by('-id')
 
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página
@@ -138,6 +147,9 @@ def index(request):
         'area_max_selecionada': area_max,
         'preco_min_selecionado': preco_min,
         'preco_max_selecionado': preco_max,
+        'lat_selecionada': lat,
+        'lng_selecionada': lng,
+        'km_selecionado': km,
     }
 
     return render(request, 'imoveis/index.html', context)
@@ -401,10 +413,10 @@ def custom_admin_delete_imovel(request, imovel_id):
     if request.method == 'POST':
         imovel.delete()
         # messages.success(request, f'Imóvel "{imovel.titulo}" excluído com sucesso!') # Se tiver messages
-        return redirect('custom_admin_imoveis_list')
+        return redirect('imoveis:custom_admin_imoveis_list')
     
     # Se for GET, não faz nada ou renderiza confirmação (mas vamos usar modal e POST)
-    return redirect('custom_admin_imoveis_list')
+    return redirect('imoveis:custom_admin_imoveis_list')
 
 @staff_member_required
 def custom_admin_sync_orulo_imovel(request, imovel_id):
@@ -426,7 +438,7 @@ def custom_admin_sync_orulo_imovel(request, imovel_id):
     else:
         messages.error(request, resultado['message'])
         
-    return redirect('custom_admin_orulo_list')
+    return redirect('imoveis:custom_admin_orulo_list')
 
 @staff_member_required
 def custom_admin_imovel_imagens(request, imovel_id):
@@ -441,7 +453,7 @@ def custom_admin_imovel_imagens(request, imovel_id):
                 imagens = request.FILES.getlist('imagens')
                 for imagem in imagens:
                     ImagemImovel.objects.create(imovel=imovel, imagem=imagem)
-                return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
+                return redirect('imoveis:custom_admin_imovel_imagens', imovel_id=imovel.id)
         
         elif action == 'update_order':
             imagem_principal_id = request.POST.get('principal')
@@ -467,7 +479,7 @@ def custom_admin_imovel_imagens(request, imovel_id):
                     except (ValueError, ImagemImovel.DoesNotExist):
                         continue
             
-            return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_imagens', imovel_id=imovel.id)
             
         elif action == 'move_to_unit':
             imagem_id = request.POST.get('imagem_id')
@@ -494,7 +506,7 @@ def custom_admin_imovel_imagens(request, imovel_id):
                 print(f"Erro ao mover imagem: {e}")
                 # messages.error(request, "Erro ao mover imagem.")
             
-            return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_imagens', imovel_id=imovel.id)
 
     else:
         form = ImovelImagensForm()
@@ -515,7 +527,7 @@ def custom_admin_delete_imagem(request, imagem_id):
     imagem = get_object_or_404(ImagemImovel, pk=imagem_id)
     imovel_id = imagem.imovel.id
     imagem.delete()
-    return redirect('custom_admin_imovel_imagens', imovel_id=imovel_id)
+    return redirect('imoveis:custom_admin_imovel_imagens', imovel_id=imovel_id)
 
 @staff_member_required
 def custom_admin_imovel_arquivos(request, imovel_id):
@@ -534,7 +546,7 @@ def custom_admin_imovel_arquivos(request, imovel_id):
                     ext = f.name.split('.')[-1]
                     f.name = f"{safe_name}.{ext}"
                     ArquivoImovel.objects.create(imovel=imovel, arquivo=f, nome=f.name)
-                return redirect('custom_admin_imovel_arquivos', imovel_id=imovel.id)
+                return redirect('imoveis:custom_admin_imovel_arquivos', imovel_id=imovel.id)
         
     else:
         form = ImovelArquivosForm()
@@ -551,7 +563,7 @@ def custom_admin_delete_arquivo(request, arquivo_id):
     arquivo = get_object_or_404(ArquivoImovel, pk=arquivo_id)
     imovel_id = arquivo.imovel.id
     arquivo.delete()
-    return redirect('custom_admin_imovel_arquivos', imovel_id=imovel_id)
+    return redirect('imoveis:custom_admin_imovel_arquivos', imovel_id=imovel_id)
 
 @staff_member_required
 def custom_admin_imovel_unidades(request, imovel_id):
@@ -576,7 +588,7 @@ def custom_admin_criar_unidade(request, imovel_id):
                     principal=True
                 )
 
-            return redirect('custom_admin_imovel_unidades', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_unidades', imovel_id=imovel.id)
     else:
         form = UnidadeForm()
     return render(request, 'custom_admin/criar_unidade.html', {'imovel': imovel, 'form': form, 'titulo': 'Nova Unidade'})
@@ -600,7 +612,7 @@ def custom_admin_editar_unidade(request, unidade_id):
                     principal=True
                 )
             
-            return redirect('custom_admin_imovel_unidades', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_unidades', imovel_id=imovel.id)
     else:
         form = UnidadeForm(instance=unidade)
     
@@ -615,7 +627,7 @@ def custom_admin_delete_unidade(request, unidade_id):
     unidade = get_object_or_404(Unidade, pk=unidade_id)
     imovel_id = unidade.imovel.id
     unidade.delete()
-    return redirect('custom_admin_imovel_unidades', imovel_id=imovel_id)
+    return redirect('imoveis:custom_admin_imovel_unidades', imovel_id=imovel_id)
 
 @staff_member_required
 def custom_admin_imovel_instalacoes(request, imovel_id):
@@ -624,7 +636,7 @@ def custom_admin_imovel_instalacoes(request, imovel_id):
         form = ImovelInstalacoesForm(request.POST, instance=imovel)
         if form.is_valid():
             form.save()
-            return redirect('custom_admin_imovel_instalacoes', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_instalacoes', imovel_id=imovel.id)
     else:
         form = ImovelInstalacoesForm(instance=imovel)
     
@@ -643,9 +655,9 @@ def custom_admin_criar_instalacao(request):
         if form.is_valid():
             form.save()
             # Retorna para a página anterior ou para admin index se não houver referer
-            next_url = request.META.get('HTTP_REFERER', 'custom_admin_imoveis_list')
+            next_url = request.META.get('HTTP_REFERER', 'imoveis:custom_admin_imoveis_list')
             return redirect(next_url)
-    return redirect('custom_admin_imoveis_list')
+    return redirect('imoveis:custom_admin_imoveis_list')
 
 @staff_member_required
 def custom_admin_criar_imovel(request):
@@ -654,7 +666,7 @@ def custom_admin_criar_imovel(request):
         if form.is_valid():
             imovel = form.save()
             # Redireciona para a edição de imagens ou lista, vamos para imagens para incentivar o cadastro completo
-            return redirect('custom_admin_imovel_imagens', imovel_id=imovel.id)
+            return redirect('imoveis:custom_admin_imovel_imagens', imovel_id=imovel.id)
     else:
         form = ImovelForm()
     return render(request, 'custom_admin/criar_imovel.html', {'form': form})
@@ -669,7 +681,7 @@ def custom_admin_editar_imovel(request, imovel_id):
         form = ImovelForm(request.POST, instance=imovel)
         if form.is_valid():
             imovel = form.save()
-            return redirect('custom_admin_imoveis_list')
+            return redirect('imoveis:custom_admin_imoveis_list')
     else:
         form = ImovelForm(instance=imovel)
     return render(request, 'custom_admin/criar_imovel.html', {'form': form, 'imovel': imovel})

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static humanize blog_tags %}
+
+{% block title %}{{ post.meta_title|default:post.titulo }} | Blog Imobidon{% endblock %}
+{% block description %}{{ post.meta_description|default:post.conteudo|striptags|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-white">
+    <div class="container">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-transparent p-0 small">
+                <li class="breadcrumb-item"><a href="{% url 'blog:public_blog_list' %}" class="text-decoration-none text-muted">Blog</a></li>
+                {% if post.categoria %}
+                <li class="breadcrumb-item"><a href="{% url 'blog:public_blog_list' %}?categoria={{ post.categoria.slug }}" class="text-decoration-none text-muted">{{ post.categoria.nome }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active text-truncate" aria-current="page" style="max-width: 300px;">{{ post.titulo }}</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Post Header -->
+                <div class="mb-4">
+                    <h1 class="fw-bold mb-3 display-5">{{ post.titulo }}</h1>
+                    <div class="d-flex align-items-center text-muted small border-bottom pb-3">
+                        <span class="me-3"><i class="far fa-user me-1"></i> ImobiDom</span>
+                        <span class="me-3"><i class="far fa-calendar-alt me-1"></i>{{ post.data_publicacao|date:"d M, Y" }}</span>
+                        {% if post.categoria %}
+                        <span class="me-3"><i class="far fa-folder me-1"></i> {{ post.categoria.nome }}</span>
+                        {% endif %}
+                        
+                        {% if post.is_featured %}
+                        <span class="badge bg-warning text-dark ms-auto">Destaque</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Featured Image -->
+                {% if post.imagem_capa %}
+                <img src="{{ post.imagem_capa.url }}" class="img-fluid rounded mb-5 w-100 shadow-sm" alt="{{ post.titulo }}">
+                {% endif %}
+
+                <!-- Content -->
+                <div class="post-content lh-lg mb-5 fs-5 text-dark text-break" style="font-family: 'Open Sans', sans-serif;">
+                    {{ post.conteudo|safe|linebreaks }}
+                </div>
+                
+                <!-- Share (Placeholder) -->
+                <div class="d-flex align-items-center mb-5 p-4 bg-light rounded text-center justify-content-center">
+                    <span class="fw-bold me-3">Compartilhe:</span>
+                    <a href="#" class="btn btn-outline-primary btn-sm rounded-circle me-2"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="btn btn-outline-info btn-sm rounded-circle me-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-success btn-sm rounded-circle me-2"><i class="fab fa-whatsapp"></i></a>
+                    <a href="#" class="btn btn-outline-secondary btn-sm rounded-circle"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+
+                <!-- Related Posts -->
+                {% if related_posts %}
+                <h4 class="fw-bold mb-3">Veja Também</h4>
+                <div class="row g-3 mb-5">
+                    {% for related in related_posts %}
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <img src="{{ related.imagem_capa.url }}" class="card-img-top" alt="{{ related.titulo }}" style="height: 150px; object-fit: cover;">
+                            <div class="card-body p-3">
+                                <h6 class="card-title small mb-0"><a href="{% url 'blog:public_post_detail' related.slug %}" class="text-dark text-decoration-none">{{ related.titulo }}</a></h6>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="mt-4">
+                     <a href="{% url 'blog:public_blog_list' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-2"></i> Voltar para o Blog</a>
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 mt-5 mt-lg-0 ps-lg-5">
+                <div class="sticky-top" style="top: 2rem; z-index: 1;">
+                   
+                   <!-- Search Widget -->
+                   <div class="mb-5">
+                        <form action="{% url 'blog:public_blog_list' %}" method="get" class="position-relative">
+                            <input type="text" name="busca" class="form-control form-control-lg border-0 shadow-sm ps-4" placeholder="Pesquisar..." style="height: 60px; border-radius: 30px;">
+                            <button class="btn btn-primary position-absolute top-50 end-0 translate-middle-y me-2 rounded-circle" type="submit" style="width: 45px; height: 45px;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                   <!-- Recent Posts -->
+                   {% if recent_posts %}
+                   <div class="mb-5">
+                       <h5 class="fw-bold mb-4 position-relative border-start border-5 border-primary ps-3">Postagens Recentes</h5>
+                       <div class="list-group list-group-flush">
+                           {% for recent in recent_posts %}
+                           <a href="{% url 'blog:public_post_detail' recent.slug %}" class="list-group-item list-group-item-action bg-transparent border-0 px-0 py-2">
+                               <div class="d-flex align-items-center">
+                                   {% if recent.imagem_capa %}
+                                   <div class="me-3 flex-shrink-0">
+                                       <img src="{{ recent.imagem_capa.url }}" class="rounded" width="60" height="60" style="object-fit: cover;" alt="">
+                                   </div>
+                                   {% endif %}
+                                   <div>
+                                       <h6 class="mb-1 text-dark fw-semibold small line-clamp-2">{{ recent.titulo }}</h6>
+                                       <small class="text-muted" style="font-size: 0.75rem;">{{ recent.data_publicacao|date:"d M, Y" }}</small>
+                                   </div>
+                               </div>
+                           </a>
+                           {% endfor %}
+                       </div>
+                   </div>
+                   {% endif %}
+
+                   {% exibir_imoveis_destaque count=3 %}
+                   
+                   <!-- Categories -->
+                   {% if categorias %}
+                   <div class="mb-5 mt-5">
+                       <h5 class="fw-bold mb-4 position-relative border-start border-5 border-primary ps-3">Categorias</h5>
+                       <ul class="list-unstyled">
+                           {% for cat in categorias %}
+                           <li class="mb-2">
+                               <a href="{% url 'blog:public_blog_list' %}?categoria={{ cat.slug }}" class="text-decoration-none text-secondary hover-primary d-flex justify-content-between align-items-center">
+                                   <span><i class="fas fa-chevron-right me-2 small text-primary"></i>{{ cat.nome }}</span>
+                                   <span class="badge bg-light text-secondary rounded-pill">{{ cat.total_posts }}</span>
+                               </a>
+                           </li>
+                           {% endfor %}
+                       </ul>
+                   </div>
+                   {% endif %}
+
+                   <!-- Propagandas / Banners -->
+                   {% if propagandas %}
+                   <div class="card mb-4 border-0 shadow-sm mt-4">
+                       <div class="card-header bg-white fw-bold">Parceiros</div>
+                       <div class="card-body p-0">
+                           {% for prop in propagandas %}
+                           <div class="p-3 border-bottom">
+                               {% if prop.link_destino %}
+                               <a href="{{ prop.link_destino }}" target="_blank">
+                                   <img src="{{ prop.imagem.url }}" alt="{{ prop.titulo }}" class="img-fluid rounded w-100">
+                               </a>
+                               {% else %}
+                               <img src="{{ prop.imagem.url }}" alt="{{ prop.titulo }}" class="img-fluid rounded w-100">
+                               {% endif %}
+                               <div class="mt-2 text-center small text-muted">{{ prop.titulo }}</div>
+                           </div>
+                           {% endfor %}
+                       </div>
+                   </div>
+                   {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Botão Voltar ao Topo -->
+<button id="backToTop" class="back-to-top" title="Voltar ao início">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<!-- Botão Flutuante WhatsApp -->
+<a href="https://wa.me/{{ WHATSAPP_NUMERO }}?text=Olá%20gostaria%20de%20mais%20informações%20sobre%20os%20imóveis%20disponíveis" class="whatsapp-float" target="_blank" title="Fale conosco no WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const backToTopBtn = document.getElementById('backToTop');
+        if (backToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('show');
+                } else {
+                    backToTopBtn.classList.remove('show');
+                }
+            });
+
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+    });
+</script>
+{% endblock %}

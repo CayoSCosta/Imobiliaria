@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{% url 'custom_admin_index' %}">
+        <a class="navbar-brand fw-bold" href="{% url 'imoveis:custom_admin_index' %}">
             <i class="fas fa-shield-alt text-primary me-2"></i>Painel Admin
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAdmin">
@@ -10,20 +10,20 @@
         <div class="collapse navbar-collapse" id="navbarNavAdmin">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'custom_admin_index' %}" style="color: white;">Visão Geral</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" href="{% url 'imoveis:custom_admin_index' %}" style="color: white;">Visão Geral</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-primary {% if 'imoveis' in request.path and not 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_imoveis_list' %}">
+                    <a class="nav-link text-primary {% if 'imoveis' in request.path and not 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'imoveis:custom_admin_imoveis_list' %}">
                         <i class="fas fa-home me-1"></i>Imóveis
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-warning {% if 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_orulo_list' %}">
+                    <a class="nav-link text-warning {% if 'orulo' in request.path %}active fw-bold{% endif %}" href="{% url 'imoveis:custom_admin_orulo_list' %}">
                         <i class="fas fa-users me-1"></i>Órulo
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success {% if 'leads' in request.path %}active fw-bold{% endif %}" href="{% url 'custom_admin_leads_list' %}">
+                    <a class="nav-link text-success {% if 'leads' in request.path %}active fw-bold{% endif %}" href="{% url 'leads:custom_admin_leads_list' %}">
                         <i class="fas fa-users me-1"></i>Leads
                     </a>
                 </li>

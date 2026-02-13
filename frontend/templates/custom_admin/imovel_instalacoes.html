@@ -4,7 +4,7 @@
 
 {% block admin_content %}
 <div class="container-fluid">
-    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">&larr; Voltar para lista</a>
+    <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">&larr; Voltar para lista</a>
     
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
@@ -57,7 +57,7 @@
 <div class="modal fade" id="novaInstalacaoModal" tabindex="-1" aria-labelledby="novaInstalacaoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{% url 'custom_admin_criar_instalacao' %}" method="post">
+            <form action="{% url 'imoveis:custom_admin_criar_instalacao' %}" method="post">
                 {% csrf_token %}
                 <div class="modal-header">
                     <h5 class="modal-title" id="novaInstalacaoModalLabel">Nova Instalação</h5>

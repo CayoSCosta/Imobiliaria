@@ -16,7 +16,7 @@
             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                 <i class="fas fa-trash-alt me-1"></i> Excluir
             </button>
-            <a href="{% url 'custom_admin_leads_list' %}" class="btn btn-outline-secondary">
+            <a href="{% url 'leads:custom_admin_leads_list' %}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Voltar para Lista
             </a>
         </div>
@@ -200,7 +200,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form method="post" action="{% url 'custom_admin_inactivate_lead' lead.id %}">
+                <form method="post" action="{% url 'leads:custom_admin_inactivate_lead' lead.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-warning">Arquivar</button>
                 </form>
@@ -222,7 +222,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <form method="post" action="{% url 'custom_admin_delete_lead' lead.id %}">
+                <form method="post" action="{% url 'leads:custom_admin_delete_lead' lead.id %}">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Excluir Permanentemente</button>
                 </form>

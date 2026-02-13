@@ -36,11 +36,11 @@ def custom_admin_delete_audit_log(request, log_id):
     if request.method == 'POST':
         log.delete()
         messages.success(request, 'Log de auditoria removido com sucesso.')
-    return redirect('custom_admin_audit_list')
+    return redirect('audit:custom_admin_audit_list')
 
 @staff_member_required
 def custom_admin_clear_audit_logs(request):
     if request.method == 'POST':
         count, _ = AuditLog.objects.all().delete()
         messages.success(request, f'{count} logs de auditoria foram removidos.')
-    return redirect('custom_admin_audit_list')
+    return redirect('audit:custom_admin_audit_list')

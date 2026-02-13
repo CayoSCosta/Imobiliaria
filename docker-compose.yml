@@ -33,6 +33,19 @@ services:
     networks:
       - imobidom_net
 
+  # --- NGINX INTERNO (STATIC/MEDIA + PROXY PARA DJANGO) ---
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./deploy/nginx-docker.conf:/etc/nginx/conf.d/default.conf:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/backend/media:ro
+    depends_on:
+      - web
+    restart: always
+    networks:
+      - imobidom_net
+
   # --- O BANCO DE DADOS ---
   db:
     image: postgres:15

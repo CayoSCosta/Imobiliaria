@@ -10,13 +10,13 @@
             <p class="text-muted">Gerencie seus imóveis de forma simplificada.</p>
         </div>
         <div class="admin-page-actions">
-            <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary me-2">
+            <a href="{% url 'imoveis:custom_admin_index' %}" class="btn btn-outline-secondary me-2">
                 <i class="fas fa-arrow-left me-1"></i> Painel
             </a>
-            <a href="{% url 'custom_admin_exportar_imoveis' %}?{{ request.GET.urlencode }}" class="btn btn-outline-success me-2">
+            <a href="{% url 'imoveis:custom_admin_exportar_imoveis' %}?{{ request.GET.urlencode }}" class="btn btn-outline-success me-2">
                 <i class="fas fa-file-excel me-1"></i> Exportar Excel
             </a>
-            <a href="{% url 'custom_admin_criar_imovel' %}" class="btn btn-success">
+            <a href="{% url 'imoveis:custom_admin_criar_imovel' %}" class="btn btn-success">
                 <i class="fas fa-plus me-1"></i> Novo Empreendimento
             </a>
         </div>
@@ -44,7 +44,7 @@
                         <i class="fas fa-search me-1"></i> Filtrar
                     </button>
                     {% if busca_filtro or status_filtro %}
-                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary ms-2" title="Limpar filtros">
+                    <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="btn btn-outline-secondary ms-2" title="Limpar filtros">
                         <i class="fas fa-times"></i>
                     </a>
                     {% endif %}
@@ -99,16 +99,16 @@
                                 {% endif %}
                             </td>
                             <td class="align-middle">
-                                <a href="{% url 'custom_admin_editar_imovel' imovel.id %}" class="btn btn-sm btn-warning text-dark me-1">
+                                <a href="{% url 'imoveis:custom_admin_editar_imovel' imovel.id %}" class="btn btn-sm btn-warning text-dark me-1">
                                     <i class="fas fa-edit"></i> Editar
                                 </a>
-                                <a href="{% url 'custom_admin_imovel_imagens' imovel.id %}" class="btn btn-sm btn-primary me-1">
+                                <a href="{% url 'imoveis:custom_admin_imovel_imagens' imovel.id %}" class="btn btn-sm btn-primary me-1">
                                     <i class="fas fa-images"></i> Imagens
                                 </a>
-                                <a href="{% url 'custom_admin_imovel_unidades' imovel.id %}" class="btn btn-sm btn-info text-white me-1">
+                                <a href="{% url 'imoveis:custom_admin_imovel_unidades' imovel.id %}" class="btn btn-sm btn-info text-white me-1">
                                     <i class="fas fa-building"></i> Unidades
                                 </a>
-                                <a href="{% url 'custom_admin_imovel_instalacoes' imovel.id %}" class="btn btn-sm btn-secondary me-1">
+                                <a href="{% url 'imoveis:custom_admin_imovel_instalacoes' imovel.id %}" class="btn btn-sm btn-secondary me-1">
                                     <i class="fas fa-swimmer"></i> Instalações
                                 </a>
                                 {% comment %} <a href="{% url 'custom_admin_imovel_arquivos' imovel.id %}" class="btn btn-sm btn-dark me-1">
@@ -201,30 +201,6 @@
     </div>
 </div>
 
-<!-- Botões flutuantes (aparecem ao rolar) -->
-<button id="backToTop" class="back-to-top admin-float" title="Voltar ao início">
-    <i class="fas fa-arrow-up"></i>
-</button>
-
-<a id="adminWhatsappFloat" href="https://wa.me/{{ WHATSAPP_NUMERO }}" class="whatsapp-float admin-float" target="_blank" title="Fale conosco no WhatsApp">
-    <i class="fab fa-whatsapp"></i>
-</a>
-
-<style>
-    .admin-float {
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(10px);
-        transition: all 0.3s ease;
-    }
-
-    .admin-float.show {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-    }
-</style>
-
 <script>
     function confirmDelete(id, title) {
         document.getElementById('imovel-title').innerText = title;
@@ -233,24 +209,5 @@
         myModal.show();
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const backToTopBtn = document.getElementById('backToTop');
-        const whatsappFloat = document.getElementById('adminWhatsappFloat');
-
-        const toggleFloatingButtons = () => {
-            const shouldShow = window.scrollY > 300;
-            if (backToTopBtn) backToTopBtn.classList.toggle('show', shouldShow);
-            if (whatsappFloat) whatsappFloat.classList.toggle('show', shouldShow);
-        };
-
-        window.addEventListener('scroll', toggleFloatingButtons);
-        toggleFloatingButtons();
-
-        if (backToTopBtn) {
-            backToTopBtn.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        }
-    });
 </script>
 {% endblock %}

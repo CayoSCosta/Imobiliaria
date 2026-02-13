@@ -1,42 +1,43 @@
+
 <div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; min-height: 100vh;">
-    <a href="{% url 'custom_admin_index' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <a href="{% url 'imoveis:custom_admin_index' %}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
         <i class="fas fa-shield-alt fa-2x text-primary me-2"></i>
         <span class="fs-4">Painel Admin</span>
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <a href="{% url 'custom_admin_index' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" aria-current="page">
+            <a href="{% url 'imoveis:custom_admin_index' %}" class="nav-link text-white {% if request.resolver_match.url_name == 'custom_admin_index' %}active{% endif %}" aria-current="page">
                 <i class="fas fa-tachometer-alt me-2"></i>
                 Dashboard
             </a>
         </li>
         <li>
-            <a href="{% url 'custom_admin_imoveis_list' %}" class="nav-link text-white {% if 'imoveis' in request.path and not 'orulo' in request.path %}active{% endif %}">
+            <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="nav-link text-white {% if 'imoveis' in request.path and not 'orulo' in request.path %}active{% endif %}">
                 <i class="fas fa-home me-2"></i>
                 Imóveis
             </a>
         </li>
         <li>
-            <a href="{% url 'custom_admin_leads_list' %}" class="nav-link text-white {% if 'leads' in request.path %}active{% endif %}">
+            <a href="{% url 'leads:custom_admin_leads_list' %}" class="nav-link text-white {% if 'leads' in request.path %}active{% endif %}">
                 <i class="fas fa-user-friends me-2"></i>
                 Leads
             </a>
         </li>
         <li>
-            <a href="{% url 'custom_admin_blog_list' %}" class="nav-link text-white {% if 'blog' in request.path %}active{% endif %}">
+            <a href="{% url 'blog:custom_admin_blog_list' %}" class="nav-link text-white {% if 'blog' in request.path %}active{% endif %}">
                 <i class="fas fa-newspaper me-2"></i>
                 Blog
             </a>
         </li>
         <li>
-            <a href="{% url 'custom_admin_orulo_list' %}" class="nav-link text-white {% if 'orulo' in request.path %}active{% endif %}">
+            <a href="{% url 'imoveis:custom_admin_orulo_list' %}" class="nav-link text-white {% if 'orulo' in request.path %}active{% endif %}">
                 <i class="fas fa-network-wired me-2"></i>
                 Gestão Órulo
             </a>
         </li>
         <li>
-            <a href="{% url 'custom_admin_audit_list' %}" class="nav-link text-white {% if 'audit' in request.path %}active{% endif %}">
+            <a href="{% url 'audit:custom_admin_audit_list' %}" class="nav-link text-white {% if 'audit' in request.path %}active{% endif %}">
                 <i class="fas fa-history me-2"></i>
                 Auditoria
             </a>

@@ -112,7 +112,7 @@ def custom_admin_lead_detail(request, pk):
             acompanhamento = form.save(commit=False)
             acompanhamento.lead = lead
             acompanhamento.save()
-            return redirect('custom_admin_lead_detail', pk=pk)
+            return redirect('leads:custom_admin_lead_detail', pk=pk)
     else:
         form = AcompanhamentoForm()
 
@@ -173,7 +173,7 @@ def custom_admin_delete_lead(request, pk):
     lead = get_object_or_404(Lead, pk=pk)
     lead.delete()
     messages.success(request, "Lead excluído permanentemente.")
-    return redirect('custom_admin_leads_list')
+    return redirect('leads:custom_admin_leads_list')
 
 @staff_member_required
 @require_POST
@@ -182,4 +182,4 @@ def custom_admin_inactivate_lead(request, pk):
     lead.ativo = False
     lead.save()
     messages.success(request, "Lead arquivado com sucesso.")
-    return redirect('custom_admin_leads_list')
+    return redirect('leads:custom_admin_leads_list')

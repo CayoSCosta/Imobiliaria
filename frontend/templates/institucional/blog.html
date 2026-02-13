@@ -1,67 +1,101 @@
 {% extends "base.html" %}
 
-{% block title %}Blog - Minha Imobiliária{% endblock %}
+{% block title %}Blog Imobidon - Lançamentos e Investimentos na Planta{% endblock %}
 
 {% block content %}
 <div class="container py-5">
-    <h1 class="text-center mb-5 fw-bold">Nosso Blog</h1>
-    
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-dark">Dicas & Lançamentos</h1>
+        <p class="lead text-muted">Tudo o que você precisa saber para investir em imóveis na planta com segurança.</p>
+        <hr class="mx-auto" style="width: 100px; height: 3px; background-color: #004aad; opacity: 1;">
+    </header>
+
     <div class="row g-4">
-        {% for post in posts %}
-        <div class="col-md-4">
-            <div class="card h-100 border-0 shadow-sm hover-card">
-                {% if post.imagem_capa %}
-                <img src="{{ post.imagem_capa.url }}" class="card-img-top" alt="{{ post.titulo }}" style="height: 200px; object-fit: cover;">
-                {% else %}
-                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
-                    <i class="fas fa-image fa-3x text-muted"></i>
+        <div class="col-lg-8">
+            <div class="row g-4">
+                {% for post in posts %}
+                <div class="col-md-6">
+                    <article class="card h-100 border-0 shadow-sm hover-card overflow-hidden">
+                        <div class="position-relative">
+                            {% if post.imagem_capa %}
+                            <img src="{{ post.imagem_capa.url }}" class="card-img-top" alt="{{ post.titulo }}" style="height: 220px; object-fit: cover;">
+                            {% endif %}
+                            <div class="position-absolute top-0 start-0 m-3">
+                                <span class="badge bg-primary shadow-sm">{{ post.data_publicacao|date:"d M" }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <small class="text-uppercase fw-bold text-primary mb-2 d-block">Tendências</small>
+                            <h2 class="card-title h5 fw-bold mb-3">
+                                <a href="{% url 'blog_post_detail' post.slug %}" class="text-decoration-none text-dark">{{ post.titulo }}</a>
+                            </h2>
+                            <p class="card-text text-muted small">
+                                {{ post.conteudo|striptags|truncatechars:110 }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                            <a href="{% url 'blog_post_detail' post.slug %}" class="btn btn-link p-0 text-primary fw-bold text-decoration-none">
+                                Ver Detalhes <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </article>
                 </div>
-                {% endif %}
-                <div class="card-body">
-                    <span class="badge bg-primary mb-2">Novidade</span>
-                    <h5 class="card-title fw-bold">{{ post.titulo }}</h5>
-                    <p class="card-text text-muted">{{ post.conteudo|striptags|truncatewords:20 }}</p>
-                </div>
-                <div class="card-footer bg-white border-0 pb-3">
-                    <a href="{% url 'blog_post_detail' post.slug %}" class="btn btn-outline-primary w-100">Ler mais</a>
-                </div>
+                {% empty %}
+                <p class="text-center text-muted">Novos artigos em breve.</p>
+                {% endfor %}
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center">
-            <p class="text-muted">Ainda não temos posts no blog.</p>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- Propagandas -->
-    {% if propagandas %}
-    <div class="my-5">
-        <h3 class="text-center mb-4">Parceiros</h3>
-        <div class="row justify-content-center g-4">
-            {% for prop in propagandas %}
-            <div class="col-md-6 col-lg-4">
-                 {% if prop.link_destino %}
-                 <a href="{{ prop.link_destino }}" target="_blank">
-                 {% endif %}
-                    <img src="{{ prop.imagem.url }}" class="img-fluid rounded shadow-sm" alt="{{ prop.titulo }}">
-                 {% if prop.link_destino %}
-                 </a>
-                 {% endif %}
+        <aside class="col-lg-4">
+            <div class="mb-5">
+                <h5 class="fw-bold mb-3 border-start border-primary border-4 ps-2">Oportunidades na Planta</h5>
+                {% for imovel in imoveis_destaque %}
+                <div class="card border-0 shadow-sm mb-3 overflow-hidden">
+                    <div class="row g-0">
+                        <div class="col-4">
+                            {% if imovel.foto_principal %}
+                            <img src="{{ imovel.foto_principal.url }}" class="img-fluid h-100" style="object-fit: cover;" alt="{{ imovel.nome }}">
+                            {% endif %}
+                        </div>
+                        <div class="col-8">
+                            <div class="card-body p-2">
+                                <h6 class="card-title mb-1 fw-bold" style="font-size: 0.9rem;">{{ imovel.nome }}</h6>
+                                <p class="card-text text-primary fw-bold" style="font-size: 0.85rem;">{{ imovel.preco_formatado }}</p>
+                                <a href="{% url 'imovel_detail' imovel.slug %}" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;">Ver Unidade</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="small text-muted">Consulte nossos lançamentos.</p>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
 
+            {% if propagandas %}
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3 border-start border-primary border-4 ps-2">Recomendados</h5>
+                {% for prop in propagandas %}
+                <div class="card border-0 shadow-sm mb-3 overflow-hidden">
+                    {% if prop.link_destino %}
+                    <a href="{{ prop.link_destino }}" target="_blank">
+                    {% endif %}
+                        <img src="{{ prop.imagem.url }}" class="img-fluid" alt="{{ prop.titulo }}">
+                    {% if prop.link_destino %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </aside>
+    </div>
 </div>
 
 <style>
-    .hover-card {
-        transition: transform 0.3s ease;
-    }
-    .hover-card:hover {
-        transform: translateY(-5px);
-    }
+    .hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+    .bg-primary { background-color: #004aad !important; }
+    .text-primary { color: #004aad !important; }
+    .btn-outline-primary { border-color: #004aad; color: #004aad; }
+    .btn-outline-primary:hover { background-color: #004aad; color: white; }
 </style>
 {% endblock %}

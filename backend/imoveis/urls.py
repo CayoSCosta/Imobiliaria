@@ -37,6 +37,8 @@ from .views import (
     custom_admin_exportar_imoveis, # Exportar Excel
 )
 
+app_name = 'imoveis'
+
 urlpatterns = [
     path('gerenciador/orulo/', custom_admin_orulo_list, name='custom_admin_orulo_list'),
     path('gerenciador/orulo/sync/<int:imovel_id>/', custom_admin_sync_orulo_imovel, name='custom_admin_sync_orulo_imovel'),

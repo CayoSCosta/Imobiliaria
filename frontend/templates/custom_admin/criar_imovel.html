@@ -4,7 +4,7 @@
 
 {% block admin_content %}
 <div class="container-fluid">
-    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">
+    <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-3">
         &larr; Voltar para lista
     </a>
     
@@ -62,6 +62,18 @@
                                             <div class="form-text mt-1">{{ form.destaque.help_text }}</div>
                                         </div>
                                     </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-check form-switch ps-0">
+                                            <div class="d-flex align-items-center">
+                                                {{ form.destaque_blog }}
+                                                <label class="form-check-label ms-2" for="{{ form.destaque_blog.id_for_label }}">
+                                                    {{ form.destaque_blog.label }}
+                                                </label>
+                                            </div>
+                                            <div class="form-text mt-1">{{ form.destaque_blog.help_text }}</div>
+                                        </div>
+                                    </div>
+
                                     <div class="col-md-6 mb-3">
                                         <div class="form-check form-switch ps-0">
                                             <div class="d-flex align-items-center">
@@ -218,7 +230,7 @@
                     <button type="submit" class="btn btn-primary btn-lg">
                         <i class="fas fa-save me-2"></i> Salvar Empreendimento
                     </button>
-                    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-link text-secondary">Cancelar</a>
+                    <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="btn btn-link text-secondary">Cancelar</a>
                 </div>
             </form>
         </div>

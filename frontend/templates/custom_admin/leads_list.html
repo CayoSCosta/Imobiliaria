@@ -195,10 +195,10 @@
             <p class="text-muted small mb-0">Arraste os cards para mudar o status</p>
         </div>
         <div class="admin-page-actions">
-            <a href="{% url 'exportar_leads_csv' %}" class="btn btn-success btn-sm me-2">
+            <a href="{% url 'leads:exportar_leads_csv' %}" class="btn btn-success btn-sm me-2">
                 <i class="fas fa-file-csv me-1"></i> Exportar CSV
             </a>
-            <a href="{% url 'custom_admin_index' %}" class="btn btn-outline-secondary btn-sm">
+            <a href="{% url 'imoveis:custom_admin_index' %}" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i> Voltar
             </a>
         </div>
@@ -213,7 +213,7 @@
             </div>
             <div class="kanban-items" data-status="{{ status_key }}">
                 {% for lead in leads %}
-                <div class="kanban-card" data-id="{{ lead.id }}" data-url="{% url 'custom_admin_lead_detail' lead.pk %}">
+                <div class="kanban-card" data-id="{{ lead.id }}" data-url="{% url 'leads:custom_admin_lead_detail' lead.pk %}">
                     <div class="d-flex justify-content-between align-items-start">
                         <div class="card-title">
                             <span class="text-dark fw-bold">

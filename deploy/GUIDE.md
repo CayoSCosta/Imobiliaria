@@ -1,19 +1,24 @@
-# Guia de Deploy no Hostinger VPS (Ubuntu)
+# Guia de Deploy no Hostinger VPS (Docker + Nginx Proxy Manager)
 
-Este guia assume que você tem acesso SSH ao seu VPS.
+Este é o fluxo recomendado para este projeto, mantendo `DEBUG=False` e imagens (`/media`) funcionando em produção.
 
-## 1. Preparação do Servidor
+## Arquitetura final
 
-Atualize o sistema e instale os pacotes necessários:
+- `proxy` (Nginx Proxy Manager): recebe tráfego público (80/443)
+- `nginx` (interno): serve `/static` e `/media`, e repassa o restante para Django
+- `web` (Django + Gunicorn)
+- `db` (PostgreSQL)
+
+## 1) Preparar o servidor
 
 ```bash
 sudo apt update
-sudo apt install python3-pip python3-venv nginx git -y
+sudo apt install -y git docker.io docker-compose-plugin
+sudo systemctl enable docker
+sudo systemctl start docker
 ```
 
-## 2. Configuração do Projeto
-
-Clone seu repositório (ou copie os arquivos) para `/var/www/imobiliaria`.
+## 2) Subir o projeto
 
 ```bash
 cd /var/www
@@ -21,77 +26,90 @@ git clone <SEU_REPO_URL> imobiliaria
 cd imobiliaria
 ```
 
-Crie o ambiente virtual e instale as dependências:
+Crie/edite o arquivo `.env` na raiz do projeto:
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-cd backend
-pip install -r requirements.txt
-```
-
-## 3. Configuração de Ambiente (.env)
-
-Crie o arquivo `.env` na raiz do projeto (`/var/www/imobiliaria/.env`) com suas configurações de produção:
-
-```bash
+```env
 DEBUG=False
-SECRET_KEY=sua_chave_secreta_super_segura_gerada_aleatoriamente
-ALLOWED_HOSTS=seu_dominio.com,www.seu_dominio.com,seu_ip_vps
-# Adicione outras chaves como banco de dados se usar PostgreSQL
+SECRET_KEY=gere_uma_chave_forte
+
+DB_NAME=imobiliaria
+DB_USER=imobiliaria
+DB_PASSWORD=senha_forte
+DB_PORT=5432
+
+WHATSAPP_NUMERO=5548999999999
+
+CSRF_TRUSTED_ORIGINS=https://imobidon.com.br,https://www.imobidon.com.br
 ```
 
-## 4. Finalizando Django
+> Observação: o projeto atualmente usa `ALLOWED_HOSTS` fixo em `settings.py`, então garanta que seu domínio está na lista.
 
-Colete os arquivos estáticos e aplique migrações:
+## 3) Build e start dos containers
 
 ```bash
-# Estando em /var/www/imobiliaria/backend com venv ativado
-python manage.py collectstatic
-python manage.py migrate
+docker compose up -d --build
 ```
 
-## 5. Configurar Gunicorn (Application Server)
-
-Copie e habilite o serviço do Gunicorn:
+Verifique se tudo subiu:
 
 ```bash
-sudo cp ../deploy/gunicorn.service /etc/systemd/system/
-sudo systemctl start gunicorn
-sudo systemctl enable gunicorn
+docker compose ps
+docker compose logs -f web
+docker compose logs -f nginx
 ```
 
-Verifique se está rodando: `sudo systemctl status gunicorn`
+## 4) Configurar o Nginx Proxy Manager (Hostinger)
 
-## 6. Configurar Nginx (Web Server)
+No painel do NPM (`http://SEU_IP:81`):
 
-Edite o arquivo `deploy/nginx.conf` e troque `SEU_DOMINIO_AQUI` pelo seu domínio real ou IP.
+1. Crie um `Proxy Host`
+2. Domain Names: `imobidon.com.br` e/ou `www.imobidon.com.br`
+3. Scheme: `http`
+4. Forward Hostname/IP: `nginx`
+5. Forward Port: `80`
+6. Ative `Websockets Support`
+7. Aba SSL: solicite certificado Let's Encrypt e ative `Force SSL`
 
-Copie para a pasta do Nginx:
+> O NPM e o `nginx` interno precisam estar na mesma rede Docker (`imobidom_net`), já configurada no `docker-compose.yml`.
+
+## 5) Por que as imagens continuam com DEBUG=False?
+
+- Uploads vão para volume persistente: `media_volume -> /app/backend/media`
+- O `nginx` interno expõe `/media/` com `alias /app/backend/media/`
+- Portanto as imagens não dependem do Django em modo debug
+
+Arquivo usado: `deploy/nginx-docker.conf`
+
+## 6) Comandos úteis de operação
+
+Rebuild após alteração de código:
 
 ```bash
-sudo cp ../deploy/nginx.conf /etc/nginx/sites-available/imobiliaria
-sudo ln -s /etc/nginx/sites-available/imobiliaria /etc/nginx/sites-enabled
-sudo nginx -t
-sudo systemctl restart nginx
+docker compose up -d --build
 ```
 
-## 7. Firewall (UFW)
-
-Se tiver firewall ativado:
+Executar migrações manualmente:
 
 ```bash
-sudo ufw allow 'Nginx Full'
+docker compose exec web python backend/manage.py migrate
 ```
 
-## 8. HTTPS (SSL) - Opcional mas recomendado
-
-Instale o Certbot:
+Criar superusuário:
 
 ```bash
-sudo apt install certbot python3-certbot-nginx
-sudo certbot --nginx -d seu_dominio.com
+docker compose exec web python backend/manage.py createsuperuser
 ```
 
----
-Agora seu site deve estar no ar!
+## 7) Checklist rápido de diagnóstico (se imagem não abrir)
+
+1. URL da imagem começa com `/media/...`
+2. Container `nginx` está `Up`
+3. NPM aponta para `nginx:80` (não para `web:8000`)
+4. `docker compose logs nginx` sem erro de `permission denied`
+5. Arquivo existe no volume:
+
+```bash
+docker compose exec web ls -la /app/backend/media
+```
+
+Se os 5 itens estiverem OK, as imagens funcionam normalmente com `DEBUG=False`.

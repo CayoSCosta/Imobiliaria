@@ -1,10 +1,12 @@
 from django.urls import path
 from . import views
 
+app_name = 'blog'
+
 urlpatterns = [
     # Public views
-    path('blog/', views.public_blog_list, name='blog_list'),
-    path('blog/<slug:slug>/', views.public_post_detail, name='blog_post_detail'),
+    path('blog/', views.public_blog_list, name='public_blog_list'),
+    path('blog/<slug:slug>/', views.public_post_detail, name='public_post_detail'),
 
     # Custom Admin views
     path('gerenciador/blog/', views.custom_admin_blog_list, name='custom_admin_blog_list'),

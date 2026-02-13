@@ -4,7 +4,7 @@
 
 {% block admin_content %}
 <div class="container-fluid">
-    <a href="{% url 'custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-4">&larr; Voltar para lista</a>
+    <a href="{% url 'imoveis:custom_admin_imoveis_list' %}" class="btn btn-outline-secondary mb-4">&larr; Voltar para lista</a>
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h2">Gerenciar Arquivos: {{ imovel.titulo }}</h1>
@@ -70,7 +70,7 @@
                                 <a href="{{ arquivo.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary me-1" title="Baixar/Visualizar">
                                     <i class="fas fa-download"></i>
                                 </a>
-                                <a href="{% url 'custom_admin_delete_arquivo' arquivo.id %}" 
+                                <a href="{% url 'imoveis:custom_admin_delete_arquivo' arquivo.id %}" 
                                    onclick="return confirm('Tem certeza que deseja apagar este arquivo?')" 
                                    class="btn btn-sm btn-outline-danger" title="Excluir">
                                     <i class="fas fa-trash"></i>

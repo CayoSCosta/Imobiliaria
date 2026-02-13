@@ -1,0 +1,36 @@
+{% load humanize %}
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Imóveis em Destaque</h5>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for imovel in imoveis_destaque %}
+            <a href="{% url 'imoveis:imovel_detalhe' imovel.slug %}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                {% if imovel.capa_lista %}
+                    {% with capa=imovel.capa_lista|first %}
+                        <img src="{{ capa.imagem.url }}" alt="{{ imovel.titulo }}" class="rounded flex-shrink-0" width="80" height="80" style="object-fit: cover;">
+                    {% endwith %}
+                {% else %}
+                    <div class="rounded bg-light d-flex align-items-center justify-content-center text-muted" style="width: 80px; height: 80px;">
+                        <small>Sem img</small>
+                    </div>
+                {% endif %}
+                <div class="d-flex gap-2 w-100 justify-content-between">
+                    <div>
+                        <h6 class="mb-0 text-dark fw-bold">{{ imovel.titulo }}</h6>
+                        <small class="text-muted d-block mb-1">{{ imovel.bairro }}</small>
+                        {% if imovel.preco %}
+                            <small class="text-primary fw-bold">R$ {{ imovel.preco|intcomma }}</small>
+                        {% else %}
+                            <small class="text-primary fw-bold">Consulte</small>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        {% empty %}
+            <div class="list-group-item text-center text-muted">
+                Nenhum destaque no momento.
+            </div>
+        {% endfor %}
+    </div>
+</div>

@@ -99,7 +99,7 @@ class ImovelForm(forms.ModelForm):
     class Meta:
         model = Imovel
         fields = [
-            'titulo', 'descricao', 'tipo', 'status', 'destaque', 
+            'titulo', 'descricao', 'tipo', 'status', 'destaque', 'destaque_blog',
             'preco', 'preco_m2', 'condominio', 'iptu', 'parcela', 
             'rua', 'numero', 'bairro', 'bairro_oficial', 'cidade', 'uf', 'cep',
             'ativo',
@@ -113,6 +113,7 @@ class ImovelForm(forms.ModelForm):
             'tipo': 'Tipo',
             'status': 'Status da Obra',
             'destaque': 'Destaque?',
+            'destaque_blog': 'Destaque no Blog?',
             'preco': 'Preço (R$)',
             'preco_m2': 'Preço do m² (R$)',
             'condominio': 'Condomínio (R$)',
@@ -139,6 +140,7 @@ class ImovelForm(forms.ModelForm):
         widgets = {
              'ativo': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left: 0;'}),
              'destaque': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left: 0;'}),
+             'destaque_blog': forms.CheckboxInput(attrs={'class': 'form-check-input', 'style': 'margin-left: 0;'}),
              'descricao': forms.Textarea(attrs={'rows': 3}),
              'data_lancamento': forms.DateInput(attrs={'type': 'date'}),
              'data_entrega': forms.DateInput(attrs={'type': 'date'}),

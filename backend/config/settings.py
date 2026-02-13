@@ -157,7 +157,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 
 # Authentication Redirects
-LOGIN_REDIRECT_URL = 'custom_admin_index'
+LOGIN_REDIRECT_URL = 'imoveis:custom_admin_index'
 
 WHATSAPP_NUMERO = os.getenv('WHATSAPP_NUMERO')
 

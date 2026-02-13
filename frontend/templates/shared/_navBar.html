@@ -13,25 +13,25 @@
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
                 
                 <li class="nav-item nav-separator">
-                    <a class="nav-link" href="{% url 'home' %}?status=EM_OBRA#empreendimentos" title="Principais lançamentos imobiliários, selecionados com critério estratégico.">
+                    <a class="nav-link" href="{% url 'imoveis:home' %}?status=EM_OBRA#empreendimentos" title="Principais lançamentos imobiliários, selecionados com critério estratégico.">
                         Lançamentos
                     </a>
                 </li>
 
                 <li class="nav-item nav-separator">
-                    <a class="nav-link" href="{% url 'home' %}?status=PRONTO#empreendimentos" title="Oportunidades em imóveis prontos com liquidez e bom custo-benefício.">
+                    <a class="nav-link" href="{% url 'imoveis:home' %}?status=PRONTO#empreendimentos" title="Oportunidades em imóveis prontos com liquidez e bom custo-benefício.">
                         Prontos
                     </a>
                 </li>
 
                 <li class="nav-item nav-separator">
-                    <a class="nav-link" href="{% url 'home' %}?tipo=LOTEAMENTO" title="Loteamentos e Haras.">
+                    <a class="nav-link" href="{% url 'imoveis:home' %}?tipo=LOTEAMENTO" title="Loteamentos e Haras.">
                         Loteamento/Haras
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-nowrap" href="{% url 'pagina_mcmv' %}" title="Regras completas MCMV, HIS e HMP com opções de imóveis.">
+                    <a class="nav-link text-nowrap" href="{% url 'imoveis:pagina_mcmv' %}" title="Regras completas MCMV, HIS e HMP com opções de imóveis.">
                         Minha Casa Minha Vida
                     </a>
                 </li>
@@ -42,7 +42,7 @@
                             <i class="fas fa-user-shield"></i> Admin
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'custom_admin_index' %}">Painel</a></li>
+                            <li><a class="dropdown-item" href="{% url 'imoveis:custom_admin_index' %}">Painel</a></li>
                             <li>
                                 <form method="post" action="{% url 'logout' %}">
                                     {% csrf_token %}
@@ -54,7 +54,7 @@
                 {% endif %}
 
                 <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                    <a href="{% url 'fale_conosco' %}" class="btn nav-btn-contato w-100" title="Clique e saiba mais.">Fale conosco</a>
+                    <a href="{% url 'imoveis:fale_conosco' %}" class="btn nav-btn-contato w-100" title="Clique e saiba mais.">Fale conosco</a>
                 </li>
             </ul>
         </div>

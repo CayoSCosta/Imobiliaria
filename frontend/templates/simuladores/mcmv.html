@@ -75,7 +75,7 @@
                         <i id="iconeResultado" class="fas fa-3x mb-3"></i>
                         <h3 class="mb-2 fw-bold" id="tituloResultado"></h3>
                         <p class="mb-0" id="textoResultado"></p>
-                        <a href="{% url 'home' %}?tipo=MCMV" id="btnVerImoveis" class="btn btn-outline-primary mt-3 d-none">Ver Imóveis Disponíveis</a>
+                        <a href="{% url 'imoveis:home' %}?tipo=MCMV" id="btnVerImoveis" class="btn btn-outline-primary mt-3 d-none">Ver Imóveis Disponíveis</a>
                         
                         <div class="alert alert-info mt-4 text-start shadow-sm border-info-subtle">
                             <div class="d-flex">
@@ -235,7 +235,7 @@
             icone.classList.add('fa-exclamation-circle', 'text-warning');
             titulo.textContent = "Renda acima do limite MCMV";
             texto.textContent = "Sua renda familiar parece estar acima do teto atual do programa (R$ 8.000,00). No entanto, oferecemos excelentes opções de médio e alto padrão com financiamento SBPE.";
-             btnVerImoveis.href = "{% url 'home' %}?tipo=MEDIO"; // Link para médio padrão
+             btnVerImoveis.href = "{% url 'imoveis:home' %}?tipo=MEDIO"; // Link para médio padrão
              btnVerImoveis.classList.remove('d-none');
              btnVerImoveis.textContent = "Ver Imóveis Médio/Alto Padrão";
         }

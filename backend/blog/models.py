@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=100, verbose_name="Nome")
-    slug = models.SlugField(unique=True, blank=True, verbose_name="Slug")
+    slug = models.SlugField(max_length=255, unique=True, blank=True, verbose_name="Slug")
 
     class Meta:
         verbose_name = "Categoria"
@@ -26,7 +26,7 @@ class Post(models.Model):
     )
 
     titulo = models.CharField(max_length=200, verbose_name="Título")
-    slug = models.SlugField(unique=True, blank=True, help_text="Gerado automaticamente a partir do título")
+    slug = models.SlugField(max_length=255, unique=True, blank=True, help_text="Gerado automaticamente a partir do título")
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name='posts', verbose_name="Categoria")
     conteudo = models.TextField(verbose_name="Conteúdo", help_text="Use Markdown para formatar o texto")
     imagem_capa = models.ImageField(upload_to='blog/capas/', blank=True, null=True, verbose_name="Imagem de Capa")

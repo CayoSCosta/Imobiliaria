@@ -13,7 +13,20 @@ class Categoria(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.nome)
+            max_slug_length = self._meta.get_field('slug').max_length
+            base_slug = slugify(self.nome) or 'categoria'
+            if len(base_slug) > max_slug_length:
+                base_slug = base_slug[:max_slug_length].rstrip('-')
+
+            slug = base_slug
+            counter = 1
+            while Categoria.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                suffix = f"-{counter}"
+                available_length = max_slug_length - len(suffix)
+                slug = f"{base_slug[:available_length].rstrip('-')}{suffix}"
+                counter += 1
+
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -45,12 +58,20 @@ class Post(models.Model):
     meta_description = models.CharField(max_length=160, blank=True, null=True, verbose_name="Meta Description (SEO)", help_text="Descrição otimizada para buscadores (max 160 caracteres)")
 
     def save(self, *args, **kwargs):
+        self._slug_was_truncated = False
         if not self.slug:
-            base_slug = slugify(self.titulo)
+            max_slug_length = self._meta.get_field('slug').max_length
+            base_slug = slugify(self.titulo) or 'post'
+            if len(base_slug) > max_slug_length:
+                self._slug_was_truncated = True
+                base_slug = base_slug[:max_slug_length].rstrip('-')
+
             slug = base_slug
             counter = 1
             while Post.objects.filter(slug=slug).exclude(pk=self.pk).exists(): # Ensure uniqueness excluding self
-                slug = f"{base_slug}-{counter}"
+                suffix = f"-{counter}"
+                available_length = max_slug_length - len(suffix)
+                slug = f"{base_slug[:available_length].rstrip('-')}{suffix}"
                 counter += 1
             self.slug = slug
         super().save(*args, **kwargs)

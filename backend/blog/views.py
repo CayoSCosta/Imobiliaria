@@ -104,8 +104,10 @@ def custom_admin_criar_post(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             try:
-                form.save()
+                post = form.save()
                 messages.success(request, 'Post criado com sucesso!')
+                if getattr(post, '_slug_was_truncated', False):
+                    messages.warning(request, 'O título era muito longo e o slug foi ajustado automaticamente para caber no limite.')
                 return redirect('blog:custom_admin_blog_list')
             except Exception:
                 logger.exception('Erro ao salvar post no custom admin.')
@@ -122,8 +124,10 @@ def custom_admin_editar_post(request, post_id):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
-            form.save()
+            saved_post = form.save()
             messages.success(request, 'Post atualizado com sucesso!')
+            if getattr(saved_post, '_slug_was_truncated', False):
+                messages.warning(request, 'O título era muito longo e o slug foi ajustado automaticamente para caber no limite.')
             return redirect('blog:custom_admin_blog_list')
         else:
             messages.error(request, 'Não foi possível atualizar o post. Verifique os campos destacados.')

@@ -1,14 +1,23 @@
 from django import template
 from django.db.models import Prefetch
 from django.utils.safestring import mark_safe
-import markdown
+from django.template.defaultfilters import linebreaksbr
 from imoveis.models import Imovel, ImagemImovel
+
+try:
+    import markdown as markdown_lib
+except ModuleNotFoundError:
+    markdown_lib = None
 
 register = template.Library()
 
 @register.filter(name='markdown')
 def markdown_format(text):
-    return mark_safe(markdown.markdown(text))
+    if not text:
+        return ''
+    if markdown_lib is None:
+        return linebreaksbr(text)
+    return mark_safe(markdown_lib.markdown(text))
 
 @register.inclusion_tag('blog/partials/sidebar_imoveis_destaque.html')
 def exibir_imoveis_destaque(count=3):

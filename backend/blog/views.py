@@ -110,6 +110,8 @@ def custom_admin_criar_post(request):
             except Exception:
                 logger.exception('Erro ao salvar post no custom admin.')
                 messages.error(request, 'Ocorreu um erro ao salvar o post. Verifique os logs do servidor.')
+        else:
+            messages.error(request, 'Não foi possível salvar o post. Verifique os campos destacados.')
     else:
         form = PostForm()
     return render(request, 'custom_admin/blog/post_form.html', {'form': form, 'titulo': 'Novo Post'})
@@ -123,6 +125,8 @@ def custom_admin_editar_post(request, post_id):
             form.save()
             messages.success(request, 'Post atualizado com sucesso!')
             return redirect('blog:custom_admin_blog_list')
+        else:
+            messages.error(request, 'Não foi possível atualizar o post. Verifique os campos destacados.')
     else:
         form = PostForm(instance=post)
     return render(request, 'custom_admin/blog/post_form.html', {'form': form, 'titulo': 'Editar Post'})

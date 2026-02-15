@@ -156,6 +156,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'backend' / 'media'
 
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.getenv('FILE_UPLOAD_MAX_MEMORY_SIZE', str(10 * 1024 * 1024))
+)
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(
+    os.getenv('DATA_UPLOAD_MAX_MEMORY_SIZE', str(50 * 1024 * 1024))
+)
+
 # Authentication Redirects
 LOGIN_REDIRECT_URL = 'imoveis:custom_admin_index'
 

@@ -16,7 +16,7 @@ services:
   # --- A APLICAÇÃO (DJANGO) ---
   web:
     build: .
-    command: sh -c "python backend/manage.py collectstatic --noinput && gunicorn --chdir backend --bind 0.0.0.0:8000 config.wsgi:application"
+    command: sh -c "python backend/manage.py collectstatic --noinput && gunicorn --chdir backend --bind 0.0.0.0:8000 --access-logfile - --error-logfile - --capture-output --log-level info config.wsgi:application"
     volumes:
       - .:/app
       - static_volume:/app/staticfiles

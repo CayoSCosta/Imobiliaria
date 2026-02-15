@@ -101,7 +101,7 @@ document.getElementById('importForm').addEventListener('submit', function(e) {
 
     function startPolling() {
         const interval = setInterval(() => {
-            fetch('{% url "check_import_progress" %}')
+            fetch('{% url "imoveis:check_import_progress" %}')
             .then(res => res.json())
             .then(status => {
                 // Update Bar

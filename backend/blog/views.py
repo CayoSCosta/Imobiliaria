@@ -5,6 +5,9 @@ from .models import Post, Propaganda, Categoria
 from .forms import PostForm, PropagandaForm
 from imoveis.models import Imovel
 from django.db.models import Q, Prefetch, Count
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ========================
 # PUBLIC VIEWS
@@ -100,9 +103,13 @@ def custom_admin_criar_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Post criado com sucesso!')
-            return redirect('blog:custom_admin_blog_list')
+            try:
+                form.save()
+                messages.success(request, 'Post criado com sucesso!')
+                return redirect('blog:custom_admin_blog_list')
+            except Exception:
+                logger.exception('Erro ao salvar post no custom admin.')
+                messages.error(request, 'Ocorreu um erro ao salvar o post. Verifique os logs do servidor.')
     else:
         form = PostForm()
     return render(request, 'custom_admin/blog/post_form.html', {'form': form, 'titulo': 'Novo Post'})

@@ -121,6 +121,14 @@
         margin-bottom: 30px;
     }
 
+    .header-preco {
+        color: var(--primary-color);
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin: 8px 0 10px;
+        line-height: 1.2;
+    }
+
     .resumo-imovel {
         display: flex;
         flex-wrap: wrap; /* Permitir quebra de linha em telas menores */
@@ -500,6 +508,9 @@
                     <h1>{{ imovel.titulo }}</h1>
                     <span class="badge-status {{ imovel.status|lower|slugify }}">{{ imovel.get_status_display }}</span>
                 </div>
+                {% if imovel.preco and imovel.preco != 'None' %}
+                <div class="header-preco">A partir de R$ {{ imovel.preco|intcomma }}</div>
+                {% endif %}
                 <i class="fas fa-map-marker-alt"></i> 
                     <span>{{imovel.bairro}} - {{imovel.uf}}<br></span>
                     <span>{{imovel.rua}} - {{imovel.bairro_oficial}} - {{imovel.cidade}}/{{imovel.uf}}</span>

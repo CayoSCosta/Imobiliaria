@@ -27,6 +27,8 @@ from datetime import datetime
 # FRONTEND (HTML)
 # =========================
 from django.core.paginator import Paginator
+from urllib.parse import quote
+import re
 
 def index(request):
     imoveis = Imovel.objects.filter(ativo=True).annotate(
@@ -275,11 +277,14 @@ def imovel_detalhe(request, slug):
         Visita.objects.create(imovel=imovel)
         request.session[session_key] = True
 
-    mensagem = f"Olá gostaria de mais informações a respeito do imóvel {imovel.titulo}"
+    whatsapp_numero_limpo = re.sub(r'\D', '', settings.WHATSAPP_NUMERO or '')
+    if whatsapp_numero_limpo and not whatsapp_numero_limpo.startswith('55'):
+        whatsapp_numero_limpo = f"55{whatsapp_numero_limpo}"
 
+    mensagem = f"Olá, gostaria de mais informações a respeito do imóvel {imovel.titulo}."
     whatsapp_url = (
-        f"https://wa.me/{settings.WHATSAPP_NUMERO}"
-        f"?text={mensagem.replace(' ', '%20')}"
+        f"https://wa.me/{whatsapp_numero_limpo}"
+        f"?text={quote(mensagem)}"
     )
     return render(request, 'imoveis/detalhe.html', {'imovel': imovel, "whatsapp_url": whatsapp_url})
 

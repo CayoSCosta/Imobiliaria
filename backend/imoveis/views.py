@@ -127,8 +127,9 @@ def index(request):
         imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
     # Ordenação padrão para garantir consistência na paginação
+    # e priorizar imóveis em destaque nas primeiras páginas.
     if not geo_ativo:
-        imoveis = imoveis.order_by('-id')
+        imoveis = imoveis.order_by('-destaque', '-id')
 
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página

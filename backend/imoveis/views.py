@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Min, Max, Q, F, Value, FloatField, Count
+from django.db.models import Min, Max, Q, F, Value, FloatField, Count, Case, When, IntegerField
 from django.db.models.functions import ACos, Cos, Radians, Sin, Cast
 from django.conf import settings
 from django.utils.text import slugify
@@ -30,6 +30,16 @@ from django.core.paginator import Paginator
 from urllib.parse import quote
 import re
 
+
+def ordenar_por_prioridade_e_cadastro(queryset):
+    return queryset.annotate(
+        sem_prioridade_manual=Case(
+            When(ordem_exibicao=0, then=Value(1)),
+            default=Value(0),
+            output_field=IntegerField(),
+        )
+    ).order_by('sem_prioridade_manual', 'ordem_exibicao', 'criado_em', 'id')
+
 def index(request):
     imoveis = Imovel.objects.filter(ativo=True).annotate(
         min_quartos=Min('unidades__quartos'),
@@ -38,8 +48,8 @@ def index(request):
         max_area=Max('unidades__area_m2')     
     ).prefetch_related('imagens', 'unidades')
 
-    # Hero (Carrossel): segue somente a priorização manual por ordem_exibicao.
-    destaques = imoveis.order_by('ordem_exibicao', '-id')[:5]
+    # Hero (Carrossel): segue priorização manual; quando ordem=0, usa ordem de cadastro.
+    destaques = ordenar_por_prioridade_e_cadastro(imoveis)[:5]
 
     # Filtros
     termo = request.GET.get('termo')
@@ -126,10 +136,10 @@ def index(request):
     if preco_max:
         imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
-    # Ordenação padrão para garantir consistência na paginação
-    # usando ordem manual definida no gerenciador.
+    # Ordenação padrão para garantir consistência na paginação:
+    # prioridade manual primeiro; quando ordem=0, segue ordem de cadastro.
     if not geo_ativo:
-        imoveis = imoveis.order_by('ordem_exibicao', '-id')
+        imoveis = ordenar_por_prioridade_e_cadastro(imoveis)
 
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página
@@ -379,7 +389,7 @@ def custom_admin_index(request):
 
 @staff_member_required
 def custom_admin_imoveis_list(request):
-    imoveis_list = Imovel.objects.all().order_by('ordem_exibicao', '-criado_em')
+    imoveis_list = ordenar_por_prioridade_e_cadastro(Imovel.objects.all())
 
     # Filtros
     busca = request.GET.get('busca')
@@ -441,7 +451,7 @@ def custom_admin_priorizar_imoveis(request):
 
         return redirect('imoveis:custom_admin_priorizar_imoveis')
 
-    imoveis = Imovel.objects.all().order_by('ordem_exibicao', '-criado_em')
+    imoveis = ordenar_por_prioridade_e_cadastro(Imovel.objects.all())
     return render(request, 'custom_admin/priorizar_imoveis.html', {'imoveis': imoveis})
 
 @staff_member_required

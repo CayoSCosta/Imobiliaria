@@ -38,8 +38,8 @@ def index(request):
         max_area=Max('unidades__area_m2')     
     ).prefetch_related('imagens', 'unidades')
 
-    # Destaques para o Hero (Carrossel)
-    destaques = imoveis.filter(destaque=True)[:5] # Pegar os 5 primeiros destaques
+    # Hero (Carrossel): segue somente a priorização manual por ordem_exibicao.
+    destaques = imoveis.order_by('ordem_exibicao', '-id')[:5]
 
     # Filtros
     termo = request.GET.get('termo')
@@ -127,9 +127,9 @@ def index(request):
         imoveis = imoveis.filter(preco__lte=preco_max).distinct()
 
     # Ordenação padrão para garantir consistência na paginação
-    # e priorizar imóveis em destaque nas primeiras páginas.
+    # usando ordem manual definida no gerenciador.
     if not geo_ativo:
-        imoveis = imoveis.order_by('-destaque', '-id')
+        imoveis = imoveis.order_by('ordem_exibicao', '-id')
 
     # Paginação
     paginator = Paginator(imoveis, 9) # 9 imóveis por página
@@ -379,7 +379,7 @@ def custom_admin_index(request):
 
 @staff_member_required
 def custom_admin_imoveis_list(request):
-    imoveis_list = Imovel.objects.all().order_by('-criado_em')
+    imoveis_list = Imovel.objects.all().order_by('ordem_exibicao', '-criado_em')
 
     # Filtros
     busca = request.GET.get('busca')
@@ -411,6 +411,38 @@ def custom_admin_imoveis_list(request):
     }
 
     return render(request, 'custom_admin/imoveis_list.html', context)
+
+@staff_member_required
+def custom_admin_priorizar_imoveis(request):
+    if request.method == 'POST':
+        imoveis = list(Imovel.objects.all().only('id', 'ordem_exibicao'))
+        alterados = []
+
+        for imovel in imoveis:
+            campo = f'ordem_{imovel.id}'
+            valor = request.POST.get(campo)
+
+            try:
+                nova_ordem = int(valor)
+                if nova_ordem < 0:
+                    nova_ordem = 0
+            except (TypeError, ValueError):
+                nova_ordem = imovel.ordem_exibicao
+
+            if nova_ordem != imovel.ordem_exibicao:
+                imovel.ordem_exibicao = nova_ordem
+                alterados.append(imovel)
+
+        if alterados:
+            Imovel.objects.bulk_update(alterados, ['ordem_exibicao'])
+            messages.success(request, 'Prioridades atualizadas com sucesso.')
+        else:
+            messages.info(request, 'Nenhuma alteração de prioridade foi detectada.')
+
+        return redirect('imoveis:custom_admin_priorizar_imoveis')
+
+    imoveis = Imovel.objects.all().order_by('ordem_exibicao', '-criado_em')
+    return render(request, 'custom_admin/priorizar_imoveis.html', {'imoveis': imoveis})
 
 @staff_member_required
 def custom_admin_delete_imovel(request, imovel_id):

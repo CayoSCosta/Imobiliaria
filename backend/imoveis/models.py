@@ -61,6 +61,7 @@ class Imovel(models.Model):
     )
     destaque = models.BooleanField(default=False, verbose_name="Destaque", help_text="Exibe este imóvel com destaque na Home e nas buscas")
     destaque_blog = models.BooleanField(default=False, verbose_name="Destaque no Blog", help_text="Exibe este imóvel na sidebar do Blog")
+    ordem_exibicao = models.PositiveIntegerField(default=0, verbose_name="Ordem de Exibição", help_text="Menores números aparecem primeiro na listagem pública")
     preco = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Preço")
     preco_m2 = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Preço do m²")
     condominio = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True, verbose_name="Condomínio")

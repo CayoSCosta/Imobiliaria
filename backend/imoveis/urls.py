@@ -29,6 +29,7 @@ from .views import (
     custom_admin_criar_instalacao,
     custom_admin_criar_imovel,
     custom_admin_editar_imovel,
+    custom_admin_priorizar_imoveis,
     custom_admin_editar_unidade,
     custom_admin_importar_orulo, # Importação
     custom_admin_orulo_list, # Lista Órulo
@@ -65,6 +66,7 @@ urlpatterns = [
     path('gerenciador/', custom_admin_index, name='custom_admin_index'),
     path('gerenciador/importar-orulo/', custom_admin_importar_orulo, name='custom_admin_importar_orulo'),  # Nova rota
     path('gerenciador/imoveis/', custom_admin_imoveis_list, name='custom_admin_imoveis_list'),
+    path('gerenciador/priorizar-imoveis/', custom_admin_priorizar_imoveis, name='custom_admin_priorizar_imoveis'),
     path('gerenciador/novo/', custom_admin_criar_imovel, name='custom_admin_criar_imovel'),
     path('gerenciador/editar/<int:imovel_id>/', custom_admin_editar_imovel, name='custom_admin_editar_imovel'),
     path('gerenciador/imovel/<int:imovel_id>/imagens/', custom_admin_imovel_imagens, name='custom_admin_imovel_imagens'),    path('gerenciador/imoveis/<int:imovel_id>/delete/', custom_admin_delete_imovel, name='custom_admin_delete_imovel'),    path('gerenciador/imagem/<int:imagem_id>/delete/', custom_admin_delete_imagem, name='custom_admin_delete_imagem'),

@@ -1,4 +1,5 @@
 from django.db import models
+import re
 from imoveis.models import Imovel
 
 class Lead(models.Model):
@@ -38,6 +39,15 @@ class Lead(models.Model):
 
     def __str__(self):
         return f"{self.nome} - {self.data_criacao.strftime('%d/%m/%Y %H:%M')}"
+
+    def save(self, *args, **kwargs):
+        if self.telefone:
+            digits = re.sub(r'\D', '', self.telefone)
+            if len(digits) == 11:
+                self.telefone = f"({digits[:2]}){digits[2:7]}-{digits[7:]}"
+            elif len(digits) == 10:
+                self.telefone = f"({digits[:2]}){digits[2:6]}-{digits[6:]}"
+        super().save(*args, **kwargs)
 
 
 class Acompanhamento(models.Model):

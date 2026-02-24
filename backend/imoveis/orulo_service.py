@@ -75,6 +75,68 @@ def get_orulo_auth_header():
         logger.error(f"Erro na autenticação Órulo: {str(e)}")
         return None
 
+def associar_plantas_a_unidades(imovel, plans, max_plans=10):
+    """
+    Tenta associar floor plans às unidades do imóvel pela área descrita na planta.
+    Retorna a quantidade de plantas associadas.
+    """
+    if not plans:
+        return 0
+
+    unidades = list(imovel.unidades.all())
+    if not unidades:
+        return 0
+
+    count_plans = 0
+
+    for j, plan in enumerate(plans[:max_plans]):
+        plan_url = plan.get('1024x1024') or plan.get('520x280')
+        plan_desc = str(plan.get('description', '')).lower()
+
+        if not plan_url:
+            continue
+
+        try:
+            r = requests.get(plan_url, timeout=10)
+            if r.status_code != 200:
+                continue
+
+            area_candidates = re.findall(r'(\d+(?:[.,]\d+)?)\s*m', plan_desc)
+            matched_unit = False
+
+            for unidade in unidades:
+                area_int = int(unidade.area_m2)
+                is_match = False
+
+                for cand in area_candidates:
+                    try:
+                        cand_float = float(cand.replace(',', '.'))
+                        if int(cand_float) == area_int or round(cand_float) == area_int:
+                            is_match = True
+                            break
+                    except Exception:
+                        continue
+
+                if not is_match:
+                    if (f" {area_int} " in f" {plan_desc} ") or \
+                       (f"{area_int}m" in plan_desc) or \
+                       (f"{area_int} m" in plan_desc):
+                        is_match = True
+
+                if is_match:
+                    filename = f"plan_unit_{unidade.id}_{j}.jpg"
+                    img_unit = ImagemUnidade(unidade=unidade, principal=False, ordem=j)
+                    img_unit.imagem.save(filename, ContentFile(r.content), save=True)
+                    matched_unit = True
+
+            if matched_unit:
+                count_plans += 1
+
+        except Exception:
+            continue
+
+    return count_plans
+
 def importar_imoveis_orulo(paginas=1, progress_callback=None):
     """
     Importa imóveis da API (Endpoint Buildings).
@@ -378,26 +440,28 @@ def importar_imoveis_orulo(paginas=1, progress_callback=None):
                    resp_plans = requests.get(url_plans, headers=headers, params=params_plans, timeout=10)
                    if resp_plans.status_code == 200:
                        plans_list = resp_plans.json().get('floor_plans', [])
-                       
-                       # Adiciona plantas como imagens do imóvel, mas no final da ordem
-                       start_order = imported_images_count + 1
-                       for j, plan in enumerate(plans_list[:5]): # Limite 5 plantas
-                           plan_url = plan.get('1024x1024') or plan.get('520x280')
-                           if plan_url:
+
+                       # Prioriza o mesmo comportamento da sincronização unitária:
+                       # plantas devem ir para ImagemUnidade quando houver match de área.
+                       count_plans = associar_plantas_a_unidades(imovel, plans_list, max_plans=10)
+
+                       # Fallback: se não houver associação, mantém planta no álbum geral do imóvel.
+                       if count_plans == 0:
+                           start_order = imported_images_count + 1
+                           for j, plan in enumerate(plans_list[:5]):
+                               plan_url = plan.get('1024x1024') or plan.get('520x280')
+                               if not plan_url:
+                                   continue
                                try:
-                                    r_plan = requests.get(plan_url, timeout=10)
-                                    if r_plan.status_code == 200:
-                                        ext = 'jpg' # Default
-                                        filename = f"orulo_plan_{imovel.id}_{j}.{ext}"
-                                        
-                                        # TODO: Poderíamos salvar como ImagemUnidade se tivéssemos link, 
-                                        # mas por enquanto salvamos no geral.
-                                        imagem_obj = ImagemImovel(
-                                            imovel=imovel,
-                                            principal=False,
-                                            ordem=start_order + j
-                                        )
-                                        imagem_obj.imagem.save(filename, ContentFile(r_plan.content), save=True)
+                                   r_plan = requests.get(plan_url, timeout=10)
+                                   if r_plan.status_code == 200:
+                                       filename = f"orulo_plan_{imovel.id}_{j}.jpg"
+                                       imagem_obj = ImagemImovel(
+                                           imovel=imovel,
+                                           principal=False,
+                                           ordem=start_order + j
+                                       )
+                                       imagem_obj.imagem.save(filename, ContentFile(r_plan.content), save=True)
                                except Exception as e_plan:
                                    logger.warning(f"Erro ao baixar planta {plan_url}: {str(e_plan)}")
 
@@ -625,72 +689,7 @@ def sincronizar_imovel_orulo(imovel_id):
              if resp_plans.status_code == 200:
                  plans = resp_plans.json().get('floor_plans', [])
                  if plans:
-                     # Tenta associar plantas às unidades pela descrição da área
-                     unidades = imovel.unidades.all()
-                     
-                     current_count = imovel.imagens.count()
-                     count_plans = 0
-                     
-                     for j, plan in enumerate(plans[:10]):
-                         plan_url = plan.get('1024x1024') or plan.get('520x280')
-                         plan_desc = str(plan.get('description', '')).lower()
-                         
-                         if not plan_url: continue
-                         
-                         try:
-                             r = requests.get(plan_url, timeout=10)
-                             if r.status_code != 200: continue
-                             
-                             content = ContentFile(r.content)
-                             ext = 'jpg'
-                             
-                             # Tentativa de matching com Unidade
-                             matched_unit = False
-                             
-                             # Extrai possíveis áreas da descrição (ex: "64m²", "64.15 m2", "36,9m")
-                             # Regex captura número (com ou sem decimais) seguido de 'm'
-                             area_candidates = re.findall(r'(\d+(?:[.,]\d+)?)\s*m', plan_desc)
-                             
-                             for unidade in unidades:
-                                 # Heurística 1: Área exata (ou int) na descrição
-                                 area_int = int(unidade.area_m2)
-                                 
-                                 is_match = False
-                                 
-                                 # Verifica candidatos extraídos via Regex
-                                 for cand in area_candidates:
-                                     try:
-                                         cand_float = float(cand.replace(',', '.'))
-                                         # Compara parte inteira (já que unidade.area_m2 é Inteiro e pode ter sido truncado)
-                                         if int(cand_float) == area_int:
-                                             is_match = True
-                                             break
-                                         
-                                         # Tolerância de arredondamento (ex: 36.9 virou 37 no DB? Ou 36?)
-                                         # Se DB tem 36, int(36.9)=36. OK.
-                                         # Se DB tem 37, round(36.9)=37. OK.
-                                         if round(cand_float) == area_int:
-                                             is_match = True
-                                             break
-                                     except: pass
-                                 
-                                 # Fallback simples de string se regex falhar
-                                 if not is_match:
-                                    if (f" {area_int} " in f" {plan_desc} ") or \
-                                       (f"{area_int}m" in plan_desc) or \
-                                       (f"{area_int} m" in plan_desc):
-                                        is_match = True
-
-                                 if is_match:
-                                     filename = f"plan_unit_{unidade.id}_{j}.{ext}"
-                                     img_unit = ImagemUnidade(unidade=unidade, principal=False, ordem=j)
-                                     img_unit.imagem.save(filename, content, save=True)
-                                     matched_unit = True
-                             
-                             if matched_unit:
-                                 count_plans += 1
-                         except Exception as e_p_inner: 
-                             pass
+                     count_plans = associar_plantas_a_unidades(imovel, plans, max_plans=10)
                      
                      if count_plans > 0:
                          result['changes'].append(f"{count_plans} plantas processadas e associadas a unidades.")

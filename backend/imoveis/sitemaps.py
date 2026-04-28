@@ -13,8 +13,7 @@ class ImovelSitemap(Sitemap):
         return obj.atualizado_em
 
     def location(self, obj):
-        # Assuming the URL pattern name is 'imovel_detalhe' and it takes a slug
-        return reverse('imovel_detalhe', args=[obj.slug])
+        return reverse('imoveis:imovel_detalhe', args=[obj.slug])
 
 class StaticViewSitemap(Sitemap):
     priority = 0.5
@@ -24,4 +23,4 @@ class StaticViewSitemap(Sitemap):
         return ['home', 'sobre_nos', 'termos_de_uso', 'politica_de_privacidade', 'fale_conosco']
 
     def location(self, item):
-        return reverse(item)
+        return reverse(f'imoveis:{item}')
